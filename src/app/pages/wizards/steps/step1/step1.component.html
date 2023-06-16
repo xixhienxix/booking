@@ -1,0 +1,73 @@
+  <div class="border" style="padding-top: 3em; padding-left: 2em;;">
+  <h2 style="text-align: center;">Selecciòn de Fechas</h2>
+      <div class="row" [formGroup]="form">
+        <div class="col-lg-4">
+          <mat-form-field>
+            <mat-label>Dia de Llegada</mat-label>
+            <input matInput [matDatepicker]="picker1" formControlName="fechaInicialForm">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+            <mat-datepicker #picker1></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="col-lg-4">
+          <mat-form-field>
+            <mat-label>Dia de Salida</mat-label>
+            <input matInput [matDatepicker]="picker2" formControlName="fechaFinalForm">
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+            <mat-datepicker #picker2></mat-datepicker>
+          </mat-form-field>
+        </div>
+        <div class="col-lg-4">
+          <mat-form-field class="example-form-field">
+            <mat-label>Còdigo Promocional</mat-label>
+            <input matInput type="text" formControlName="codigoPromo" [(ngModel)]="codigoPromocional">
+            <button *ngIf="codigoPromocional" matSuffix mat-icon-button aria-label="Clear" (click)="codigoPromocional=''">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+      </div>
+  </div>
+
+
+
+
+    <!-- <div class="col-lg-6">
+      <input
+        formControlName="accountType"
+        name="accountType"
+        type="radio"
+        class="btn-check"
+        id="kt_create_account_form_account_type_corporate"
+        value="corporate"
+      />
+      <label
+        class="
+          btn btn-outline btn-outline-dashed btn-outline-default
+          p-7
+          d-flex
+          align-items-center
+        "
+        for="kt_create_account_form_account_type_corporate"
+      >
+        <span
+          [inlineSVG]="'./assets/media/icons/duotune/finance/fin006.svg'"
+          class="svg-icon svg-icon-3x me-5"
+        ></span>
+
+        <span class="d-block fw-bold text-start">
+          <span class="text-dark fw-bolder d-block fs-4 mb-2"
+            >Corporate Account</span
+          >
+          <span class="text-gray-400 fw-bold fs-6">
+            Create corporate account to mane users
+          </span>
+        </span>
+      </label>
+    </div> -->
+
+    <div class="fv-plugins-message-container invalid-feedback">
+      <!-- <ErrorMessage name='accountType' /> -->
+    </div>
