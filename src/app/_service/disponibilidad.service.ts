@@ -22,7 +22,6 @@ export class DisponibilidadService {
   }
 
   getDisponibilidadBooking(fechaInicial:string, fechaFinal:string, dias:number){
-    //Format List: https://moment.github.io/luxon/docs/manual/parsing.html#fromformat
     var inputFormat = "dd-MM-yyyy";
 
     const params = new HttpParams()

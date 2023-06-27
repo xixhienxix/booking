@@ -1,127 +1,153 @@
-<div class="card-body py-9" style="border: black; border-width: 5px; border-style: solid;">
-  <!--begin::Row-->
-  <div class="row gx-9 h-100">
-      <!--begin::Col-->
-      <div class="col-sm-6 mb-10 mb-sm-0">
-          <!--begin::Image-->
-          <div class="bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-400px min-h-sm-100 h-100" style="background-size: 100% 100%;background-image:url('/metronic8/demo1/assets/media/stock/600x600/img-65.jpg')">
-          </div>
-          <!--end::Image-->
-      </div>
-      <!--end::Col-->
-
-      <ng-container *ngFor="let dispo of habitaciones; let x = index">
-      <!--begin::Col-->
-      <div class="col-sm-6">
-          <!--begin::Wrapper-->
-          <div class="d-flex flex-column h-100">
-              <!--begin::Header-->
-              <div class="mb-7">
-                  <!--begin::Headin-->
-                  <div class="d-flex flex-stack mb-6">
-                      <!--begin::Title-->
-                      <div class="flex-shrink-0 me-5">
-                          <span class="modal-header" style="color:#00506a; font-weight: bold; font-size: x-large;">{{dispo.Codigo.replace("_"," ")}}</span>
-                      </div>
-                      <!--end::Title-->
+<ng-container *ngFor="let dispo of habitaciones; let x = index">
+        <div class="card-body py-9" style="border: black; border-width: 5px; border-style: solid;">
+          <!--begin::Row-->
+          <div class="row gx-9 h-100">
+              <!--begin::Col-->
+              <div class="col-sm-6 mb-10 mb-sm-0">
+                  <!--begin::Image-->
+                  <div class="bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-400px min-h-sm-100 h-100" 
+                       style="background-size: 100% 100%; background-image:url('{{dispo.URL}}')">
                   </div>
-                  <!--end::Heading-->
-
-                    <!--begin::Items-->
-                    <div class="d-flex align-items-center flex-wrap d-grid gap-2">
-                        <ng-container *ngFor="let amenidades of amenidades;">
-                        <!--begin::Item-->
-                        <div class="d-flex align-items-center me-5 me-xl-13">
-                            <!--begin::Symbol-->
-                            <div class="symbol symbol-30px symbol-circle me-3">
-                                <img src="../../../../../assets/media/icons/custom/{{amenidades}}.png" class="" alt="">
+                  <!--end::Image-->
+              </div>
+              <!--end::Col-->
+        
+              <!--begin::Col-->
+              <div class="col-sm-6">
+                  <!--begin::Wrapper-->
+                  <div class="d-flex flex-column h-100">
+                      <!--begin::Header-->
+                      <div class="mb-7">
+                          <!--begin::Headin-->
+                          <div class="d-flex flex-stack mb-6">
+                              <!--begin::Title-->
+                              <div class="flex-shrink-0 me-5">
+                                  <span class="modal-header" style="color:#00506a; font-weight: bold; font-size: x-large;">{{dispo.Codigo.replace("_"," ")}}</span>
+                              </div>
+                              <!--end::Title-->
+                          </div>
+                          <!--end::Heading-->
+        
+                            <!--begin::Items-->
+                            <div class="d-flex align-items-center flex-wrap d-grid gap-2">
+                                <ng-container *ngFor="let amenidades of habitaciones[x].Amenidades;">
+                                <!--begin::Item-->
+                                <div class="d-flex align-items-center me-5 me-xl-13">
+                                    <!--begin::Symbol-->
+                                    <div class="symbol symbol-30px symbol-circle me-3">
+                                        <img src="../../../../../assets/media/icons/custom/{{amenidades}}.png" class="" alt="">
+                                    </div>
+                                    <!--end::Symbol-->
+        
+                                    <!--begin::Info-->
+                                    <div class="m-0">
+                                        <!-- <span class="fw-semibold text-gray-400 d-block fs-8">Manager</span> -->
+                                        <a  class="fw-bold text-gray-800 text-hover-primary fs-7">{{amenidades}}</a>
+                                    </div>
+                                    <!--end::Info-->
+                                </div>
+                                <!--end::Item-->
+                                </ng-container>
                             </div>
-                            <!--end::Symbol-->
-
-                            <!--begin::Info-->
-                            <div class="m-0">
-                                <!-- <span class="fw-semibold text-gray-400 d-block fs-8">Manager</span> -->
-                                <a href="/metronic8/demo1/../demo1/pages/user-profile/overview.html" class="fw-bold text-gray-800 text-hover-primary fs-7">{{amenidades}}</a>
+                          <!--end::Items-->
+                      </div>
+                      <!--end::Header-->
+        
+                      <!--begin::Body-->
+                      <div class="mb-6">
+                          <!--begin::Text-->
+                          <span class="fw-semibold text-gray-600 fs-6 mb-8 d-block">
+                              {{dispo.Descripcion}}
+                          </span>
+                          <!--end::Text-->
+                          <h4 style="color:#00506a; font-weight: bold;" class="modal-title">Tarifas Disponibles</h4>
+                          <!--begin::Stats-->
+                          <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 py-2 px-4 me-6 mb-3">
+                            <div class="d-flex">
+                                <!--begin::Stat-->
+                                <section style="display: table; width: 100%;">
+                                    <div style="display: flex;" class="container">
+                                        <div class="row">
+                                            <!--begin::Date-->
+                                            <span class="fs-6 text-gray-800 fw-bold">Alojamiento + Alimentos </span>
+                                            <!--end::Date-->
+                                        </div>
+                                        <div class="row" style="float: left; padding-left: 10%;">
+                                          <span class="fs-6 text-gray-800 fw-bold">$8,000</span>
+                                        </div>
+                                        <div class="row">
+                                          <div class="d-flex">
+                                                  <div style=" padding-left: 15%;">
+                                                      <!--begin::Label-->
+                                                      <div style="color: red; font-size: xx-small;  display: table-cell;" class="fw-semibold ">No. Personas </div>
+                                                      <div style="color: green; font-size: xx-small;  display: table-cell;" class="fw-semibold "> Quedan n</div>
+                                                      <!--end::Label-->
+                                                  </div>
+                                            </div>
+                                        </div>
+                                      </div>
+                                </section>
+                                <!--end::Stat-->
                             </div>
-                            <!--end::Info-->
+                            <div class="d-flex">
+                              <div class="container" style="display: flex;">
+                                      <!--begin::Label-->
+                                      <div style="color: red;" class="fw-semibold ">Regular </div>
+                                      <div style="color: green;" class="fw-semibold "> Descuento</div>
+                                      <!--end::Label-->
+                              </div>
+                            </div>
+                          </div>
+                          <!--end::Stats-->
+                      </div>
+                      <!--end::Body-->
+                      <div class="parent">
+                        <div class="div1"> <span> Primer Div</span></div>
+                        <div class="div2"> <span> segundo Div</span></div>
+                        <div class="div3"> <span> tercero Div</span></div>
+                        <div class="div4"> <span> cuarto Div</span></div>
+                        <div class="div5"> <span> quinto Div</span></div>
+                        <div class="div6"> <span> sexto Div</span></div>
+                        <div class="div7"> <span> septimo Div</span></div>
+                        <div class="div8"> <span> otavco Div</span></div>
+                        <div class="div9"> <span> noveno Div</span></div>
+                        <div class="div10"><span> decimo Div</span></div>
                         </div>
-                        <!--end::Item-->
-                        </ng-container>
-                    </div>
-                  <!--end::Items-->
-              </div>
-              <!--end::Header-->
 
-              <!--begin::Body-->
-              <div class="mb-6">
-                  <!--begin::Text-->
-                  <span class="fw-semibold text-gray-600 fs-6 mb-8 d-block">
-                      {{dispo.Descripcion}}
-                  </span>
-                  <!--end::Text-->
 
-                  <!--begin::Stats-->
-                  <div class="d-flex">
-                      <!--begin::Stat-->
-                      <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 py-2 px-4 me-6 mb-3">
-                          <!--begin::Date-->
-                          <span class="fs-6 text-gray-700 fw-bold">Feb 6, 2021 </span>
-                          <!--end::Date-->
-
-                          <!--begin::Label-->
-                          <div class="fw-semibold text-gray-400">Due Date</div>
-                          <!--end::Label-->
+                      <!--begin::Footer-->
+                      <div class="d-flex flex-stack mt-auto bd-highlight">
+                          <!--begin::Users group-->
+                          <div class="symbol-group symbol-hover flex-nowrap">
+                                                              <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" aria-label="Melody Macy" data-bs-original-title="Melody Macy" data-kt-initialized="1">
+                                                                              <img alt="Pic" src="/metronic8/demo1/assets/media/avatars/300-2.jpg">
+                                                                      </div>
+                                                              <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" aria-label="Michael Eberon" data-bs-original-title="Michael Eberon" data-kt-initialized="1">
+                                                                              <img alt="Pic" src="/metronic8/demo1/assets/media/avatars/300-3.jpg">
+                                                                      </div>
+                                                              <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" data-bs-original-title="Susan Redwood" data-kt-initialized="1">
+                                                                              <span class="symbol-label bg-primary text-inverse-primary fw-bold">S</span>
+                                                                      </div>
+        
+                          </div>
+                          <!--end::Users group-->
+        
+                          <!--begin::Actions-->
+                          <a href="/metronic8/demo1/../demo1/apps/projects/project.html" class="d-flex align-items-center text-primary opacity-75-hover fs-6 fw-semibold">
+                              View Project
+        
+                              <i class="ki-duotone ki-exit-right-corner fs-4 ms-1"><span class="path1"></span><span class="path2"></span></i>
+                          </a>
+                          <!--end::Actions-->
                       </div>
-                      <!--end::Stat-->
-
-                      <!--begin::Stat-->
-                      <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 py-2 px-4 mb-3">
-                          <!--begin::Number-->
-                          <span class="fs-6 text-gray-700 fw-bold">$<span class="ms-n1 counted" data-kt-countup="true" data-kt-countup-value="284,900.00" data-kt-initialized="1">284,900</span></span>
-                          <!--end::Number-->
-
-                          <!--begin::Label-->
-                          <div class="fw-semibold text-gray-400">Budget</div>
-                          <!--end::Label-->
-                      </div>
-                      <!--end::Stat-->
+                      <!--end::Footer-->
                   </div>
-                  <!--end::Stats-->
+                  <!--end::Wrapper-->
               </div>
-              <!--end::Body-->
-
-              <!--begin::Footer-->
-              <div class="d-flex flex-stack mt-auto bd-highlight">
-                  <!--begin::Users group-->
-                  <div class="symbol-group symbol-hover flex-nowrap">
-                                                      <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" aria-label="Melody Macy" data-bs-original-title="Melody Macy" data-kt-initialized="1">
-                                                                      <img alt="Pic" src="/metronic8/demo1/assets/media/avatars/300-2.jpg">
-                                                              </div>
-                                                      <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" aria-label="Michael Eberon" data-bs-original-title="Michael Eberon" data-kt-initialized="1">
-                                                                      <img alt="Pic" src="/metronic8/demo1/assets/media/avatars/300-3.jpg">
-                                                              </div>
-                                                      <div class="symbol symbol-35px symbol-circle" data-bs-toggle="tooltip" data-bs-original-title="Susan Redwood" data-kt-initialized="1">
-                                                                      <span class="symbol-label bg-primary text-inverse-primary fw-bold">S</span>
-                                                              </div>
-
-                  </div>
-                  <!--end::Users group-->
-
-                  <!--begin::Actions-->
-                  <a href="/metronic8/demo1/../demo1/apps/projects/project.html" class="d-flex align-items-center text-primary opacity-75-hover fs-6 fw-semibold">
-                      View Project
-
-                      <i class="ki-duotone ki-exit-right-corner fs-4 ms-1"><span class="path1"></span><span class="path2"></span></i>
-                  </a>
-                  <!--end::Actions-->
-              </div>
-              <!--end::Footer-->
+              <!--end::Col-->
+        
           </div>
-          <!--end::Wrapper-->
-      </div>
-      <!--end::Col-->
-      </ng-container>
+          <!--end::Row-->
+        </div>
+</ng-container>
 
-  </div>
-  <!--end::Row-->
-</div>

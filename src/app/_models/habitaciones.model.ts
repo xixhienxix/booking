@@ -13,6 +13,6 @@ export interface IHabitaciones
   Camas:number,
   Tarifa:number,
   Inventario:number,
-  Orden:Number
-
+  Orden:Number,
+  URL:string
 }

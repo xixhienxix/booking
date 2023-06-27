@@ -14,7 +14,7 @@ export class HabitacionesService {
 
   getHabitacionesbyTipo(id:string) : Observable<IHabitaciones[]> {
 
-  return  (this.http.get<IHabitaciones[]>(environment.apiUrl+"/reportes/IHabitaciones/"+id)
+  return  (this.http.get<IHabitaciones[]>(environment.apiUrl+"/reportes/habitaciones/"+id)
       .pipe(
         map(responseData=>{
           return responseData
@@ -34,7 +34,7 @@ export class HabitacionesService {
 
   getHabitaciones() :Observable<IHabitaciones[]> {
    return this.http
-    .get<IHabitaciones[]>(environment.apiUrl + '/reportes/IHabitaciones')
+    .get<IHabitaciones[]>(environment.apiUrl + '/reportes/habitaciones')
   }
 
   getInfoHabitaciones(numero:string,tipo:string) :Observable<IHabitaciones[]> {
@@ -43,7 +43,7 @@ export class HabitacionesService {
     .set('tipo', tipo)
 
     return this.http
-     .get<IHabitaciones[]>(environment.apiUrl + '/info/IHabitaciones', {params:params})
+     .get<IHabitaciones[]>(environment.apiUrl + '/info/habitaciones', {params:params})
      .pipe(
        map(responseData=>{
        return responseData
