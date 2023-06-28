@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 @import "./assets/sass/style.scss";
 // Replace above style with this css file to enable RTL styles
@@ -6,6 +7,9 @@
 @import './assets/sass/plugins.scss';
 // @import "./assets/css/style.rtl.css";
 @import "./assets/sass/style.angular.scss";
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
