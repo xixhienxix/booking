@@ -21,6 +21,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatRadioModule } from '@angular/material/radio';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatSelectModule} from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
     Step5Component,
   ],
   imports: [
+    MatSelectModule,
+    MatButtonModule,
     MatCheckboxModule,
     MatRadioModule,
     MatExpansionModule,

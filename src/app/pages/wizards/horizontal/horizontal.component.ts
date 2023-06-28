@@ -5,6 +5,8 @@ import { ICreateAccount, inits } from '../create-account.helper';
 import { IDisponibilidad, defaultDispo } from 'src/app/_models/disponibilidad.model';
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { DateTime } from 'luxon';
+import { TarifasService } from 'src/app/_service/tarifas.service';
+import { ITarifas } from 'src/app/_models/tarifas.model';
 @Component({
   selector: 'app-horizontal',
   templateUrl: './horizontal.component.html',
@@ -14,6 +16,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   formsCount = 5;
   account$: BehaviorSubject<ICalendario> = new BehaviorSubject<ICalendario>(defaultCalendario);
 
+  tarifasArray:ITarifas[]=[]
   currentStep$: BehaviorSubject<number> = new BehaviorSubject(1);
   isCurrentFormValid$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     false
@@ -21,7 +24,8 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   private unsubscribe: Subscription[] = [];
 
   constructor(
-    private disponibilidadService : DisponibilidadService
+    private disponibilidadService : DisponibilidadService,
+    private tarifasService : TarifasService
   ) {}
 
   ngOnInit(): void {
@@ -47,11 +51,50 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
     this.disponibilidadService.getDisponibilidadBooking(comparadorInicialString,comparadorFinalString,diaDif.days).subscribe(val=>{
         this.disponibilidadService.changeData(val );
+        this.getTasrifario()
       },
       error=>{
         console.log(error)
       })
+        
 
+  }
+
+  getTasrifario(){
+    this.tarifasService.getTarifas().subscribe(
+      (value)=>{
+        this.tarifasArray=[]
+        if(value){
+          for(let e=0;e<value.length;e++){
+            for(let i=0;i<value[e].Habitacion.length;i++){
+              let tarifario = {
+                  Tarifa:value[e].Tarifa,
+                  Habitacion:value[e].Habitacion[i],
+                  Llegada:value[e].Llegada,
+                  Salida:value[e].Salida,
+                  Plan:value[e].Plan,
+                  Politicas:value[e].Politicas,
+                  EstanciaMinima:value[e].EstanciaMinima,
+                  EstanciaMaxima:value[e].EstanciaMaxima,
+                  TarifaRack:value[e].TarifaRack,
+                  TarifaxPersona:value[e].TarifaxPersona,
+                  Dias:value[e].Dias,
+                  Estado:value[e].Estado==true ? 'Activa' : 'No Activa',
+                  Tarifa_Promedio:0
+              }
+              if(value[e].Estado==true){
+                this.tarifasArray.push(tarifario)
+                this.tarifasArrayCompleto.push(tarifario)
+              }
+
+          }
+        }
+       
+        this.filtrarTarifario()        
+      }
+      },
+      (error)=>{}
+      )
   }
 
   nextStep() {

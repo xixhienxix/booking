@@ -37,11 +37,7 @@ export class Step2Component implements OnInit, OnDestroy {
     this._disponibilidadService.currentData.subscribe(res => {
       for(let i=0;i<res.length;i++){
         this.habitaciones.push(res[i])
-        // for(let x=0;x<res[i].Amenidades.length;x++){
-        //   this.amenidades.push(res[i].Amenidades[x])
-        // }
       }
-      // console.log(this.amenidades)
     })
     console.log(this.habitaciones)
   }
