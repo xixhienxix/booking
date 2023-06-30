@@ -8,12 +8,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { AppRoutingModule } from './app-routing.module';
-import { LoaddingSpinnerComponent } from './_helpers/loadding-spinner/loadding-spinner.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoaddingSpinnerComponent,    
   ],
   imports: [
     HttpClientModule,

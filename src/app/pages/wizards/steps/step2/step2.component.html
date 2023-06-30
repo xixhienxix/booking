@@ -64,10 +64,32 @@
                           <!--begin::Tarifas-->
                             <ng-container *ngFor="let tarifas of tarifasArray">
                                 <ng-container *ngIf="tarifas.Habitacion == dispo.Codigo">
-                                    <div class="parent border border-gray-300 border-dashed rounded min-w-100px w-100 px-4 me-6 mb-3">
-                                        <div class="div1">
+                                    <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 px-4 me-6 mb-3">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <mat-label style="font-size: 17px; font-weight: bold;"> {{tarifas.Tarifa}} </mat-label>
+                                                <p><small style="color: red; font-weight: bold;">Regular: {{tarifas.TarifaRack}}</small></p>
+                                                <!-- <p><small style="color: rgb(32, 189, 32); font-weight: bold;">Descuento: {{tarifas.Descuento}}</small></p> -->
+                                            </div>
+                                            <div class="col-md-2">
+                                                <mat-label style="font-size: 17px; font-weight: bold; ">${{tarifas.TarifaRack}}</mat-label>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <select name="numeroDePersonas" class="form-select form-select-lg form-select-solid border-gray-300">
+                                                    <option value="1">{{dispo.Personas}}</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <select appereance="none" name="inventario" class="form-select form-select-lg form-select-solid border-gray-300" >
+                                                    <option value="1">{{dispo.Inventario}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            
+                                        </div>
+                                        <!-- <div class="div1">
                                             <mat-form-field appearance="fill">
-                                                <!-- <mat-label>{{tarifas.Tarifa}}</mat-label> -->
                                                 <input matInput value="{{tarifas.Tarifa}}">
                                                 <mat-hint>Regular: {{tarifas.TarifaRack}}  Descuento:  </mat-hint>
                                             </mat-form-field>       
@@ -85,7 +107,7 @@
                                         </div>
                                         <div class="div5">    
                                             <button class="btn btn-primary" style="color: black;" type="button">Agregar Habitación</button>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </ng-container>    
                             </ng-container>
