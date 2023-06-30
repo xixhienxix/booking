@@ -3,6 +3,7 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable, map } from "rxjs";
 import { ITarifas } from "../_models/tarifas.model";
 import { environment } from "src/environments/environment";
+import { tarifarioTabla } from "../_models/tarifario.model";
 
 @Injectable({
     providedIn: 'root'
@@ -13,7 +14,7 @@ import { environment } from "src/environments/environment";
     constructor(private http : HttpClient){
     }
 
-    private tarifas$ :BehaviorSubject<ITarifas[]> = new BehaviorSubject<ITarifas[]>([])
+    private tarifas$ :BehaviorSubject<tarifarioTabla[]> = new BehaviorSubject<tarifarioTabla[]>([])
     currentData = this.tarifas$.asObservable();
 
 

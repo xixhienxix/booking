@@ -61,33 +61,35 @@
                           </span>
                           <!--end::Text-->
                           <h4 style="color:#00506a; font-weight: bold;" class="modal-title">Tarifas Disponibles</h4>
-                          <!--begin::Stats-->
-                          <div class="parent border border-gray-300 border-dashed rounded min-w-100px w-100 px-4 me-6 mb-3">
-                            <div class="div1">Alojamiento + Alimento </div>
-                            <div class="div2"> Regular : $9,000</div>
-                            <div class="div3"> Descuento: 10%</div>
-                            <div class="div4"> $8,000</div>
-                            <div class="div5"> <span> Numero de Personas</span> </div>
-                            <div class="div6"> <span> Quedan 2</span></div>
-                            <div class="div7">  
-                                <mat-select>
-                                    <mat-option value="option1">1</mat-option>
-                                    <mat-option value="option2">2</mat-option>
-                                    <mat-option value="option3">3</mat-option>
-                                </mat-select>
-                            </div>
-                            <div class="div8">
-                                    <mat-select style="background: aquamarine;">
-                                        <mat-option value="option1">1</mat-option>
-                                        <mat-option value="option2">2</mat-option>
-                                        <mat-option value="option3">3</mat-option>
-                                    </mat-select>
-                             </div>
-                            <div class="div9">    
-                                <button class="btn btn-primary" style="color: black;" type="button">Agregar Habitación</button>
-                            </div>
-                        </div>
-                          <!--end::Stats-->
+                          <!--begin::Tarifas-->
+                            <ng-container *ngFor="let tarifas of tarifasArray">
+                                <ng-container *ngIf="tarifas.Habitacion == dispo.Codigo">
+                                    <div class="parent border border-gray-300 border-dashed rounded min-w-100px w-100 px-4 me-6 mb-3">
+                                        <div class="div1">
+                                            <mat-form-field appearance="fill">
+                                                <!-- <mat-label>{{tarifas.Tarifa}}</mat-label> -->
+                                                <input matInput value="{{tarifas.Tarifa}}">
+                                                <mat-hint>Regular: {{tarifas.TarifaRack}}  Descuento:  </mat-hint>
+                                            </mat-form-field>       
+                                        </div>
+                                        <div class="div2"><h3> {{tarifas.TarifaRack}}</h3></div>
+                                        <div class="div3">  
+                                            <select name="numeroDePersonas" class="form-select form-select-lg form-select-solid border-gray-300">
+                                                <option value="1">{{dispo.Personas}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="div4">
+                                            <select name="inventario" class="form-select form-select-lg form-select-solid border-gray-300" >
+                                                <option value="1">{{dispo.Inventario}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="div5">    
+                                            <button class="btn btn-primary" style="color: black;" type="button">Agregar Habitación</button>
+                                        </div>
+                                    </div>
+                                </ng-container>    
+                            </ng-container>
+                          <!--end::Tarifas-->
                       </div>
                       <!--end::Body-->
                   </div>

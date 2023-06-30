@@ -22,6 +22,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatRadioModule } from '@angular/material/radio';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSelectModule} from '@angular/material/select';
+import { LoaddingSpinnerComponent } from 'src/app/_helpers/loadding-spinner/loadding-spinner.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import {MatSelectModule} from '@angular/material/select';
     Step3Component,
     Step4Component,
     Step5Component,
+    LoaddingSpinnerComponent
   ],
   imports: [
     MatSelectModule,

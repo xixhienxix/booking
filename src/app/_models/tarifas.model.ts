@@ -1,4 +1,5 @@
 export interface ITarifas  {
+    _id?:string;
     Tarifa:string;
     Habitacion:string[];
     Llegada:string;
@@ -8,7 +9,9 @@ export interface ITarifas  {
     EstanciaMinima:number;
     EstanciaMaxima:number;
     TarifaRack:number;
-    TarifaxPersona:number[]
+    TarifaxPersona:number[];
+    Activa?:boolean;
+    Descuento?:number;
     Estado:boolean
     Dias:{
         name: string;

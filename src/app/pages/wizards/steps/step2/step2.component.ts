@@ -5,8 +5,9 @@ import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { ICalendario } from 'src/app/_models/calendario.model';
 import { Subscription } from 'rxjs';
 import { IHabitaciones } from 'src/app/_models/habitaciones.model';
-
-
+import { TarifasService } from 'src/app/_service/tarifas.service';
+import { ITarifas } from 'src/app/_models/tarifas.model';
+import { tarifarioTabla } from 'src/app/_models/tarifario.model';
 @Component({
   selector: 'app-step2',
   templateUrl: './step2.component.html',
@@ -22,11 +23,12 @@ export class Step2Component implements OnInit, OnDestroy {
 
   habitaciones:IHabitaciones[]=[]
   amenidades:string[]=[]
-
+  tarifasArray:tarifarioTabla[]=[]
   private unsubscribe: Subscription[] = [];
 
   constructor(
     private _disponibilidadService : DisponibilidadService,
+    private _tarifasServices : TarifasService,
     private fb: FormBuilder,
 
     ) {}
@@ -37,6 +39,12 @@ export class Step2Component implements OnInit, OnDestroy {
     this._disponibilidadService.currentData.subscribe(res => {
       for(let i=0;i<res.length;i++){
         this.habitaciones.push(res[i])
+      }
+    })
+    this._tarifasServices.currentData.subscribe(res=>{
+      for(let h =0 ; h<res.length;h++)
+      {
+        this.tarifasArray.push(res[h])
       }
     })
     console.log(this.habitaciones)

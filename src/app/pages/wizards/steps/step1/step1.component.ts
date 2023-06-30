@@ -68,7 +68,6 @@ export class Step1Component implements OnInit, OnDestroy {
     });
 
     const formChangesSubscr = this.form.valueChanges.subscribe((val) => {
-
       const fechaInicialC=new Date(val.fechaInicialForm).toISOString()
       this.fechaInicial=DateTime.fromISO(fechaInicialC);
 

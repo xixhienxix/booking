@@ -7,26 +7,7 @@ import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { DateTime } from 'luxon';
 import { TarifasService } from 'src/app/_service/tarifas.service';
 import { ITarifas } from 'src/app/_models/tarifas.model';
-
-type tarifarioTabla={
-  Habitacion:string,
-  Tarifa:string,
-  Dias:{
-    name: string;
-    value: number;
-    checked: boolean;
-}[],
-  Estado:string,
-  EstanciaMaxima:number,
-  EstanciaMinima:number,
-  Llegada:string,
-  Plan:string,
-  Politicas:string,
-  Salida:string,
-  TarifaxPersona:number[]
-  Tarifa_Promedio:number,
-  TarifaRack:number
-}
+import { tarifarioTabla } from 'src/app/_models/tarifario.model';
 
 @Component({
   selector: 'app-horizontal',
@@ -36,6 +17,7 @@ type tarifarioTabla={
 export class HorizontalComponent implements OnInit, OnDestroy {
   formsCount = 5;
   account$: BehaviorSubject<ICalendario> = new BehaviorSubject<ICalendario>(defaultCalendario);
+  isLoading:boolean=false
 
   tarifasArray:tarifarioTabla[]=[]
   tarifasArrayCompleto:tarifarioTabla[]=[]
@@ -66,6 +48,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   buscaDisponibilidad(busca:boolean){
 
+    this.isLoading=true
     let fechaInicial: DateTime = this.account$.value.fechaInicial
     let fechaFinal: DateTime = this.account$.value.fechaFinal
     let diaDif = fechaFinal.diff(fechaInicial, ["years", "months", "days", "hours"])
@@ -169,9 +152,14 @@ export class HorizontalComponent implements OnInit, OnDestroy {
           }
         }
       }
+
+      this.isLoading=false
       /** */
     }
-    this.tarifasArray
+
+    this.tarifasService.updateTarifario(this.tarifasArray);
+
+
 }
 
   nextStep() {
