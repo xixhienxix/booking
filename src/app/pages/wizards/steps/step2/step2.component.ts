@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { ICalendario } from 'src/app/_models/calendario.model';
@@ -18,7 +18,7 @@ export class Step2Component implements OnInit, OnDestroy {
     part: Partial<ICalendario>,
     isFormValid: boolean
   ) => void;
-  form: FormGroup;
+  reservaForm: FormGroup;
   updateAccount:ICalendario
 
   habitaciones:IHabitaciones[]=[]
@@ -34,14 +34,15 @@ export class Step2Component implements OnInit, OnDestroy {
     ) {}
 
   ngOnInit() {
-    this.initForm();
-    this.updateParentModel({}, this.checkForm())
+    // this.updateParentModel({}, this.checkForm())
     this._disponibilidadService.currentData.subscribe(res => {
+      this.habitaciones=[]
       for(let i=0;i<res.length;i++){
         this.habitaciones.push(res[i])
       }
     })
     this._tarifasServices.currentData.subscribe(res=>{
+      this.tarifasArray=[]
       for(let h =0 ; h<res.length;h++)
       {
         this.tarifasArray.push(res[h])
@@ -50,21 +51,27 @@ export class Step2Component implements OnInit, OnDestroy {
     console.log(this.habitaciones)
   }
 
-  initForm() {
-    this.form = this.fb.group({
-      businessName: ['', [Validators.required]],
-    });
 
-    const formChangesSubscr = this.form.valueChanges.subscribe((val) => {
-      this.updateParentModel(val, this.checkForm());
-    });
-    this.unsubscribe.push(formChangesSubscr);
+  initForm() {
+    // this.reservaForm = this.fb.group({
+    //   codigoCuarto: [''],
+    //   nombreTarifa: [''],
+    //   tarifa:[''],
+    //   personas:[''],
+    //   inventario:['']
+
+    // });
+
   }
 
-  checkForm() {
-    return !(
-      this.form.get('businessName')?.hasError('required')
-    );
+  // checkForm() {
+  //   return !(
+  //     this.reservaForm.get('codigoCuarto')?.hasError('required')
+  //   );
+  // }
+
+  seleccionHab(){
+
   }
 
   ngOnDestroy() {

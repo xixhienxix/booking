@@ -1,13 +1,16 @@
 <ng-container *ngFor="let dispo of habitaciones; let x = index">
-        <div class="card-body py-9" style="border: black; border-width: 5px; border-style: solid;">
+        <div  class="card-body py-9 " style="border: black; border-width: 5px; border-style: solid;">
           <!--begin::Row-->
           <div class="row gx-9 h-100">
               <!--begin::Col-->
-              <div class="col-sm-6 mb-10 mb-sm-0">
+              <div class="row col-sm-6 mb-10 mb-sm-0">
                   <!--begin::Image-->
-                  <div class="bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-400px min-h-sm-100 h-100" 
-                       style="background-size: 100% 100%; background-image:url('{{dispo.URL}}')">
+                  <div class="bgi-no-repeat card-rounded" 
+                       style="background-size: 100% 100%; height: 70%; background-image:url('{{dispo.URL}}');">
                   </div>
+              <div class="row">
+                        <h2>Maximo de Personas: {{dispo.Personas}}</h2>
+              </div>
                   <!--end::Image-->
               </div>
               <!--end::Col-->
@@ -67,47 +70,33 @@
                                     <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 px-4 me-6 mb-3">
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <mat-label style="font-size: 17px; font-weight: bold;"> {{tarifas.Tarifa}} </mat-label>
+                                                <mat-radio-button  style="font-size: 17px; font-weight: bold;" (change)="seleccionHab()">{{tarifas.Tarifa}}</mat-radio-button >
                                                 <p><small style="color: red; font-weight: bold;">Regular: {{tarifas.TarifaRack}}</small></p>
                                                 <!-- <p><small style="color: rgb(32, 189, 32); font-weight: bold;">Descuento: {{tarifas.Descuento}}</small></p> -->
                                             </div>
-                                            <div class="col-md-2">
+                                            <div style="padding: 10px;" class="col-md-2">
                                                 <mat-label style="font-size: 17px; font-weight: bold; ">${{tarifas.TarifaRack}}</mat-label>
                                             </div>
-                                            <div class="col-md-2">
+                                            <div style="padding: 2px;" class="col-md-2">
+                                                <small style="font-weight: bold;">Personas</small>
                                                 <select name="numeroDePersonas" class="form-select form-select-lg form-select-solid border-gray-300">
-                                                    <option value="1">{{dispo.Personas}}</option>
+                                                    <ng-container *ngFor="let personas of [].constructor(dispo.Personas); let i = index">
+                                                        <option value="{{i+1}}">{{i+1}}</option>
+                                                    </ng-container>
                                                 </select>
                                             </div>
-                                            <div class="col-md-2">
+                                            <div style="padding: 2px;" class="col-md-2">
+                                                <small style="font-weight: bold;">Quedan:</small><small style="color:red; font-weight: bold;"> {{dispo.Inventario}}</small>
                                                 <select appereance="none" name="inventario" class="form-select form-select-lg form-select-solid border-gray-300" >
-                                                    <option value="1">{{dispo.Inventario}}</option>
+                                                    <ng-container *ngFor="let inv of [].constructor(dispo.Inventario); let i = index">
+                                                        <option value="{{i+1}}">{{i+1}}</option>
+                                                    </ng-container>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            
+                                            <!-- <button type="button" class="btn btn-primary">Seleccionar Habitación</button> -->
                                         </div>
-                                        <!-- <div class="div1">
-                                            <mat-form-field appearance="fill">
-                                                <input matInput value="{{tarifas.Tarifa}}">
-                                                <mat-hint>Regular: {{tarifas.TarifaRack}}  Descuento:  </mat-hint>
-                                            </mat-form-field>       
-                                        </div>
-                                        <div class="div2"><h3> {{tarifas.TarifaRack}}</h3></div>
-                                        <div class="div3">  
-                                            <select name="numeroDePersonas" class="form-select form-select-lg form-select-solid border-gray-300">
-                                                <option value="1">{{dispo.Personas}}</option>
-                                            </select>
-                                        </div>
-                                        <div class="div4">
-                                            <select name="inventario" class="form-select form-select-lg form-select-solid border-gray-300" >
-                                                <option value="1">{{dispo.Inventario}}</option>
-                                            </select>
-                                        </div>
-                                        <div class="div5">    
-                                            <button class="btn btn-primary" style="color: black;" type="button">Agregar Habitación</button>
-                                        </div> -->
                                     </div>
                                 </ng-container>    
                             </ng-container>

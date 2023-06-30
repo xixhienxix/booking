@@ -4,7 +4,7 @@ import { IDisponibilidad } from '../_models/disponibilidad.model'
 import { environment } from 'src/environments/environment';
 import { BehaviorSubject } from 'rxjs';
 import { IHabitaciones } from '../_models/habitaciones.model';
-
+import { DateTime } from 'luxon'
 @Injectable({
   providedIn: 'root'
 })
@@ -13,9 +13,24 @@ export class DisponibilidadService {
   private disponibilidad$: BehaviorSubject<IHabitaciones[]> = new BehaviorSubject<IHabitaciones[]>([]);
   currentData = this.disponibilidad$.asObservable();
 
+  private fechaInicial$: BehaviorSubject<DateTime> = new BehaviorSubject<DateTime>(DateTime.now())
+  currentFechaIni = this.fechaInicial$.asObservable();
+
+  private fechaFinal$: BehaviorSubject<DateTime> = new BehaviorSubject<DateTime>(DateTime.now())
+  currentFechaFin = this.fechaFinal$.asObservable();
+
+
   constructor(
     private http:HttpClient
   ) { }
+
+  changeFechaIni(data:DateTime){
+    this.fechaInicial$.next(data);
+  }
+
+  changeFechaFinal(data:DateTime){
+    this.fechaFinal$.next(data)
+  }
 
   changeData(data:any){
     this.disponibilidad$.next(data);

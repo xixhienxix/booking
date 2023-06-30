@@ -5,6 +5,7 @@ import { DateTime } from 'luxon'
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { ICalendario } from 'src/app/_models/calendario.model';
+import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 
 const today = new Date();
 const month = today.getMonth();
@@ -52,7 +53,8 @@ export class Step1Component implements OnInit, OnDestroy {
   form: FormGroup;
   private unsubscribe: Subscription[] = [];
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, 
+    private _disponibilidadService:DisponibilidadService) {}
 
   ngOnInit() {
     this.initForm();
@@ -70,9 +72,11 @@ export class Step1Component implements OnInit, OnDestroy {
     const formChangesSubscr = this.form.valueChanges.subscribe((val) => {
       const fechaInicialC=new Date(val.fechaInicialForm).toISOString()
       this.fechaInicial=DateTime.fromISO(fechaInicialC);
+      this._disponibilidadService.changeFechaIni(this.fechaInicial)
 
       const fechaFinalC=new Date(val.fechaFinalForm).toISOString()
       this.fechaFinal=DateTime.fromISO(fechaFinalC);
+      this._disponibilidadService.changeFechaFinal(this.fechaFinal)
 
       this.updateParentModel({fechaFinal:this.fechaFinal,fechaInicial:this.fechaInicial, codigoPromo:val.codigoPromo},true)
       this.buscaDisponibilidad.emit(true)

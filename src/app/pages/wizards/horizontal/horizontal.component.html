@@ -54,7 +54,7 @@
       </div>
 
       <form
-        class="mx-auto mw-1500px w-100 pt-15 pb-10"
+        class="mx-auto pt-15 pb-10"
         noValidate
         id="kt_create_account_form"
       >
@@ -65,13 +65,23 @@
               (buscaDisponibilidad)="buscaDisponibilidad($event)"
               [updateParentModel]="updateAccount"
             ></app-step1>
+            
           </ng-container>
 
           <ng-container *ngIf="currentStep$.value === 2">
-            <app-step2
-              class="w-100"
+            <div style="display:flex;">
+              <app-step2
               [updateParentModel]="updateAccount"
+              style="width: 70%;"
             ></app-step2>
+            <div class="wrap">
+              <app-detalle-reserva style="flex-grow: 1;"
+              (buscaDisponibilidad)="buscaDisponibilidad($event)"
+              [updateParentModel]="updateAccount">
+              </app-detalle-reserva>
+              <app-reserva></app-reserva>
+            </div>
+            </div>
           </ng-container>
 
           <ng-container *ngIf="currentStep$.value === 3">

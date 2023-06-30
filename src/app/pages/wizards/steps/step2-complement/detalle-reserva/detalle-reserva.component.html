@@ -1,0 +1,43 @@
+<div class="card-body py-9 col-md-12" style="border: rgb(129, 25, 25); border-width: 5px; border-style: solid;">
+        <div style="background-color: #00506a;" class="modal-header">
+          <div class="text-center modal-title h4 col-12" style="padding: 3%; color: white; text-align: center;">
+            NUEVA BUSQUEDA
+          </div>      
+        </div>
+        <div class="modal-body" style="background-color: #e6e9ed">
+            <ng-container [formGroup]="form">
+                <div class="container" style="padding: 10px;">
+                    <div class="row">
+                          <mat-form-field>
+                            <mat-label>Dia de Llegada</mat-label>
+                            <input matInput [matDatepicker]="picker1" formControlName="fechaInicialForm" style="width: 100%;">
+                            <mat-hint>MM/DD/YYYY</mat-hint>
+                            <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
+                            <mat-datepicker #picker1></mat-datepicker>
+                          </mat-form-field>
+                    </div>
+                    <div class="row">
+                            <mat-form-field>
+                              <mat-label>Dia de Salida</mat-label>
+                              <input matInput [matDatepicker]="picker2" formControlName="fechaFinalForm">
+                              <mat-hint>MM/DD/YYYY</mat-hint>
+                              <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                              <mat-datepicker #picker2></mat-datepicker>
+                            </mat-form-field>
+                    </div>
+                    <div class="row">
+                            <mat-form-field class="example-form-field">
+                              <mat-label>Còdigo Promocional</mat-label>
+                              <input matInput type="text" formControlName="codigoPromo" [(ngModel)]="codigoPromocional">
+                              <button *ngIf="codigoPromocional" matSuffix mat-icon-button aria-label="Clear" (click)="codigoPromocional=''">
+                                <mat-icon>close</mat-icon>
+                              </button>
+                            </mat-form-field>
+                    </div>
+                    <div class="row">
+                        <button type="button" class="btn btn-primary" (click)="buscaDispo()">Ver Disponibilidad</button>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+</div>

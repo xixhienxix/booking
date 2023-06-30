@@ -23,6 +23,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSelectModule} from '@angular/material/select';
 import { LoaddingSpinnerComponent } from 'src/app/_helpers/loadding-spinner/loadding-spinner.component';
+import { DetalleReservaComponent } from './steps/step2-complement/detalle-reserva/detalle-reserva.component';
+import { ReservaComponent } from './steps/step2-complement/reserva/reserva.component';
 
 @NgModule({
   declarations: [
@@ -33,9 +35,12 @@ import { LoaddingSpinnerComponent } from 'src/app/_helpers/loadding-spinner/load
     Step3Component,
     Step4Component,
     Step5Component,
-    LoaddingSpinnerComponent
+    LoaddingSpinnerComponent,
+    DetalleReservaComponent,
+    ReservaComponent
   ],
   imports: [
+    MatRadioModule,
     MatSelectModule,
     MatButtonModule,
     MatCheckboxModule,
