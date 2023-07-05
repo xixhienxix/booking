@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { BehaviorSubject } from 'rxjs';
 import { IHabitaciones } from '../_models/habitaciones.model';
 import { DateTime } from 'luxon'
+import { miReserva } from '../_models/mireserva.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -19,10 +20,20 @@ export class DisponibilidadService {
   private fechaFinal$: BehaviorSubject<DateTime> = new BehaviorSubject<DateTime>(DateTime.now())
   currentFechaFin = this.fechaFinal$.asObservable();
 
+  private miReserva$: BehaviorSubject<miReserva[]> = new BehaviorSubject<miReserva[]>([])
+  currentReserva = this.miReserva$.asObservable();
 
   constructor(
     private http:HttpClient
   ) { }
+
+  addMiReserva(data:miReserva[]){
+    this.miReserva$.next(this.miReserva$.getValue().concat(data))
+  }
+
+  changeMiReserva(data:miReserva[]){
+    this.miReserva$.next(data)
+  }
 
   changeFechaIni(data:DateTime){
     this.fechaInicial$.next(data);

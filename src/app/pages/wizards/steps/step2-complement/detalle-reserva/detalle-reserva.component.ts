@@ -93,7 +93,9 @@ export class DetalleReservaComponent implements OnDestroy, OnInit {
 
   buscaDispo(){
     this.updateParentModel({fechaFinal:this.fechaFinal,fechaInicial:this.fechaInicial, codigoPromo:this.codigoPromocional},true)
-      this.buscaDisponibilidad.emit(true)
+    this.buscaDisponibilidad.emit(true)
+    this._disponibilidadService.changeFechaFinal(this.fechaFinal)
+    this._disponibilidadService.changeFechaIni(this.fechaInicial)
   }
 
   ngOnDestroy() {

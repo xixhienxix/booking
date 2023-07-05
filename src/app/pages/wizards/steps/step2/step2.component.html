@@ -9,8 +9,9 @@
                        style="background-size: 100% 100%; height: 70%; background-image:url('{{dispo.URL}}');">
                   </div>
               <div class="row">
-                        <h2>Maximo de Personas: {{dispo.Personas}}</h2>
-              </div>
+                <h2>Maximo de Adultos: {{dispo.Adultos}}</h2>
+                <h2>Maximo de Niños: {{dispo.Ninos}}</h2>
+            </div>
                   <!--end::Image-->
               </div>
               <!--end::Col-->
@@ -69,8 +70,8 @@
                                 <ng-container *ngIf="tarifas.Habitacion == dispo.Codigo">
                                     <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 px-4 me-6 mb-3">
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                <mat-radio-button  style="font-size: 17px; font-weight: bold;" (change)="seleccionHab()">{{tarifas.Tarifa}}</mat-radio-button >
+                                            <div class="col-md-4">
+                                                <mat-radio-button  style="font-size: 17px; font-weight: bold;" value="{{dispo.Codigo}},{{dispo.Numero}},{{tarifas.TarifaRack}},{{tarifas.Plan}}"  (change)="seleccionHabRadioButton($event)">{{tarifas.Tarifa}}</mat-radio-button >
                                                 <p><small style="color: red; font-weight: bold;">Regular: {{tarifas.TarifaRack}}</small></p>
                                                 <!-- <p><small style="color: rgb(32, 189, 32); font-weight: bold;">Descuento: {{tarifas.Descuento}}</small></p> -->
                                             </div>
@@ -78,16 +79,24 @@
                                                 <mat-label style="font-size: 17px; font-weight: bold; ">${{tarifas.TarifaRack}}</mat-label>
                                             </div>
                                             <div style="padding: 2px;" class="col-md-2">
-                                                <small style="font-weight: bold;">Personas</small>
-                                                <select name="numeroDePersonas" class="form-select form-select-lg form-select-solid border-gray-300">
-                                                    <ng-container *ngFor="let personas of [].constructor(dispo.Personas); let i = index">
+                                                <small style="font-weight: bold;">Adultos</small>
+                                                <select (change)="onSelectChange($event.target)" id="numeroDeAdultos" class="form-select form-select-lg form-select-solid border-gray-300">
+                                                    <ng-container *ngFor="let personas of [].constructor(dispo.Adultos); let i = index">
+                                                        <option value="{{i+1}}">{{i+1}}</option>
+                                                    </ng-container>
+                                                </select>
+                                            </div>
+                                            <div style="padding: 2px;" class="col-md-2">
+                                                <small style="font-weight: bold;">Niños</small>
+                                                <select (change)="onSelectChange($event.target)" id="numeroDeNinos" class="form-select form-select-lg form-select-solid border-gray-300">
+                                                    <ng-container *ngFor="let ninos of [].constructor((dispo.Ninos == 0) ? 1 : dispo.Ninos); let i = index">
                                                         <option value="{{i+1}}">{{i+1}}</option>
                                                     </ng-container>
                                                 </select>
                                             </div>
                                             <div style="padding: 2px;" class="col-md-2">
                                                 <small style="font-weight: bold;">Quedan:</small><small style="color:red; font-weight: bold;"> {{dispo.Inventario}}</small>
-                                                <select appereance="none" name="inventario" class="form-select form-select-lg form-select-solid border-gray-300" >
+                                                <select (change)="onSelectChange($event.target)" id="inventario" appereance="none" name="inventario" class="form-select form-select-lg form-select-solid border-gray-300" >
                                                     <ng-container *ngFor="let inv of [].constructor(dispo.Inventario); let i = index">
                                                         <option value="{{i+1}}">{{i+1}}</option>
                                                     </ng-container>
@@ -97,6 +106,9 @@
                                         <div class="row">
                                             <!-- <button type="button" class="btn btn-primary">Seleccionar Habitación</button> -->
                                         </div>
+                                    </div>
+                                    <div class="row">
+                                        <button [disabled]="!tarifaNotSelected" class="btn btn-primary" type="button" (click)="agregaHab()">Agregar Habitación</button>
                                     </div>
                                 </ng-container>    
                             </ng-container>

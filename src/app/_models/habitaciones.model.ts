@@ -7,8 +7,8 @@ export interface IHabitaciones
   Numero:string,
   Descripcion:string,
   Tipo:string;
-  Personas:number,
-  Personas_Extra:number,
+  Adultos:number,
+  Ninos:number,
   Vista:string,
   Camas:number,
   Tarifa:number,
