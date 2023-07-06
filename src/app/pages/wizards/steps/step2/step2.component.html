@@ -86,22 +86,6 @@
                                                     </ng-container>
                                                 </select>
                                             </div>
-                                            <div style="padding: 2px;" class="col-md-2">
-                                                <small style="font-weight: bold;">Niños</small>
-                                                <select (change)="onSelectChange($event.target)" id="numeroDeNinos" class="form-select form-select-lg form-select-solid border-gray-300">
-                                                    <ng-container *ngFor="let ninos of [].constructor((dispo.Ninos == 0) ? 1 : dispo.Ninos); let i = index">
-                                                        <option value="{{i+1}}">{{i+1}}</option>
-                                                    </ng-container>
-                                                </select>
-                                            </div>
-                                            <div style="padding: 2px;" class="col-md-2">
-                                                <small style="font-weight: bold;">Quedan:</small><small style="color:red; font-weight: bold;"> {{dispo.Inventario}}</small>
-                                                <select (change)="onSelectChange($event.target)" id="inventario" appereance="none" name="inventario" class="form-select form-select-lg form-select-solid border-gray-300" >
-                                                    <ng-container *ngFor="let inv of [].constructor(dispo.Inventario); let i = index">
-                                                        <option value="{{i+1}}">{{i+1}}</option>
-                                                    </ng-container>
-                                                </select>
-                                            </div>
                                         </div>
                                         <div class="row">
                                             <!-- <button type="button" class="btn btn-primary">Seleccionar Habitación</button> -->

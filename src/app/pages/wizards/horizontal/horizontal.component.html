@@ -60,11 +60,13 @@
       >
         <div class="current">
           <ng-container *ngIf="currentStep$.value === 1">
-            <app-step1
-              class="w-100"
+            <div style="width: 1200px;">
+              <app-step1
               (buscaDisponibilidad)="buscaDisponibilidad($event)"
               [updateParentModel]="updateAccount"
             ></app-step1>
+            </div>
+
             
           </ng-container>
 

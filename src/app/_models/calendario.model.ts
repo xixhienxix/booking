@@ -5,11 +5,15 @@ export interface ICalendario {
   fechaInicial:any,
   fechaFinal:any,
   codigoPromo:string
+  adultos:number,
+  ninos:number
 }
 export let defaultCalendario = {
   fechaInicial:undefined,
   fechaFinal:undefined,
-  codigoPromo:''
+  codigoPromo:'',
+  adultos:1,
+  ninos:0
 }
 
 

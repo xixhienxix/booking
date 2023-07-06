@@ -66,8 +66,13 @@ export class Step1Component implements OnInit, OnDestroy {
     this.form = new FormGroup({
       fechaInicialForm: new FormControl(new Date(year, month, today.getDate())),
       fechaFinalForm: new FormControl(new Date(year, month, today.getDate()+1)),
-      codigoPromo : new FormControl('')
+      codigoPromo : new FormControl(''),
+      adultos: new FormControl(),
+      ninos: new FormControl()
     });
+
+    this.form.controls['adultos'].setValue(1, {onlySelf: true});
+    this.form.controls['ninos'].setValue(0, {onlySelf: true});
 
     const formChangesSubscr = this.form.valueChanges.subscribe((val) => {
       const fechaInicialC=new Date(val.fechaInicialForm).toISOString()
@@ -78,7 +83,7 @@ export class Step1Component implements OnInit, OnDestroy {
       this.fechaFinal=DateTime.fromISO(fechaFinalC);
       this._disponibilidadService.changeFechaFinal(this.fechaFinal)
 
-      this.updateParentModel({fechaFinal:this.fechaFinal,fechaInicial:this.fechaInicial, codigoPromo:val.codigoPromo},true)
+      this.updateParentModel({fechaFinal:this.fechaFinal,fechaInicial:this.fechaInicial, codigoPromo:val.codigoPromo, adultos:val.adultos, ninos:val.ninos},true)
       this.buscaDisponibilidad.emit(true)
     });
 
