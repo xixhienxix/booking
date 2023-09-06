@@ -66,7 +66,7 @@
                           <!--end::Text-->
                           <h4 style="color:#00506a; font-weight: bold;" class="modal-title">Tarifas Disponibles</h4>
                           <!--begin::Tarifas-->
-                            <ng-container *ngFor="let tarifas of tarifasArray">
+                            <ng-container *ngFor="let tarifas of tarifasArray; let i = index">
                                 <ng-container *ngIf="tarifas.Habitacion == dispo.Codigo">
                                     <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 px-4 me-6 mb-3">
                                         <div class="row">
@@ -92,7 +92,7 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <button [disabled]="!tarifaNotSelected" class="btn btn-primary" type="button" (click)="agregaHab()">Agregar Habitación</button>
+                                        <button [disabled]="!tarifaNotSelected" class="btn btn-primary" type="button" (click)="agregaHab(tarifas,tarifas.Habitacion)">Agregar Habitación</button>
                                     </div>
                                 </ng-container>    
                             </ng-container>

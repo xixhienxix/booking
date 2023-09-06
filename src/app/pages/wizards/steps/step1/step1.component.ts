@@ -61,7 +61,6 @@ export class Step1Component implements OnInit, OnDestroy {
     this.updateParentModel({}, true);
   }
 
-
   initForm() {
     this.form = new FormGroup({
       fechaInicialForm: new FormControl(new Date(year, month, today.getDate())),

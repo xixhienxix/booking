@@ -100,9 +100,13 @@ export class Step2Component implements OnInit, OnDestroy {
     this.tarifaNotSelected=true
   }
 
-  agregaHab(){
+  agregaHab(tarifaSeleccionada:any,codigoCuarto:any){
+
+    console.log(tarifaSeleccionada)
+    console.log(codigoCuarto)
+
     const obj : miReserva[]= [{
-      codigoCuarto:this.codigoCuarto,
+      codigoCuarto:codigoCuarto,
       numeroCuarto:this.numeroCuarto,
       cantidadHabitaciones:this.inventario,
       nombreTarifa:this.nombreTarifa,
