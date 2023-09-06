@@ -8,6 +8,7 @@ import { DateTime } from 'luxon';
 import { TarifasService } from 'src/app/_service/tarifas.service';
 import { ITarifas } from 'src/app/_models/tarifas.model';
 import { tarifarioTabla } from 'src/app/_models/tarifario.model';
+import { SpinnerService } from 'src/app/_service/spinner.service';
 
 @Component({
   selector: 'app-horizontal',
@@ -17,12 +18,12 @@ import { tarifarioTabla } from 'src/app/_models/tarifario.model';
 export class HorizontalComponent implements OnInit, OnDestroy {
   formsCount = 5;
   account$: BehaviorSubject<ICalendario> = new BehaviorSubject<ICalendario>(defaultCalendario);
-  isLoading:boolean=false
 
   tarifasArray:tarifarioTabla[]=[]
   tarifasArrayCompleto:tarifarioTabla[]=[]
   fromDate: DateTime;
   diaDif:number=1;
+  isLoading:boolean=false
 
   currentStep$: BehaviorSubject<number> = new BehaviorSubject(1);
   isCurrentFormValid$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
@@ -32,11 +33,18 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   constructor(
     private disponibilidadService : DisponibilidadService,
-    private tarifasService : TarifasService
-  ) {}
+    private tarifasService : TarifasService,
+    private spinnerService : SpinnerService
+
+  ) {
+    this.spinnerService.isLoading$.subscribe((val)=>{
+      this.isLoading=val
+    }
+    )
+  }
 
   ngOnInit(): void {
-
+    this.spinnerService.loadingState=true
   }
 
   updateAccount = (part: Partial<ICalendario>, isFormValid: boolean) => {
@@ -48,7 +56,6 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   buscaDisponibilidad(busca:boolean){
 
-    this.isLoading=true
     let fechaInicial: DateTime = this.account$.value.fechaInicial
     let fechaFinal: DateTime = this.account$.value.fechaFinal
     let diaDif = fechaFinal.diff(fechaInicial, ["years", "months", "days", "hours"])
@@ -68,12 +75,15 @@ export class HorizontalComponent implements OnInit, OnDestroy {
       },
       error=>{
         console.log(error)
+      },
+      ()=>{
+        this.spinnerService.loadingState=false
       })
-        
 
   }
 
   getTasrifario(){
+    this.spinnerService.loadingState=true
     this.tarifasService.getTarifas().subscribe(
       (value)=>{
         this.tarifasArray=[]
@@ -107,7 +117,10 @@ export class HorizontalComponent implements OnInit, OnDestroy {
         this.filtrarTarifario()        
       }
       },
-      (error)=>{}
+      (error)=>{},
+      ()=>{
+        this.spinnerService.loadingState=false
+      }
       )
   }
 

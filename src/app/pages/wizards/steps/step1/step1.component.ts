@@ -6,6 +6,7 @@ import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/materia
 import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
 import { ICalendario } from 'src/app/_models/calendario.model';
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
+import { SpinnerService } from 'src/app/_service/spinner.service';
 
 const today = new Date();
 const month = today.getMonth();
@@ -53,7 +54,8 @@ export class Step1Component implements OnInit, OnDestroy {
   form: FormGroup;
   private unsubscribe: Subscription[] = [];
 
-  constructor(private fb: FormBuilder, 
+  constructor(private fb: FormBuilder,
+    private spinnerLoading : SpinnerService, 
     private _disponibilidadService:DisponibilidadService) {}
 
   ngOnInit() {
@@ -87,7 +89,7 @@ export class Step1Component implements OnInit, OnDestroy {
     });
 
     this.unsubscribe.push(formChangesSubscr);
-
+    this.spinnerLoading.loadingState = false
   }
 
   ngOnDestroy() {
