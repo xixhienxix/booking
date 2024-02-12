@@ -4,6 +4,7 @@ import { HttpClient,HttpParams } from "@angular/common/http";
 import { catchError, map, tap } from 'rxjs/operators';
 import { IHabitaciones } from '../_models/habitaciones.model'
 import { environment } from 'src/environments/environment';
+import { Ihoteles } from '../_models/hoteles.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,15 @@ import { environment } from 'src/environments/environment';
 export class HabitacionesService {
   private listaFolios: IHabitaciones[] = [];
 
+
+  getHoteles() : Observable<Ihoteles[]>{
+    return  (this.http.get<Ihoteles[]>(environment.apiUrl+"/listahoteles/")
+    .pipe(
+      map(responseData=>{
+        return responseData
+      })
+    ))
+  }
 
   getHabitacionesbyTipo(id:string) : Observable<IHabitaciones[]> {
 

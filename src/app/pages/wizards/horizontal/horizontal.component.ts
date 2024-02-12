@@ -9,6 +9,8 @@ import { TarifasService } from 'src/app/_service/tarifas.service';
 import { ITarifas } from 'src/app/_models/tarifas.model';
 import { tarifarioTabla } from 'src/app/_models/tarifario.model';
 import { SpinnerService } from 'src/app/_service/spinner.service';
+import { HabitacionesService } from 'src/app/_service/habitacion.service';
+import { Ihoteles } from 'src/app/_models/hoteles.model';
 
 @Component({
   selector: 'app-horizontal',
@@ -24,6 +26,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   fromDate: DateTime;
   diaDif:number=1;
   isLoading:boolean=false
+  listaHoteles:Ihoteles[]=[]
 
   currentStep$: BehaviorSubject<number> = new BehaviorSubject(1);
   isCurrentFormValid$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
@@ -34,8 +37,8 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   constructor(
     private disponibilidadService : DisponibilidadService,
     private tarifasService : TarifasService,
-    private spinnerService : SpinnerService
-
+    private spinnerService : SpinnerService,
+    private habitacionService : HabitacionesService
   ) {
     this.spinnerService.isLoading$.subscribe((val)=>{
       this.isLoading=val
@@ -45,6 +48,12 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinnerService.loadingState=true
+    this.habitacionService.getHoteles().subscribe(
+      (val)=>{
+        for(let i=0; i<val.length;i++){
+          this.listaHoteles.push(val[i])
+        }
+    })
   }
 
   updateAccount = (part: Partial<ICalendario>, isFormValid: boolean) => {
