@@ -61,10 +61,13 @@
         <div class="current">
           <ng-container *ngIf="currentStep$.value === 1">
             <div style="width: 1200px;">
-              <app-step1
+              <!-- <app-step1
               (buscaDisponibilidad)="buscaDisponibilidad($event)"
               [updateParentModel]="updateAccount"
-            ></app-step1>
+            ></app-step1> -->
+            <app-step1
+            [updateParentModel]="updateAccount"
+          ></app-step1>
             </div>
 
             
@@ -77,8 +80,11 @@
               style="width: 70%;"
             ></app-step2>
             <div class="wrap">
-              <app-detalle-reserva style="flex-grow: 1;"
+              <!-- <app-detalle-reserva style="flex-grow: 1;"
               (buscaDisponibilidad)="buscaDisponibilidad($event)"
+              [updateParentModel]="updateAccount">
+              </app-detalle-reserva> -->
+              <app-detalle-reserva style="flex-grow: 1;"
               [updateParentModel]="updateAccount">
               </app-detalle-reserva>
               <app-reserva></app-reserva>

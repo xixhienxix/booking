@@ -1,4 +1,4 @@
-  <div  style="padding-top: 3em; padding-left: 2em;;">
+  <div  style="padding-top: 3em; padding-left: 2em;">
       <div class="row">
         <div class="col-lg-3">
           <!-- <label>Día de Llegada</label> -->
@@ -63,13 +63,21 @@
         <div class="col-lg-4">
           <mat-form-field class="example-form-field">
             <mat-label>Còdigo Promocional</mat-label>
-            <input matInput type="text" formControlName="codigoPromo" [(ngModel)]="codigoPromocional">
+            <!-- <input matInput type="text" formControlName="codigoPromo" [(ngModel)]="codigoPromocional"> -->
+            <input matInput type="text" formControlName="codigoPromo" >
             <button *ngIf="codigoPromocional" matSuffix mat-icon-button aria-label="Clear" (click)="codigoPromocional=''">
               <mat-icon>close</mat-icon>
             </button>
           </mat-form-field>
         </div>
       </div>
+  </div>
+  <div>
+    <select class="form-select form-select-lg form-select-solid border-gray-300">
+      <ng-container *ngFor="let item of listaHoteles">
+        <option>{{item}}</option>
+      </ng-container>
+    </select>
   </div>
 
 

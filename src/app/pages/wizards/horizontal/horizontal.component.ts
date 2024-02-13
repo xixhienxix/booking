@@ -48,12 +48,6 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.spinnerService.loadingState=true
-    this.habitacionService.getHoteles().subscribe(
-      (val)=>{
-        for(let i=0; i<val.length;i++){
-          this.listaHoteles.push(val[i])
-        }
-    })
   }
 
   updateAccount = (part: Partial<ICalendario>, isFormValid: boolean) => {
@@ -63,7 +57,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     this.isCurrentFormValid$.next(isFormValid);
   };
 
-  buscaDisponibilidad(busca:boolean){
+  buscaDisponibilidad(hotel:string){
 
     let fechaInicial: DateTime = this.account$.value.fechaInicial
     let fechaFinal: DateTime = this.account$.value.fechaFinal
@@ -78,7 +72,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
     this.fromDate=fechaInicial
 
-    this.disponibilidadService.getDisponibilidadBooking(comparadorInicialString,comparadorFinalString,diaDif.days).subscribe(val=>{
+    this.disponibilidadService.getDisponibilidadBooking(comparadorInicialString,comparadorFinalString,diaDif.days,hotel).subscribe(val=>{
         this.disponibilidadService.changeData(val );
         this.getTasrifario()
       },

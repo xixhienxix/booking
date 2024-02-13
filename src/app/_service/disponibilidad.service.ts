@@ -47,13 +47,14 @@ export class DisponibilidadService {
     this.disponibilidad$.next(data);
   }
 
-  getDisponibilidadBooking(fechaInicial:string, fechaFinal:string, dias:number){
+  getDisponibilidadBooking(fechaInicial:string, fechaFinal:string, dias:number, hotel:string){
     var inputFormat = "dd-MM-yyyy";
 
     const params = new HttpParams()
     .set('fechaInicial', fechaInicial)
     .set('fechaFinal', fechaFinal)
     .set('dias',dias)
+    .set('hotel',hotel)
 
     return this.http.get<IDisponibilidad[]>(environment.apiUrl+"/booking/disponibilidad",{params:params})
    }

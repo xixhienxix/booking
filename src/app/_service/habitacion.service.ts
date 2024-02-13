@@ -13,8 +13,9 @@ export class HabitacionesService {
   private listaFolios: IHabitaciones[] = [];
 
 
-  getHoteles() : Observable<Ihoteles[]>{
-    return  (this.http.get<Ihoteles[]>(environment.apiUrl+"/listahoteles/")
+  getHoteles() : Observable<string[]>{
+
+    return  (this.http.get<string[]>(environment.apiUrl+"/listahoteles")
     .pipe(
       map(responseData=>{
         return responseData
@@ -24,7 +25,7 @@ export class HabitacionesService {
 
   getHabitacionesbyTipo(id:string) : Observable<IHabitaciones[]> {
 
-  return  (this.http.get<IHabitaciones[]>(environment.apiUrl+"/reportes/habitaciones/"+id)
+    return  (this.http.get<IHabitaciones[]>(environment.apiUrl+"/reportes/habitaciones/"+id)
       .pipe(
         map(responseData=>{
           return responseData

@@ -7,6 +7,7 @@ import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/mat
 import { ICalendario } from 'src/app/_models/calendario.model';
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { SpinnerService } from 'src/app/_service/spinner.service';
+import { HabitacionesService } from 'src/app/_service/habitacion.service';
 
 const today = new Date();
 const month = today.getMonth();
@@ -48,6 +49,7 @@ export class Step1Component implements OnInit, OnDestroy {
 
   fechaInicial:DateTime
   fechaFinal:DateTime
+  listaHoteles:string[]=[]
 
   codigoPromocional = '';
 
@@ -56,10 +58,17 @@ export class Step1Component implements OnInit, OnDestroy {
 
   constructor(private fb: FormBuilder,
     private spinnerLoading : SpinnerService, 
-    private _disponibilidadService:DisponibilidadService) {}
+    private _disponibilidadService:DisponibilidadService,
+    private _habitacionService:HabitacionesService) {}
 
   ngOnInit() {
     this.initForm();
+    this._habitacionService.getHoteles().subscribe(
+      (val)=>{
+        for(let i=0; i<val.length;i++){
+          this.listaHoteles.push(val[i])
+        }
+    })
     this.updateParentModel({}, true);
   }
 
@@ -69,7 +78,8 @@ export class Step1Component implements OnInit, OnDestroy {
       fechaFinalForm: new FormControl(new Date(year, month, today.getDate()+1)),
       codigoPromo : new FormControl(''),
       adultos: new FormControl(),
-      ninos: new FormControl()
+      ninos: new FormControl(),
+      hotel: new FormControl()
     });
 
     this.form.controls['adultos'].setValue(1, {onlySelf: true});
