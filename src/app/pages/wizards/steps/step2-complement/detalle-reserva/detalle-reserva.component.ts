@@ -43,8 +43,8 @@ export class DetalleReservaComponent implements OnDestroy, OnInit {
   ) => void;
   @Output() buscaDisponibilidad : EventEmitter<boolean> = new EventEmitter<boolean>(false);
 
-  fechaInicial:DateTime
-  fechaFinal:DateTime
+  fechaInicial:Date
+  fechaFinal:Date
 
   codigoPromocional = '';
 
@@ -70,21 +70,28 @@ export class DetalleReservaComponent implements OnDestroy, OnInit {
   initForm() {
 
     this.form = new FormGroup({
-      fechaInicialForm: new FormControl(new Date(this.fechaInicial.year, (this.fechaInicial.month)-1, this.fechaInicial.day)),
-      fechaFinalForm: new FormControl(new Date(this.fechaFinal.year, (this.fechaFinal.month)-1, this.fechaFinal.day)),
+      fechaInicialForm: new FormControl(new Date(year, month, today.getDate())),
+      fechaFinalForm: new FormControl(new Date(year, month, today.getDate()+1)),
       codigoPromo : new FormControl('')
     });
 
     const formChangesSubscr = this.form.valueChanges.subscribe((val) => {
       this.codigoPromocional=val.codigoPromo
 
-      const fechaInicialC=new Date(val.fechaInicialForm).toISOString()
-      this.fechaInicial=DateTime.fromISO(fechaInicialC);
-      this._disponibilidadService.changeFechaIni(this.fechaInicial)
+      const fechaInicial=new Date(val.fechaInicialForm)
+      this.fechaInicial=fechaInicial
+      this._disponibilidadService.changeFechaIni(fechaInicial)
 
-      const fechaFinalC=new Date(val.fechaFinalForm).toISOString()
-      this.fechaFinal=DateTime.fromISO(fechaFinalC);
-      this._disponibilidadService.changeFechaFinal(this.fechaFinal)
+      const fechaFinalC=new Date(val.fechaFinalForm)
+      this.fechaFinal=fechaFinalC
+      this._disponibilidadService.changeFechaFinal(fechaFinalC)
+      // const fechaInicialC=new Date(val.fechaInicialForm).toISOString()
+      // this.fechaInicial=DateTime.fromISO(fechaInicialC);
+      // this._disponibilidadService.changeFechaIni(this.fechaInicial)
+
+      // const fechaFinalC=new Date(val.fechaFinalForm).toISOString()
+      // this.fechaFinal=DateTime.fromISO(fechaFinalC);
+      // this._disponibilidadService.changeFechaFinal(this.fechaFinal)
     });
 
     this.unsubscribe.push(formChangesSubscr);

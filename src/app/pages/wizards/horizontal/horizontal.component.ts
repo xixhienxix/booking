@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, takeUntil } from 'rxjs';
 import { ICalendario, defaultCalendario } from 'src/app/_models/calendario.model';
 import { ICreateAccount, inits } from '../create-account.helper';
 import { IDisponibilidad, defaultDispo } from 'src/app/_models/disponibilidad.model';
@@ -20,6 +20,7 @@ import { Ihoteles } from 'src/app/_models/hoteles.model';
 export class HorizontalComponent implements OnInit, OnDestroy {
   formsCount = 5;
   account$: BehaviorSubject<ICalendario> = new BehaviorSubject<ICalendario>(defaultCalendario);
+  private ngUnsubscribe = new Subject<void>();
 
   tarifasArray:tarifarioTabla[]=[]
   tarifasArrayCompleto:tarifarioTabla[]=[]
@@ -59,30 +60,45 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   buscaDisponibilidad(hotel:string){
 
-    let fechaInicial: DateTime = this.account$.value.fechaInicial
-    let fechaFinal: DateTime = this.account$.value.fechaFinal
-    let diaDif = fechaFinal.diff(fechaInicial, ["years", "months", "days", "hours"])
+    // let fechaInicial: DateTime = this.account$.value.fechaInicial
+    // let fechaFinal: DateTime = this.account$.value.fechaFinal
+
+    // Calculating the time difference
+    // of two dates
+    let Difference_In_Time =
+        this.account$.value.fechaFinal.getTime() - this.account$.value.fechaFinal.getTime();
+    
+    // Calculating the no. of days between
+    // two dates
+    let Difference_In_Days =
+        Math.round
+            (Difference_In_Time / (1000 * 3600 * 24));
+
+    // let diaDif = fechaFinal.diff(fechaInicial, ["years", "months", "days", "hours"])
 
 
-    let diaDifCalc = fechaFinal.diff(fechaInicial, ["days"])
-    this.diaDif=Math.ceil(diaDifCalc.days)
+    // let diaDifCalc = fechaFinal.diff(fechaInicial, ["days"])
+    // this.diaDif=Math.ceil(diaDifCalc.days)
   
-    const comparadorInicialString=fechaInicial.day+'/'+fechaInicial.month+'/'+fechaInicial.year
-    const comparadorFinalString=fechaFinal.day+'/'+fechaFinal.month+'/'+fechaFinal.year
+    // const comparadorInicialString=fechaInicial.day+'/'+fechaInicial.month+'/'+fechaInicial.year
+    // const comparadorFinalString=fechaFinal.day+'/'+fechaFinal.month+'/'+fechaFinal.year
 
-    this.fromDate=fechaInicial
+    // this.fromDate=fechaInicial
 
-    this.disponibilidadService.getDisponibilidadBooking(comparadorInicialString,comparadorFinalString,diaDif.days,hotel).subscribe(val=>{
+    this.disponibilidadService.getDisponibilidadBooking(this.account$.value.fechaInicial,this.account$.value.fechaFinal,Difference_In_Days,hotel)
+    .pipe(takeUntil(this.ngUnsubscribe))
+    .subscribe({
+      next: (val)=>{
         this.disponibilidadService.changeData(val );
         this.getTasrifario()
       },
-      error=>{
+      error: (error)=>{
         console.log(error)
       },
-      ()=>{
-        this.spinnerService.loadingState=false
-      })
-
+      complete: () =>{
+        this.spinnerService.loadingState=false    
+      }  
+    })
   }
 
   getTasrifario(){
@@ -180,6 +196,9 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   nextStep() {
     const nextStep = this.currentStep$.value + 1;
+    if(nextStep === 2){
+      this.buscaDisponibilidad(this.account$.value.hotel);
+    }
     if (nextStep > this.formsCount) {
       return;
     }
@@ -193,8 +212,8 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     }
     this.currentStep$.next(prevStep);
   }
-
-  ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();    
   }
 }

@@ -1,25 +1,25 @@
 
 export interface IDisponibilidad
 {
-  Cuarto:string,
-  Habitacion:string,
-  Estatus:number,
-  Dia:number,
-  Mes:number,
-  Ano:number
-  Estatus_Ama_De_Llaves:string,
-  Folio_Huesped:number,
-  Fecha?:string
+  _id: string;
+  Cuarto: string;
+  Habitacion: string;
+  Estatus: number;
+  Llegada: Date;
+  Salida: Date;
+  Estatus_AMA: string;
+  hotel: string;
+  Folio: string;
 }
 
 export let defaultDispo: IDisponibilidad = {
-  Cuarto:'',
-  Habitacion:'',
+  _id: '',
+  Cuarto: '',
+  Habitacion: '',
   Estatus:1,
-  Dia:1,
-  Mes:1,
-  Ano:2023,
-  Estatus_Ama_De_Llaves:'',
-  Folio_Huesped:1,
-  Fecha:''
+  Llegada: new Date(),
+  Salida: new Date(Date.now() + ( 3600 * 1000 * 24)),
+  Estatus_AMA: '',
+  hotel: '',
+  Folio: ''
 };

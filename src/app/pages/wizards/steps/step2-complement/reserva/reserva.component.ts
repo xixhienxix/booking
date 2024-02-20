@@ -25,10 +25,10 @@ export class ReservaComponent implements OnInit {
   ngOnInit(){
 
     combineLatest([this._disponibilidadService.currentFechaIni,this._disponibilidadService.currentFechaFin]).subscribe((val)=>{
-      this.fechaInicial=val[0].toLocaleString(DateTime.DATETIME_SHORT).split(',')[0]
-      this.fechaIniDateTime=val[0]
-      this.fechaFinal=val[1].toLocaleString(DateTime.DATETIME_SHORT).split(',')[0]
-      this.FechaFinDateTime=val[1]
+      // this.fechaInicial=val[0].toLocaleString(DateTime.DATETIME_SHORT).split(',')[0]
+      // this.fechaIniDateTime=val[0]
+/*       this.fechaFinal=val[1].toLocaleString(DateTime.DATETIME_SHORT).split(',')[0]
+      this.FechaFinDateTime=val[1] */
 
       const diff = this.FechaFinDateTime.diff(this.fechaIniDateTime, ["days"]).toObject().days
       if(diff!=undefined){

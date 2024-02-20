@@ -14,10 +14,10 @@ export class DisponibilidadService {
   private disponibilidad$: BehaviorSubject<IHabitaciones[]> = new BehaviorSubject<IHabitaciones[]>([]);
   currentData = this.disponibilidad$.asObservable();
 
-  private fechaInicial$: BehaviorSubject<DateTime> = new BehaviorSubject<DateTime>(DateTime.now())
+  private fechaInicial$: BehaviorSubject<Date> = new BehaviorSubject<Date>(new Date())
   currentFechaIni = this.fechaInicial$.asObservable();
 
-  private fechaFinal$: BehaviorSubject<DateTime> = new BehaviorSubject<DateTime>(DateTime.now())
+  private fechaFinal$: BehaviorSubject<Date> = new BehaviorSubject<Date>(new Date(Date.now() + ( 3600 * 1000 * 24)))
   currentFechaFin = this.fechaFinal$.asObservable();
 
   private miReserva$: BehaviorSubject<miReserva[]> = new BehaviorSubject<miReserva[]>([])
@@ -35,11 +35,11 @@ export class DisponibilidadService {
     this.miReserva$.next(data)
   }
 
-  changeFechaIni(data:DateTime){
+  changeFechaIni(data:Date){
     this.fechaInicial$.next(data);
   }
 
-  changeFechaFinal(data:DateTime){
+  changeFechaFinal(data:Date){
     this.fechaFinal$.next(data)
   }
 
@@ -48,14 +48,21 @@ export class DisponibilidadService {
   }
 
   getDisponibilidadBooking(fechaInicial:string, fechaFinal:string, dias:number, hotel:string){
-    var inputFormat = "dd-MM-yyyy";
 
     const params = new HttpParams()
     .set('fechaInicial', fechaInicial)
     .set('fechaFinal', fechaFinal)
     .set('dias',dias)
     .set('hotel',hotel)
+    
+    return this.http.get<IDisponibilidad[]>(environment.apiUrl+"/disponibilidad/booking",{params:params})
+   }
 
-    return this.http.get<IDisponibilidad[]>(environment.apiUrl+"/booking/disponibilidad",{params:params})
+   postDisponibilidadBooking(fechaInicial:string, fechaFinal:string, dias:number, hotel:string){
+    const body = {
+      fechaInicial, fechaFinal, dias, hotel
+    } 
+    return this.http.post(environment.apiUrl+"/disponibilidad/booking",body)
+
    }
 }
