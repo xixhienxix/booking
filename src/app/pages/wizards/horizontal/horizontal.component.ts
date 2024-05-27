@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, Subject, Subscription, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, concat, takeUntil } from 'rxjs';
 import { ICalendario, defaultCalendario } from 'src/app/_models/calendario.model';
 import { ICreateAccount, inits } from '../create-account.helper';
 import { IDisponibilidad, defaultDispo } from 'src/app/_models/disponibilidad.model';
@@ -60,13 +60,10 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   buscaDisponibilidad(hotel:string){
 
-    // let fechaInicial: DateTime = this.account$.value.fechaInicial
-    // let fechaFinal: DateTime = this.account$.value.fechaFinal
-
     // Calculating the time difference
     // of two dates
     let Difference_In_Time =
-        this.account$.value.fechaFinal.getTime() - this.account$.value.fechaFinal.getTime();
+        this.account$.value.fechaFinal.getTime() - this.account$.value.fechaInicial.getTime();
     
     // Calculating the no. of days between
     // two dates
@@ -74,25 +71,25 @@ export class HorizontalComponent implements OnInit, OnDestroy {
         Math.round
             (Difference_In_Time / (1000 * 3600 * 24));
 
-    // let diaDif = fechaFinal.diff(fechaInicial, ["years", "months", "days", "hours"])
+    const request1 = this.disponibilidadService.getDisponibilidadBooking(this.account$.value.fechaInicial,this.account$.value.fechaFinal,Difference_In_Days,hotel);
+    const request2 = 
+    const request3 = this.tarifasService.getTarifas();
 
-
-    // let diaDifCalc = fechaFinal.diff(fechaInicial, ["days"])
-    // this.diaDif=Math.ceil(diaDifCalc.days)
-  
-    // const comparadorInicialString=fechaInicial.day+'/'+fechaInicial.month+'/'+fechaInicial.year
-    // const comparadorFinalString=fechaFinal.day+'/'+fechaFinal.month+'/'+fechaFinal.year
-
-    // this.fromDate=fechaInicial
-
-    this.disponibilidadService.getDisponibilidadBooking(this.account$.value.fechaInicial,this.account$.value.fechaFinal,Difference_In_Days,hotel)
+    concat(request1,request2)
     .pipe(takeUntil(this.ngUnsubscribe))
     .subscribe({
       next: (val)=>{
-        this.disponibilidadService.changeData(val );
+        let cuartosNoDisponibles:string[]=[]
+
+        this.disponibilidadService.changeData(val);
+        for(let i=0;i<val.length; i++){
+          cuartosNoDisponibles.push(val[i].Habitacion);
+        }
+        this.disponibilidadService.setCuartosNoDisponibles=cuartosNoDisponibles;
         this.getTasrifario()
       },
       error: (error)=>{
+
         console.log(error)
       },
       complete: () =>{

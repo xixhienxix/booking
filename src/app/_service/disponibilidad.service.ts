@@ -11,6 +11,9 @@ import { miReserva } from '../_models/mireserva.model';
 })
 export class DisponibilidadService {
 
+  private cuartosNoDisponibles$: BehaviorSubject<string[]> = new BehaviorSubject<string[]>([]);
+  currentCuartosNoDisponibles = this.cuartosNoDisponibles$.asObservable();
+
   private disponibilidad$: BehaviorSubject<IHabitaciones[]> = new BehaviorSubject<IHabitaciones[]>([]);
   currentData = this.disponibilidad$.asObservable();
 
@@ -26,6 +29,10 @@ export class DisponibilidadService {
   constructor(
     private http:HttpClient
   ) { }
+
+  set setCuartosNoDisponibles (val:string[]){
+    this.cuartosNoDisponibles$.next(val)
+  }
 
   addMiReserva(data:miReserva[]){
     this.miReserva$.next(this.miReserva$.getValue().concat(data))
