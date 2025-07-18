@@ -1,9 +1,6 @@
 <div class="card">
   <div class="card-body">
-    <div
-      class="stepper stepper-links d-flex flex-column pt-15"
-      id="kt_create_account_stepper"
-    >
+    <div class="stepper stepper-links d-flex flex-column pt-15" id="kt_create_account_stepper">
       <div class="stepper-nav mb-5">
         <div
           class="stepper-item"
@@ -12,11 +9,11 @@
             completed: currentStep$.value > 1
           }"
         >
-          <h3 class="stepper-title">Selecciòn de Fechas</h3>
+          <h3 class="stepper-title">Selección de Fechas</h3>
         </div>
 
         <div
-          class="stepper-item"
+          class="stepper-item"x
           [ngClass]="{
             current: currentStep$.value === 2,
             completed: currentStep$.value > 2
@@ -32,7 +29,7 @@
             completed: currentStep$.value > 3
           }"
         >
-          <h3 class="stepper-title">Confirmar Reservacion</h3>
+          <h3 class="stepper-title">Confirmar Reservación</h3>
         </div>
 
         <div
@@ -45,69 +42,45 @@
           <h3 class="stepper-title">Forma de Pago</h3>
         </div>
 
-        <div
-          class="stepper-item"
-          [ngClass]="{ current: currentStep$.value === 5 }"
-        >
+        <div class="stepper-item" [ngClass]="{ current: currentStep$.value === 5 }">
           <h3 class="stepper-title">Completado</h3>
         </div>
       </div>
 
-      <form
-        class="mx-auto pt-15 pb-10"
-        noValidate
-        id="kt_create_account_form"
-      >
+      <form class="mx-auto pt-15 pb-10" noValidate id="kt_create_account_form">
         <div class="current">
+          <!-- Step 1 -->
           <ng-container *ngIf="currentStep$.value === 1">
-            <div style="width: 1200px;">
-              <!-- <app-step1
-              (buscaDisponibilidad)="buscaDisponibilidad($event)"
-              [updateParentModel]="updateAccount"
-            ></app-step1> -->
-            <app-step1
-            [updateParentModel]="updateAccount"
-          ></app-step1>
+            <div class="step-content">
+              <app-step1 
+                (formValid)="handleStep1FormValidity($event)"
+                [updateParentModel]="updateAccount">
+              </app-step1>
             </div>
-
-            
           </ng-container>
 
+          <!-- Step 2 -->
           <ng-container *ngIf="currentStep$.value === 2">
-            <div style="display:flex;">
-              <app-step2
-              [updateParentModel]="updateAccount"
-              style="width: 70%;"
-            ></app-step2>
-            <div class="wrap">
-              <!-- <app-detalle-reserva style="flex-grow: 1;"
-              (buscaDisponibilidad)="buscaDisponibilidad($event)"
-              [updateParentModel]="updateAccount">
-              </app-detalle-reserva> -->
-              <app-detalle-reserva style="flex-grow: 1;"
-              [updateParentModel]="updateAccount">
-              </app-detalle-reserva>
-              <app-reserva></app-reserva>
-            </div>
+            <div class="step-content flex-wrap">
+              <app-step2 [updateParentModel]="updateAccount" class="step-section"></app-step2>
+              <div class="wrap">
+                <app-detalle-reserva [updateParentModel]="updateAccount" class="step-section"></app-detalle-reserva>
+                <app-reserva></app-reserva>
+              </div>
             </div>
           </ng-container>
 
+          <!-- Step 3 -->
           <ng-container *ngIf="currentStep$.value === 3">
-            <app-step3
-              class="w-100"
-              [updateParentModel]="updateAccount"
-              [defaultValues]="account$.value"
-            ></app-step3>
+            <app-step3 class="w-100" [updateParentModel]="updateAccount" [defaultValues]="account$.value"></app-step3>
           </ng-container>
 
+          <!-- Step 4 -->
           <ng-container *ngIf="currentStep$.value === 4">
-            <app-step4
-              class="w-100"
-              [updateParentModel]="updateAccount"
-              [defaultValues]="account$.value"
-            ></app-step4>
+            <app-step4 class="w-100" [updateParentModel]="updateAccount" [defaultValues]="account$.value"></app-step4>
           </ng-container>
 
+          <!-- Step 5 -->
           <ng-container *ngIf="currentStep$.value === 5">
             <app-step5 class="w-100"></app-step5>
           </ng-container>
@@ -116,15 +89,8 @@
         <div class="d-flex flex-stack pt-15">
           <div class="mr-2">
             <ng-container *ngIf="currentStep$.value !== 1">
-              <button
-                type="button"
-                class="btn btn-lg btn-light-primary me-3"
-                (click)="prevStep()"
-              >
-                <span
-                  [inlineSVG]="'./assets/media/icons/duotune/arrows/arr063.svg'"
-                  class="svg-icon svg-icon-4 me-1"
-                ></span>
+              <button type="button" class="btn btn-lg btn-light-primary me-3" (click)="prevStep()">
+                <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr063.svg'" class="svg-icon svg-icon-4 me-1"></span>
                 Back
               </button>
             </ng-container>
@@ -132,21 +98,11 @@
 
           <ng-container *ngIf="currentStep$.value !== formsCount">
             <div>
-              <button
-                type="button"
-                class="btn btn-lg btn-primary me-3"
-                [disabled]="!isCurrentFormValid$.value"
-                (click)="nextStep()"
-              >
+              <button type="button" class="btn btn-lg btn-primary me-3" [disabled]="!isCurrentFormValid$.value" (click)="nextStep()">
                 <span class="indicator-label">
                   <ng-container *ngIf="currentStep$.value < formsCount - 1">
-                    Continue {{ " " }}
-                    <span
-                      [inlineSVG]="
-                        './assets/media/icons/duotune/arrows/arr064.svg'
-                      "
-                      class="svg-icon svg-icon-3 ms-2 me-0"
-                    ></span>
+                    Continue
+                    <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr064.svg'" class="svg-icon svg-icon-3 ms-2 me-0"></span>
                   </ng-container>
                   <ng-container *ngIf="currentStep$.value === formsCount - 1">
                     Submit
@@ -160,7 +116,7 @@
     </div>
   </div>
 </div>
-  
+
 <ng-container *ngIf="isLoading">
   <app-loadding-spinner></app-loadding-spinner>
 </ng-container>

@@ -1,3 +1,69 @@
-.wrap{
-    float:left;
+/* Mobile-first CSS */
+.step-content {
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.step-section {
+    width: 100%;
+}
+
+.wrap {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+button {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* Tablet & Small Desktop */
+@media (min-width: 768px) {
+    .step-section {
+        width: 100%;
+    }
+
+    .step-content {
+        padding: 0 2rem;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .step-content {
+        width: 100%; /* Use full width of the parent */
+        padding: 0 3rem;
+    }
+
+    .step-section {
+        width: 100%; /* Ensure full width for step sections */
+    }
+
+    .wrap {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    button {
+        width: auto; /* Button can scale as per content */
+    }
+}
+
+/* Extra-large desktop */
+@media (min-width: 1440px) {
+    .step-content {
+        max-width: 80%; /* Further restrict width for very large screens */
+        margin: 0 auto;
+    }
+
+    .step-section {
+        width: 70%;
+    }
+
+    .wrap {
+        justify-content: space-around;
+    }
 }

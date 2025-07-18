@@ -1,91 +1,115 @@
-<div style="padding-top: 3em; padding-left: 2em;">
-  <div class="row">
-    <div class="col-lg-3">
-      <!-- <label>Día de Llegada</label> -->
-    </div>
-    <div class="col-lg-3">
-      <!-- <label>Día de Salida</label> -->
-    </div>
-    <div class="col-lg-1">
-      <small style="font-weight: bold;">Adultos</small>
-    </div>
-    <div class="col-lg-1">
-      <small style="font-weight: bold;">Niños</small>
-    </div>
-    <div class="col-lg-4">
-      <!-- <label>Código Promocional</label> -->
-    </div>
-  </div>
-  <div class="row" [formGroup]="form">
-    <div class="col-lg-3">
-      <mat-form-field>
-        <mat-label>Dia de Llegada</mat-label>
-        <input matInput [matDatepicker]="picker1" formControlName="fechaInicialForm">
-        <mat-hint>MM/DD/YYYY</mat-hint>
-        <mat-datepicker-toggle matIconSuffix [for]="picker1"></mat-datepicker-toggle>
-        <mat-datepicker #picker1></mat-datepicker>
-      </mat-form-field>
-    </div>
-    <div class="col-lg-3">
-      <mat-form-field>
-        <mat-label>Dia de Salida</mat-label>
-        <input matInput [matDatepicker]="picker2" formControlName="fechaFinalForm">
-        <mat-hint>MM/DD/YYYY</mat-hint>
-        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-        <mat-datepicker #picker2></mat-datepicker>
-      </mat-form-field>
-    </div>
-    <div style="padding: 2px;" class="col-md-1">
-      <select formControlName="adultos" id="numeroDeAdultos"
-        class="form-select form-select-lg form-select-solid border-gray-300">
-        <option value="1">1</option>
-        <option value="1">2</option>
-        <option value="1">3</option>
-        <option value="1">4</option>
-        <option value="1">5</option>
-        <option value="1">6</option>
-        <option value="1">7</option>
-        <option value="1">8</option>
-      </select>
-    </div>
-    <div style="padding: 2px;" class="col-md-1">
-      <select formControlName="ninos" id="numeroDeNinos"
-        class="form-select form-select-lg form-select-solid border-gray-300">
-        <option value="0">0</option>
-        <option value="1">1</option>
-        <option value="1">2</option>
-        <option value="1">3</option>
-        <option value="1">4</option>
-        <option value="1">5</option>
-        <option value="1">6</option>
-        <option value="1">7</option>
-        <option value="1">8</option>
-      </select>
-    </div>
-    <div class="col-lg-4">
-      <mat-form-field class="example-form-field">
-        <mat-label>Còdigo Promocional</mat-label>
-        <!-- <input matInput type="text" formControlName="codigoPromo" [(ngModel)]="codigoPromocional"> -->
-        <input matInput type="text" formControlName="codigoPromo">
-        <button *ngIf="codigoPromocional" matSuffix mat-icon-button aria-label="Clear" (click)="codigoPromocional=''">
-          <mat-icon>close</mat-icon>
-        </button>
-      </mat-form-field>
-    </div>
-    <select formControlName="hotel" (change)="categoryOnChange($event)"
-      class="form-select form-select-lg form-select-solid border-gray-300">
-      <option>Selecciona el hotel</option>
-      <ng-container *ngFor="let item of listaHoteles">
-        <option [value]="item">{{item}}</option>
-      </ng-container>
-    </select>
-  </div>
-</div>
-<div>
+<!-- step1-dates.component.html -->
+<div class="booking-step">
+  <form [formGroup]="formGroup" class="form">
 
-</div>
+    <!-- Hotel Selection -->
+    <!-- <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Selecciona el hotel</mat-label>
+      <mat-select
+        id="hotel"
+        formControlName="hotel"
+        (selectionChange)="categoryOnChange($event)">
+        <mat-option *ngFor="let item of listaHoteles" [value]="item">
+          {{ item }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="formGroup.get('hotel')?.hasError('required')">
+        Este campo es obligatorio.
+      </mat-error>
+    </mat-form-field> -->
 
+    <!-- Fechas y Noches -->
+    <fieldset class="form-section">
+      <legend>Fechas de Estancia</legend>
+      <div class="row-container">
 
-<div class="fv-plugins-message-container invalid-feedback">
-  <!-- <ErrorMessage name='accountType' /> -->
+        <!-- Date Picker -->
+        <div class="date-picker">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Selecciona tus fechas</mat-label>
+            <mat-date-range-input [rangePicker]="picker" [min]="minDate">
+              <input
+                matStartDate
+                placeholder="Fecha de Llegada"
+                formControlName="fechaInicialForm"
+                (dateChange)="addEventIntialDate('change', $event)">
+              <input
+                matEndDate
+                placeholder="Fecha de Salida"
+                formControlName="fechaFinalForm"
+                (dateChange)="addEventEndDate('change', $event)">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+              <mat-hint *ngIf="formGroup.hasError('dateRangeInvalid') && (formGroup.touched || formGroup.dirty)">
+                La fecha de salida debe ser posterior o igual a la fecha de llegada.
+              </mat-hint>
+          </mat-form-field>
+        </div>
+
+        <!-- Noches Badge -->
+        <div class="noches-box">
+          <div class="nights-content">
+            <mat-icon>hotel</mat-icon>
+            <span class="nights-label">Noches</span>
+            <span class="nights-badge">
+              {{ stayNights < 0 ? 1 : stayNights }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- Adultos y Niños -->
+    <fieldset class="form-section">
+      <legend>Huéspedes</legend>
+      <div class="row-container">
+
+        <!-- Adultos -->
+        <div class="guest-box">
+          <label class="guest-label">Adultos</label>
+          <div class="counter">
+            <button type="button" (click)="minus()" aria-label="Menos adultos">-</button>
+            <input
+              type="text"
+              formControlName="adultos"
+              readonly
+              [min]="1"
+              class="counter-input"
+              [value]="quantity" />
+            <button type="button" (click)="plus()" aria-label="Más adultos">+</button>
+          </div>
+        </div>
+
+        <!-- Niños -->
+        <div class="guest-box">
+          <label class="guest-label">Niños</label>
+          <div class="counter">
+            <button type="button" (click)="minusNin()" aria-label="Menos niños">-</button>
+            <input
+              type="text"
+              formControlName="ninos"
+              readonly
+              class="counter-input"
+              [value]="quantityNin" />
+            <button type="button" (click)="plusNin()" aria-label="Más niños">+</button>
+          </div>
+        </div>
+
+      </div>
+    </fieldset>
+
+    <!-- Código Promocional -->
+    <mat-form-field appearance="outline" class="full-width mt-3">
+      <mat-label>Código Promocional</mat-label>
+      <input matInput type="text" formControlName="codigoPromo">
+      <button *ngIf="codigoPromocional"
+              matSuffix mat-icon-button
+              aria-label="Borrar"
+              (click)="codigoPromocional = ''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+
+  </form>
 </div>

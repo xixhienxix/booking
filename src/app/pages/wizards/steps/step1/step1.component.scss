@@ -1,4 +1,93 @@
-.example-form-field {
-  margin: 0 8px 16px 0;
+.booking-step {
+  max-width: 800px;
+  margin: auto;
+  padding: 16px;
 }
 
+.full-width {
+  width: 100%;
+}
+
+.form-section {
+  border: 1px solid #ccc;
+  padding: 16px;
+  margin-top: 20px;
+  border-radius: 8px;
+}
+
+legend {
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 0 8px;
+  color: #00506a;
+}
+
+.row-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.date-picker {
+  flex: 2 1 60%;
+}
+
+.noches-box {
+  flex: 1 1 30%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nights-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #00506a;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-weight: bold;
+}
+
+.nights-badge {
+  font-size: 1.4rem;
+}
+
+.guest-box {
+  flex: 1 1 45%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.guest-label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #00506a;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter button {
+  background-color: #e6e9ed;
+  border: none;
+  padding: 8px 12px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.counter-input {
+  width: 50px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 40px;
+}

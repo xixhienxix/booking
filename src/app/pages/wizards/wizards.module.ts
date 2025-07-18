@@ -14,7 +14,7 @@ import { Step5Component } from './steps/step5/step5.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatNativeDateModule } from '@angular/material/core';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -25,7 +25,18 @@ import {MatSelectModule} from '@angular/material/select';
 import { LoaddingSpinnerComponent } from 'src/app/_helpers/loadding-spinner/loadding-spinner.component';
 import { DetalleReservaComponent } from './steps/step2-complement/detalle-reserva/detalle-reserva.component';
 import { ReservaComponent } from './steps/step2-complement/reserva/reserva.component';
-
+import { MomentDateAdapter } from '@angular/material-moment-adapter';
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'LL',
+  },
+  display: {
+    dateInput: 'LL',
+    monthYearLabel: 'MMMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 @NgModule({
   declarations: [
     HorizontalComponent,
@@ -58,6 +69,11 @@ import { ReservaComponent } from './steps/step2-complement/reserva/reserva.compo
     ReactiveFormsModule,
     InlineSVGModule,
     NgbTooltipModule,
+  ],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'es-MX' },
+    { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS },
   ],
 })
 export class WizardsModule {}

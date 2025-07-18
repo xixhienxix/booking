@@ -1,18 +1,22 @@
 
 export interface IHabitaciones
 {
-  Amenidades:string[],
-  Tipos_Camas:string[],
+  _id:string,
   Codigo:string,
-  Numero:string,
+  Numero:string[],
+  Tipo:string,
   Descripcion:string,
-  Tipo:string;
-  Adultos:number,
-  Ninos:number,
+  Adultos:number;
+  Ninos:number;
+  Inventario:number,
   Vista:string,
   Camas:number,
-  Tarifa:number,
-  Inventario:number,
+  Tipos_Camas:string[],
+  Amenidades:string[],
   Orden:Number,
-  URL:string
+  Tarifa:number,
+  URL?: string;
+  hotel?:string;
+  Color?:string;
+  Estatus:string;
 }

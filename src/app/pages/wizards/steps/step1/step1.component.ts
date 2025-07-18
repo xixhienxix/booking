@@ -8,6 +8,9 @@ import { ICalendario } from 'src/app/_models/calendario.model';
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { SpinnerService } from 'src/app/_service/spinner.service';
 import { HabitacionesService } from 'src/app/_service/habitacion.service';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { environment } from '../../../../../environments/environment';
+import { dateRangeValidator } from 'src/app/_helpers/custom-validators/date-range.validator';
 
 const today = new Date();
 const month = today.getMonth();
@@ -30,98 +33,172 @@ export const MY_FORMATS = {
 @Component({
   selector: 'app-step1',
   templateUrl: './step1.component.html',
-  styleUrls: ['./step1.component.scss'],
-  providers: [
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
-    {provide: MAT_DATE_FORMATS, useValue: MY_FORMATS},
-  ],
+  styleUrls: ['./step1.component.scss']
 })
 export class Step1Component implements OnInit, OnDestroy {
-  @Input('updateParentModel') updateParentModel: (
-    part: Partial<ICalendario>,
-    isFormValid: boolean
-  ) => void;
-  // @Output() buscaDisponibilidad : EventEmitter<boolean> = new EventEmitter<boolean>(false);
+  @Input('updateParentModel') updateParentModel: (part: Partial<ICalendario>, isFormValid: boolean) => void;
   @Output() honSubmit: EventEmitter<any> = new EventEmitter();
 
-  fechaInicial:Date
-  fechaFinal:Date
-  listaHoteles:string[]=[]
-
+  fechaInicial: Date;
+  fechaFinal: Date;
+  listaHoteles: string[] = ['Hotel Pokemon'];
   codigoPromocional = '';
 
-  form: FormGroup;
+  quantityNin:number=0;
+  quantity:number=1;
+  hotelId: string = environment.hotelID;
+
+    /** Dates */
+    intialDateFC = new FormControl(null);
+    endDateFC = new FormControl(null);
+    intialDate: Date | null = null;
+    endDate: Date | null = null;
+    minDate: Date = new Date(); // Set minDate to today's date
+  
+    intialDateEvent: string[] = [];
+    endDateEvent: string[] = [];
+    stayNights:number=1;
+
+    formGroup: FormGroup;
   private unsubscribe: Subscription[] = [];
 
-  constructor(private fb: FormBuilder,
-    private spinnerLoading : SpinnerService, 
-    private _disponibilidadService:DisponibilidadService,
-    private _habitacionService:HabitacionesService) {}
+  @Output() formValid: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    get f(){  
-      return this.form.controls;  
-    }
+  constructor(
+    private fb: FormBuilder,
+    private spinnerLoading: SpinnerService,
+
+    private habitacionService: HabitacionesService
+  ) {
+    this.formGroup = this.fb.group({
+      adultos: [1, Validators.required],
+      ninos: [0, Validators.required],
+      fechaInicialForm: [null, Validators.required],
+      fechaFinalForm: [null, Validators.required],
+      codigoPromo: [''],
+      hotel: []
+    }, { validators: dateRangeValidator }); 
+
+    this.spinnerLoading.loadingState = false;
+  }
+
+  get f() {
+    return this.formGroup.controls;
+  }
 
   ngOnInit() {
-    this.initForm();
+    this.formGroup.controls["hotel"].patchValue(this.hotelId);
+    console.log('his.formGroup.controls["hotel"]:', this.formGroup.controls["hotel"]?.value);
+
+    this.formGroup.statusChanges.subscribe(status => {
+      console.log('Form status:', status);
+      if (status === 'VALID') {
+        this.updateParentModel({}, this.formGroup.valid);
+      }
+    });
   
-    this._habitacionService.getHoteles().subscribe(
-      (val)=>{
-        for(let i=0; i<val.length;i++){
-          this.listaHoteles.push(val[i])
-        }
-    })
-    this.updateParentModel({}, true);
+    // Subscribe to valueChanges to handle changes dynamically
+    this.formGroup.valueChanges.subscribe(value => {
+      localStorage.setItem('HOTEL',value.hotel);
+      console.log('Form values:', value);
+      this.emitFormValues();
+    });
   }
 
-  initForm() {
-    this.form = new FormGroup({
-      fechaInicialForm: new FormControl(new Date(year, month, today.getDate())),
-      fechaFinalForm: new FormControl(new Date(year, month, today.getDate()+1)),
-      codigoPromo : new FormControl(''),
-      adultos: new FormControl(1),
-      ninos: new FormControl(0),
-      hotel: new FormControl('')
-    });
-    this.updateParentModel(
-        {
-          fechaFinal:this.form.controls["fechaInicialForm"].value,
-          fechaInicial:this.form.controls["fechaInicialForm"].value, 
-          codigoPromo:this.form.controls["codigoPromo"].value, 
-          adultos:this.form.controls["adultos"].value, 
-          ninos:this.form.controls["ninos"].value, 
-          hotel: this.form.controls["hotel"].value
-        },true)
 
-    this.form.controls['adultos'].setValue(1, {onlySelf: true});
-    this.form.controls['ninos'].setValue(0, {onlySelf: true});
-
-    const formChangesSubscr = this.form.valueChanges.subscribe((val) => {
-      const fechaInicial=new Date(val.fechaInicialForm)
-      this.fechaInicial=fechaInicial
-      this._disponibilidadService.changeFechaIni(fechaInicial)
-
-      const fechaFinalC=new Date(val.fechaFinalForm)
-      this.fechaFinal=fechaFinalC
-      this._disponibilidadService.changeFechaFinal(fechaFinalC)
-
-      this.updateParentModel({fechaFinal:this.fechaFinal,fechaInicial:this.fechaInicial, codigoPromo:val.codigoPromo, adultos:val.adultos, ninos:val.ninos, hotel: val.hotel},true)
-    });
-
-    this.unsubscribe.push(formChangesSubscr);
-    this.spinnerLoading.loadingState = false
+  //**DatePicker */
+  addEventIntialDate(type: string, event: MatDatepickerInputEvent<Date>) {
+    this.intialDateEvent = [];
+    this.intialDateEvent.push(`${type}: ${event.value}`);
+    this.intialDate = new Date(event.value!);
   }
 
-  categoryOnChange(e:any){
-    this.updateParentModel({hotel:e.target.value},true)
-    console.log(e.target.value)
+  addEventEndDate(type: string, event: MatDatepickerInputEvent<Date>) {
+    this.endDateEvent = [];
+    this.endDateEvent.push(`${type}: ${event.value}`);
+    this.endDate = new Date(event.value!);
+
+    if (this.intialDate && this.endDate) {
+      let Difference_In_Time = this.endDate.getTime() - this.intialDate.getTime();
+      this.stayNights = Math.ceil(Difference_In_Time / (1000 * 3600 * 24));
+    }
+  }
+  
+adjustQuantity(operation: 'plus' | 'minus', min: number, controlName: string) {
+  const control = this.formGroup.get(controlName);
+
+  if (!control) return;
+
+  let current = control.value || 0;
+
+  if (operation === 'plus') {
+    current += 1;
+  } else if (operation === 'minus' && current > min) {
+    current -= 1;
+  }
+
+  control.setValue(current);
+}
+
+plus() {
+  this.adjustQuantity('plus', 1, 'adultos');
+}
+
+minus() {
+  this.adjustQuantity('minus', 1, 'adultos');
+}
+
+plusNin() {
+  this.adjustQuantity('plus', 0, 'ninos');
+}
+
+minusNin() {
+  this.adjustQuantity('minus', 0, 'ninos');
+}
+
+
+  
+
+  isControlValid(controlName: string): boolean {
+    const control = this.formGroup.controls[controlName];
+    return control.valid && (control.dirty || control.touched);
+  }
+
+  isControlInvalid(controlName: string): boolean {
+    const control = this.formGroup.controls[controlName];
+    return control.invalid && (control.dirty || control.touched);
+  }
+
+  controlHasError(validation:any, controlName:string): boolean {
+    const control = this.formGroup.controls[controlName];
+    return control.hasError(validation) && (control.dirty || control.touched);
+  }
+
+  // private loadHoteles() {
+  //   this.habitacionService.getHoteles().subscribe(hoteles => {
+  //     this.listaHoteles = [...hoteles];
+  //   });
+  // }
+
+  emitFormValues() {
+    const { fechaInicialForm, fechaFinalForm, codigoPromo, adultos, ninos, hotel } = this.formGroup.value;
+    this.updateParentModel({
+      fechaInicial: new Date(fechaInicialForm),
+      fechaFinal: new Date(fechaFinalForm),
+      codigoPromo,
+      adultos,
+      ninos,
+      hotel
+    }, this.formGroup.valid);
+  }
+
+  // Handle dropdown change
+  categoryOnChange(event: any) {
+    this.updateParentModel({ hotel: event.value }, this.formGroup.valid);
   }
 
   ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
+    this.unsubscribe.forEach(sub => sub.unsubscribe());
   }
 }
+
