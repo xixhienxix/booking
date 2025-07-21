@@ -1,111 +1,88 @@
-<div class="card-body py-9 col-md-12" style="border: rgb(25, 129, 79); border-width: 5px; border-style: solid;">
-    <div style="background-color: #00506a;" class="modal-header">
-        <div class="text-center modal-title h4 col-12" style="padding: 3%; color: white; text-align: center;">
-          Mi Reserva
-        </div>      
-      </div>
-      <div class="modal-body" style="background-color: #e6e9ed">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-4">
-              <label style="font-weight: bold;"> Fecha :</label>
-            </div>
-            <div class="col-md-8">
-              <label> {{fechaInicial}} - {{fechaFinal}}</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-4">
-              <label style="font-weight: bold;">Noches:</label>
-            </div>
-            <div class="col-md-4">
-              <label>{{diff}}</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-4">
-              <label style="font-weight:bold">Habitaciones: </label>
-            </div>
-            <div class="col-md-4">
-              <label>2</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="container">
-              <hr>
-            </div>
-          </div>
-        </div>
-        <ng-container *ngFor="let reservas of miReserva; let i = index">
-          <div class="row">
-            <div class="col-md-10">
-              <h2 style="color:#00506a; font-weight: bold;">[{{reservas.codigoCuarto}}]</h2>
-            </div>
-            <div class="col-md-2">
-              <button style="background-color:#fa6d7c; font-weight: bold; color: white;" class="btn" (click)="pop(i)"> X </button>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-2">
-              <label>{{reservas.cantidadHabitaciones}}</label>
-            </div>
-            <div class="col-md-8">
-              <label> Habitaciones</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-2">
-              <label>[{{reservas.cantidadAdultos}}]</label>
-            </div>
-            <div class="col-md-8">
-              <label> Adultos</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-2">
-              <label>[{{reservas.cantidadNinos}}]</label>
-            </div>
-            <div class="col-md-8">
-              <label> Niños</label>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              <h2 style="color:#00506a; font-weight: bold;">Total por Estancia: ${{reservas.precioTarifa*diff||1}}</h2>
-            </div>
-          </div>
-        </ng-container>
-        
-        <div style="background-color: #a2a5a9">
-            <div class="container">
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Subtotal: </label>
-                </div>
-                <div class="col-md-6">
-                  <label>{{subtotal}}</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Impuestos: </label>
-                </div>
-                <div class="col-md-6">
-                  <label>{{impuestos}}</label>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <label>Total: </label>
-                </div>
-                <div class="col-md-6">
-                  <label>{{subtotal+impuestos}}</label>
-                </div>
-              </div>
-            </div>
-            <button type="button" class="btn btn-success col-md-12">RESERVA AHORA</button>
-        </div>
-      </div>
+<div class="mi-reserva-card">
+  <div class="modal-header">
+    <div class="modal-title">Mi Reserva</div>      
+  </div>
+  <div class="modal-body">
+    <!-- Summary Info -->
+    <div class="summary-row">
+      <label>Fecha :</label>
+      <div class="value">{{fechaInicial}} - {{fechaFinal}}</div>
+    </div>
+    <div class="summary-row">
+      <label>Noches:</label>
+      <div class="value">{{diff}}</div>
+    </div>
+    <div class="summary-row">
+      <label>Habitaciones:</label>
+      <div class="value">2</div>
+    </div>
+    <hr />
 
-      
+<div class="rooms-list">
+  <ng-container *ngFor="let reservas of miReserva; let i = index">
+    <mat-card class="room-item mat-elevation-z3">
+      <mat-card-header>
+        <div class="header-content">
+          <h2 class="room-code">[{{ reservas.codigoCuarto }}]</h2>
+          <button
+            mat-icon-button
+            color="warn"
+            aria-label="Eliminar habitación"
+            (click)="pop(i)"
+            class="btn-remove"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="room-details">
+          <div class="detail-group full-width">
+            <label>Habitaciones</label>
+            <div class="value">{{ reservas.cantidadHabitaciones }}</div>
+          </div>
+
+          <div class="detail-row">
+            <div class="detail-group small">
+              <label>Adultos</label>
+              <div class="value">{{ reservas.cantidadAdultos }}</div>
+            </div>
+            <div class="detail-group small">
+              <label>Niños</label>
+              <div class="value">{{ reservas.cantidadNinos }}</div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-footer>
+        <div class="total-price">
+          Total por Estancia:
+          <span class="price">${{ reservas.precioTarifa * diff || 1 }}</span>
+        </div>
+      </mat-card-footer>
+    </mat-card>
+  </ng-container>
+</div>
+
+
+
+    <!-- Price Summary -->
+    <div class="price-summary">
+      <div class="summary-row">
+        <label>Subtotal:</label>
+        <div class="value">{{subtotal}}</div>
+      </div>
+      <div class="summary-row">
+        <label>Impuestos:</label>
+        <div class="value">{{impuestos}}</div>
+      </div>
+      <div class="summary-row">
+        <label>Total:</label>
+        <div class="value">{{subtotal + impuestos}}</div>
+      </div>
+      <button type="button" class="btn btn-success btn-reserva">RESERVA AHORA</button>
+    </div>
+  </div>
 </div>

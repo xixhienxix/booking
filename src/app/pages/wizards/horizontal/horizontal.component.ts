@@ -34,6 +34,9 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   intialDate:Date
   endDate:Date
 
+  qty:number=1;
+  qtyNin:number=0
+
 
   currentStep$: BehaviorSubject<number> = new BehaviorSubject(1);
   isCurrentFormValid$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
@@ -76,6 +79,13 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   // filtrarTarifario(){
   // }
+
+  onQuantityChange($event:any){
+    this.qty = $event.qty
+    this.qtyNin = $event.qtyNin
+    console.log('this.qty',this.qty)
+    console.log('this.qtyNin',this.qtyNin)
+  }
 
   async nextStep() {
     const nextStep = this.currentStep$.value + 1;

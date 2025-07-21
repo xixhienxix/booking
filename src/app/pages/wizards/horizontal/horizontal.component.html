@@ -52,7 +52,8 @@
           <!-- Step 1 -->
           <ng-container *ngIf="currentStep$.value === 1">
             <div class="step-content">
-              <app-step1 
+              <app-step1
+                (quantityChanged)="onQuantityChange($event)" 
                 (formValid)="handleStep1FormValidity($event)"
                 [updateParentModel]="updateAccount">
               </app-step1>
@@ -61,14 +62,24 @@
 
           <!-- Step 2 -->
           <ng-container *ngIf="currentStep$.value === 2">
-            <div class="step-content flex-wrap">
-              <app-step2 [updateParentModel]="updateAccount" [accountsCurrentData]="account$.value" [intialDate]="intialDate" [endDate]="endDate" class="step-section"></app-step2>
-              <div class="wrap">
-                <app-detalle-reserva [updateParentModel]="updateAccount" class="step-section"></app-detalle-reserva>
-                <app-reserva></app-reserva>
+            <div class="step-content">
+              <app-step2
+              [qtyNin]="qtyNin"
+              [qty]="qty"
+                [updateParentModel]="updateAccount"
+                [accountsCurrentData]="account$.value"
+                [intialDate]="intialDate"
+                [endDate]="endDate"
+                class="step-section step2-section"
+              ></app-step2>
+
+              <div class="fixed-reserva-wrapper">
+                <app-reserva class="step-section reserva-section"></app-reserva>
               </div>
             </div>
           </ng-container>
+
+
 
           <!-- Step 3 -->
           <ng-container *ngIf="currentStep$.value === 3">

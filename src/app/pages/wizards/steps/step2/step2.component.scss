@@ -73,51 +73,94 @@
       margin-bottom: 1rem;
     }
 
-    .tarifa-row {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      padding: 0.75rem;
-      border: 1px dashed #ccc;
-      border-radius: 8px;
-      background: #fafafa;
-      margin-bottom: 1rem;
+.tarifa-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap; // evita que los elementos se rompan de línea
+  gap: .5rem;
+  padding: 0.75rem;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  background: #fafafa;
+  margin-bottom: 1rem;
 
-      .tarifa-radio {
-        font-weight: bold;
-        font-size: 1rem;
-      }
+  .tarifa-radio {
+    flex: 0 0 200px; // ancho fijo
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: bold;
+    font-size: 1rem;
+  }
 
-      .precio {
-        font-size: 1.1rem;
-        font-weight: bold;
-        color: #198754;
-      }
+  .precio-wrapper {
+  display: flex;
+  flex-shrink: 0;
+  min-width: 200px; // ancho mínimo para contener ambos
+}
 
-      .precio-regular {
-        color: red;
-        font-size: 0.9rem;
-        font-weight: bold;
-      }
 
-      .select-group {
-        display: flex;
-        flex-direction: column;
+  .precio {
+    flex: 0 0 120px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #198754;
+  }
 
-        label {
-          font-size: 0.8rem;
-          font-weight: bold;
-        }
+  .precio-regular {
+    flex: 0 0 130px;
+    color: red;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
 
-        select {
-          min-width: 70px;
-        }
-      }
+  .select-group {
+    flex: 0 0 100px;
+    display: flex;
+    flex-direction: column;
 
-      .btn-group {
-        margin-left: auto;
-      }
+    label {
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    select {
+      min-width: 70px;
     }
   }
+
+  .btn-group {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
 }
+
+  }
+}
+.precio, .precio-regular {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  small {
+    font-size: 0.75rem;
+    color: gray;
+    margin-bottom: 2px;
+    line-height: 1;
+  }
+
+  .monto {
+    font-weight: bold;
+    font-size: 1rem;
+    line-height: 1;
+  }
+}
+
+.noches-info {
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #444;
+  text-align: left;
+}
+

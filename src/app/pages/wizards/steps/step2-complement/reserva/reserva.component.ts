@@ -24,28 +24,42 @@ export class ReservaComponent implements OnInit {
 
   ngOnInit(){
 
-    combineLatest([this._disponibilidadService.currentFechaIni,this._disponibilidadService.currentFechaFin]).subscribe((val)=>{
-      // this.fechaInicial=val[0].toLocaleString(DateTime.DATETIME_SHORT).split(',')[0]
-      // this.fechaIniDateTime=val[0]
-/*       this.fechaFinal=val[1].toLocaleString(DateTime.DATETIME_SHORT).split(',')[0]
-      this.FechaFinDateTime=val[1] */
+combineLatest([this._disponibilidadService.currentFechaIni, this._disponibilidadService.currentFechaFin])
+  .subscribe(([fechaIni, fechaFin]) => {
+        // Validar que no sean undefined ni null
+        if (fechaIni && fechaFin) {
+          this.fechaIniDateTime = DateTime.fromJSDate(fechaIni instanceof Date ? fechaIni : new Date(fechaIni));
+          this.FechaFinDateTime = DateTime.fromJSDate(fechaFin instanceof Date ? fechaFin : new Date(fechaFin));
 
-      const diff = this.FechaFinDateTime.diff(this.fechaIniDateTime, ["days"]).toObject().days
-      if(diff!=undefined){
-        this.diff=diff
-      }
+          // Calcular la diferencia solo si ambos existen
+          const diff = this.FechaFinDateTime.diff(this.fechaIniDateTime, ["days"]).toObject().days;
 
-    })
-    this._disponibilidadService.currentReserva.subscribe(val=>{
-      this.miReserva=val
-      for(let i=0;i<val.length;i++){
-          this.subtotal+=(val[i].precioTarifa*this.diff)
-          this.impuestos = (this.subtotal* 16)/100
-        
+          if (diff !== undefined && diff !== null) {
+            this.diff = diff;
+          } else {
+            this.diff = 0; // valor por defecto
+          }
+        } else {
+          this.diff = 0; // valor por defecto si alguna fecha no está definida
+        }
+      });
+
+    this._disponibilidadService.currentReserva.subscribe(val => {
+      this.miReserva = val;
+
+      // Reiniciar subtotal para evitar acumulación indefinida
+      this.subtotal = 0;
+      this.impuestos = 0;
+
+      if (this.diff && this.diff > 0) {
+        for (let i = 0; i < val.length; i++) {
+          this.subtotal += val[i].precioTarifa * this.diff;
+        }
+        this.impuestos = (this.subtotal * 16) / 100;
       }
-    })
-    
+    });
   }
+
 
   pop(index:number){
     if(index===0){

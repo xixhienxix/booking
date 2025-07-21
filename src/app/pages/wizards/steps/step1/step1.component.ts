@@ -38,6 +38,8 @@ export const MY_FORMATS = {
 export class Step1Component implements OnInit, OnDestroy {
   @Input('updateParentModel') updateParentModel: (part: Partial<ICalendario>, isFormValid: boolean) => void;
   @Output() honSubmit: EventEmitter<any> = new EventEmitter();
+  @Output() quantityChanged = new EventEmitter<{ qty: number; qtyNin: number }>();
+
 
   fechaInicial: Date;
   fechaFinal: Date;
@@ -138,6 +140,11 @@ adjustQuantity(operation: 'plus' | 'minus', min: number, controlName: string) {
   }
 
   control.setValue(current);
+    // Emit updated values
+  this.quantityChanged.emit({
+    qty: this.formGroup.get('adultos')?.value,
+    qtyNin: this.formGroup.get('ninos')?.value
+  });
 }
 
 plus() {

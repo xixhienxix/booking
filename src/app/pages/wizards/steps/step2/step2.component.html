@@ -1,93 +1,82 @@
 <ng-container *ngFor="let dispo of habitaciones; let x = index">
-  <!-- Habitación Card -->
-  <div class="habitacion-card">
-    <div class="room-info">
-      <!-- Imagen -->
-      <div
-        class="room-image"
-        [ngStyle]="{ 'background-image': 'url(' + dispo.URL + ')' }"
-      ></div>
+    <!-- Habitación Card -->
+    <div class="habitacion-card">
+        <div class="room-info">
+            <!-- Imagen -->
+            <div class="room-image" [ngStyle]="{ 'background-image': 'url(' + dispo.URL + ')' }"></div>
 
-      <!-- Info -->
-      <div class="room-details">
-        <h2 class="room-code">{{ dispo.Codigo.replace('_', ' ') }}</h2>
+            <!-- Info -->
+            <div class="room-details">
+                <h2 class="room-code">{{ dispo.Codigo.replace('_', ' ') }}</h2>
 
-        <p class="room-desc">{{ dispo.Descripcion }}</p>
+                <p class="room-desc">{{ dispo.Descripcion }}</p>
 
-        <div class="max-ocupacion">
-          <span><strong>Máx. Adultos:</strong> {{ dispo.Adultos }}</span> |
-          <span><strong>Máx. Niños:</strong> {{ dispo.Ninos }}</span>
+                <div class="max-ocupacion">
+                    <span><strong>Máx. Adultos:</strong> {{ dispo.Adultos }}</span> |
+                    <span><strong>Máx. Niños:</strong> {{ dispo.Ninos }}</span>
+                </div>
+
+                <!-- Amenidades -->
+                <div class="amenidades">
+                    <ng-container *ngFor="let amenidad of dispo.Amenidades">
+                        <div class="amenidad-item">
+                            <img src="../../../../../assets/media/icons/custom/{{ amenidad }}.png" [alt]="amenidad" />
+                            <span>{{ amenidad }}</span>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
         </div>
 
-        <!-- Amenidades -->
-        <div class="amenidades">
-          <ng-container *ngFor="let amenidad of dispo.Amenidades">
-            <div class="amenidad-item">
-              <img
-                src="../../../../../assets/media/icons/custom/{{ amenidad }}.png"
-                [alt]="amenidad"
-              />
-              <span>{{ amenidad }}</span>
-            </div>
-          </ng-container>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tarifas Disponibles -->
-    <div class="tarifas-container">
-      <h4 class="tarifas-title">Tarifas Disponibles</h4>
-      <ng-container *ngFor="let tarifas of tarifasArray">
-        <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
-          <div class="tarifa-row">
-            <mat-radio-button
-              class="tarifa-radio"
-              [value]="dispo.Codigo + ',' + dispo.Numero + ',' + tarifas.TarifaRack + ',' + tarifas.Plan"
-              (change)="seleccionHabRadioButton($event)"
-            ><!--              [checked]="selectedTarifas[dispo.Codigo]?.Tarifa === tarifas.Tarifa"-->
-              {{ tarifas.Tarifa }}
-            </mat-radio-button>
-
-            <div class="precio">
-              {{
-                roundUp(ratesToCalc(tarifas, false, dispo.Codigo))
-                  | currency: 'MXN':'symbol':'1.0-0'
-              }}
+        <!-- Tarifas Disponibles -->
+        <div class="tarifas-container">
+            <div class="noches-info">
+                <small>
+                    Tarifa basada en <strong>{{ totalNights }}</strong>
+                    {{ totalNights === 1 ? 'noche' : 'noches' }}
+                </small>
             </div>
 
-            <div class="precio-regular">
-              Regular:
-              {{
-                tarifas.TarifaRack
-                  | currency: 'MXN':'symbol':'1.0-0'
-              }}
-            </div>
+            <h4 class="tarifas-title">Tarifas Disponibles</h4>
+            <ng-container *ngFor="let tarifas of tarifasArray">
+                <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
+                    <div class="tarifa-row">
+                        <mat-radio-button
+                            class="tarifa-radio"
+                            [value]="dispo.Codigo + ',' + dispo.Numero + ',' + tarifas.TarifaRack + ',' + tarifas.Plan"
+                            (change)="seleccionHabRadioButton($event); agregaHab(tarifas, tarifas.Habitacion, roundUp(ratesToCalc(tarifas, false, dispo.Codigo)), roundUp(ratesToCalc(tarifas, false, dispo.Codigo)/totalNights)); "
+                            >
+                            <div class="tarifa-texto">
+                                {{ tarifas.Tarifa }}
+                            </div>
+                        </mat-radio-button>
 
-            <div class="select-group">
-              <label>Adultos</label>
-              <select
-                (change)="onSelectChange($event.target)"
-                class="form-select"
-              >
-                <ng-container *ngFor="let i of [].constructor(dispo.Adultos); let j = index">
-                  <option [value]="j + 1">{{ j + 1 }}</option>
-                </ng-container>
-              </select>
-            </div>
+  <div class="precio-wrapper">
 
-            <div class="btn-group">
-              <button
-                [disabled]="!tarifaNotSelected"
-                class="btn btn-primary"
-                type="button"
-                (click)="agregaHab(tarifas, tarifas.Habitacion)"
-              >
-                Agregar
-              </button>
-            </div>
-          </div>
-        </ng-container>
-      </ng-container>
-    </div>
+                        <div class="precio">
+                            <small>Total</small>
+                            <span class="monto">
+                                {{
+                                roundUp(ratesToCalc(tarifas, false, dispo.Codigo))
+                                | currency: 'MXN':'symbol':'1.0-0'
+                                }}
+                            </span>
+                        </div>
+
+
+                        <div class="precio-regular">
+                            <small>$ Promedio x Noche</small>
+                            <span class="monto">
+                                {{
+                                roundUp(ratesToCalc(tarifas, false, dispo.Codigo)/totalNights)
+                                | currency: 'MXN':'symbol':'1.0-0'
+                                }}
+                            </span>
+                        </div>
   </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>
 </ng-container>

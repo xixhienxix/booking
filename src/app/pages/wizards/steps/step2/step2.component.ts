@@ -48,6 +48,9 @@ export class Step2Component implements OnInit, OnDestroy {
 
   @Input() intialDate: Date = new Date();
   @Input() endDate: Date = new Date();
+  @Input() qtyNin:number=0
+  @Input() qty:number=1;
+
   totalNights: number = 1
 
   constructor(
@@ -137,20 +140,23 @@ export class Step2Component implements OnInit, OnDestroy {
     this.tarifaNotSelected = true
   }
 
-  agregaHab(tarifaSeleccionada: any, codigoCuarto: any) {
+  agregaHab(tarifaSeleccionada: any, codigoCuarto: any, totalTarifa:number, tarifaPromedio:number) {
 
-    console.log(tarifaSeleccionada)
-    console.log(codigoCuarto)
+    console.log(totalTarifa)
+    console.log(tarifaPromedio)
+
+        console.log(this.qty)
+    console.log(this.qtyNin)
 
     const obj: miReserva[] = [{
       codigoCuarto: codigoCuarto,
       numeroCuarto: this.numeroCuarto,
       cantidadHabitaciones: this.inventario,
       nombreTarifa: this.nombreTarifa,
-      precioTarifa: this.precioTarifa,
+      precioTarifa: totalTarifa,
       detallesTarifa: this.plan,
-      cantidadAdultos: this.numeroDeAdultos,
-      cantidadNinos: this.numeroDeNinos
+      cantidadAdultos: this.qty,
+      cantidadNinos: this.qtyNin
     }]
 
     this._disponibilidadService.addMiReserva(obj)

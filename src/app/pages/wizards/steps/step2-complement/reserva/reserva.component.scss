@@ -1,0 +1,188 @@
+.mi-reserva-card {
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 800px;
+  background: #fff;
+
+  .modal-header {
+    background-color: #00506a;
+    padding: 1rem;
+    text-align: center;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+
+  .modal-body {
+    background-color: #e6e9ed;
+    padding: 1.5rem;
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+
+      label {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #333;
+      }
+      .value {
+        font-weight: 500;
+        font-size: 1rem;
+        color: #00506a;
+      }
+    }
+
+    
+
+.rooms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+
+  .room-item {
+    display: flex;
+    flex-direction: column;
+
+    mat-card-header {
+      padding: 0.75rem 1rem;
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+
+        .room-code {
+          font-weight: 700;
+          font-size: 1.4rem;
+          color: #00506a;
+          margin: 0;
+          user-select: none;
+        }
+
+.btn-remove {
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  font-weight: bold;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  /* Fondo rojo sólido en normal */
+  background-color: #fa6d7c;
+  color: #fff;
+  border: none;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    /* Rojo más oscuro en hover */
+    background-color: #d94e5c;
+    color: #fff;
+  }
+}
+
+      }
+    }
+
+    mat-card-content {
+      padding: 0.5rem 1.5rem 1rem;
+
+      .room-details {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        .detail-group {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          label {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #333;
+          }
+
+          .value {
+            font-weight: 700;
+            color: #00506a;
+            font-size: 1rem;
+          }
+
+          &.full-width {
+            width: 100%;
+          }
+        }
+
+        .detail-row {
+          display: flex;
+          gap: 2.5rem;
+          justify-content: flex-start;
+
+          .detail-group.small {
+            min-width: 80px;
+
+            label {
+              font-size: 0.9rem;
+              color: #555;
+            }
+
+            .value {
+              font-size: 1.1rem;
+              color: #198754;
+            }
+          }
+        }
+      }
+    }
+
+    mat-card-footer {
+      border-top: 1px solid #ddd;
+      padding: 1rem 1.5rem;
+      text-align: center;
+
+      .total-price {
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #198754;
+
+        .price {
+          font-weight: 900;
+          font-size: 1.5rem;
+          margin-left: 0.5rem;
+          color: #0b5e3a;
+        }
+      }
+    }
+  }
+}
+  }
+
+  // Responsive:
+  @media (max-width: 576px) {
+    .modal-body {
+      .summary-row,
+      .price-summary .summary-row {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .value {
+          margin-top: 0.25rem;
+        }
+      }
+
+      .rooms-list .room-item {
+        grid-template-columns: 1fr 40px;
+      }
+    }
+  }
+}
