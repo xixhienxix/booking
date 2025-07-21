@@ -1,99 +1,122 @@
-.booking-container {
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  padding: 2rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-}
-
-.sidebar {
-  flex: 1;
-  max-width: 300px;
-  background-color: #f2f2f2;
-  padding: 1.5rem;
+.habitacion-card {
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 12px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-}
-
-.rooms-list {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.room-card {
-  display: flex;
-  flex-direction: row;
+  margin-bottom: 2rem;
   padding: 1rem;
-  border-radius: 12px;
-  background-color: #fff;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
 
-  .room-content {
+  .room-info {
     display: flex;
-    gap: 2rem;
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-    }
+    gap: 1rem;
+    flex-wrap: wrap;
 
     .room-image {
-      min-width: 200px;
+      width: 250px;
       height: 150px;
       background-size: cover;
       background-position: center;
-      border-radius: 8px;
+      border-radius: 10px;
+      flex-shrink: 0;
     }
 
     .room-details {
       flex: 1;
 
-      h2 {
-        margin: 0 0 0.5rem 0;
-        font-size: 1.5rem;
+      .room-code {
         color: #00506a;
+        font-weight: bold;
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
       }
 
-      .room-icons {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        margin: 0.5rem 0;
+      .room-desc {
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+      }
 
-        mat-icon {
-          font-size: 20px;
-          vertical-align: middle;
+      .max-ocupacion {
+        font-size: 0.9rem;
+        color: #555;
+        margin-bottom: 1rem;
+      }
+
+      .amenidades {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+
+        .amenidad-item {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+
+          img {
+            width: 24px;
+            height: 24px;
+          }
+
+          span {
+            font-size: 0.85rem;
+          }
+        }
+      }
+    }
+  }
+
+  .tarifas-container {
+    margin-top: 1.5rem;
+
+    .tarifas-title {
+      color: #00506a;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .tarifa-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 0.75rem;
+      border: 1px dashed #ccc;
+      border-radius: 8px;
+      background: #fafafa;
+      margin-bottom: 1rem;
+
+      .tarifa-radio {
+        font-weight: bold;
+        font-size: 1rem;
+      }
+
+      .precio {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #198754;
+      }
+
+      .precio-regular {
+        color: red;
+        font-size: 0.9rem;
+        font-weight: bold;
+      }
+
+      .select-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+          font-size: 0.8rem;
+          font-weight: bold;
+        }
+
+        select {
+          min-width: 70px;
         }
       }
 
-      .amenities {
-        display: flex;
-        gap: 0.5rem;
-        margin: 0.5rem 0;
-
-        img {
-          width: 24px;
-          height: 24px;
-        }
-      }
-
-      .tarifas {
-        margin: 0.5rem 0;
-      }
-
-      select {
-        margin: 0.25rem 0;
-        padding: 0.25rem;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-      }
-
-      button {
-        margin-top: 1rem;
+      .btn-group {
+        margin-left: auto;
       }
     }
   }

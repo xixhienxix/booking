@@ -1,112 +1,93 @@
 <ng-container *ngFor="let dispo of habitaciones; let x = index">
-        <div  class="card-body py-9 " style="border: black; border-width: 5px; border-style: solid;">
-          <!--begin::Row-->
-          <div class="row gx-9 h-100">
-              <!--begin::Col-->
-              <div class="row col-sm-6 mb-10 mb-sm-0">
-                  <!--begin::Image-->
-                  <div class="bgi-no-repeat card-rounded" 
-                       style="background-size: 100% 100%; height: 70%; background-image:url('{{dispo.URL}}');">
-                  </div>
-              <div class="row">
-                <h2>Maximo de Adultos: {{dispo.Adultos}}</h2>
-                <h2>Maximo de Niños: {{dispo.Ninos}}</h2>
-            </div>
-                  <!--end::Image-->
-              </div>
-              <!--end::Col-->
-        
-              <!--begin::Col-->
-              <div class="col-sm-6">
-                  <!--begin::Wrapper-->
-                  <div class="d-flex flex-column h-100">
-                      <!--begin::Header-->
-                      <div class="mb-7">
-                          <!--begin::Headin-->
-                          <div class="d-flex flex-stack mb-6">
-                              <!--begin::Title-->
-                              <div class="flex-shrink-0 me-5">
-                                  <span class="modal-header" style="color:#00506a; font-weight: bold; font-size: x-large;">{{dispo.Codigo.replace("_"," ")}}</span>
-                              </div>
-                              <!--end::Title-->
-                          </div>
-                          <!--end::Heading-->
-        
-                            <!--begin::Items-->
-                            <div class="d-flex align-items-center flex-wrap d-grid gap-2">
-                                <ng-container *ngFor="let amenidades of habitaciones[x].Amenidades;">
-                                <!--begin::Item-->
-                                <div class="d-flex align-items-center me-5 me-xl-13">
-                                    <!--begin::Symbol-->
-                                    <div class="symbol symbol-30px symbol-circle me-3">
-                                        <img src="../../../../../assets/media/icons/custom/{{amenidades}}.png" class="" alt="">
-                                    </div>
-                                    <!--end::Symbol-->
-        
-                                    <!--begin::Info-->
-                                    <div class="m-0">
-                                        <!-- <span class="fw-semibold text-gray-400 d-block fs-8">Manager</span> -->
-                                        <a  class="fw-bold text-gray-800 text-hover-primary fs-7">{{amenidades}}</a>
-                                    </div>
-                                    <!--end::Info-->
-                                </div>
-                                <!--end::Item-->
-                                </ng-container>
-                            </div>
-                          <!--end::Items-->
-                      </div>
-                      <!--end::Header-->
-        
-                      <!--begin::Body-->
-                      <div class="mb-6">
-                          <!--begin::Text-->
-                          <span class="fw-semibold text-gray-600 fs-6 mb-8 d-block">
-                              {{dispo.Descripcion}}
-                          </span>
-                          <!--end::Text-->
-                          <h4 style="color:#00506a; font-weight: bold;" class="modal-title">Tarifas Disponibles</h4>
-                          <!--begin::Tarifas-->
-                            <ng-container *ngFor="let tarifas of tarifasArray; let i = index">
-                                <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
-                                    <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 px-4 me-6 mb-3">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <mat-radio-button  style="font-size: 17px; font-weight: bold;" value="{{dispo.Codigo}},{{dispo.Numero}},{{tarifas.TarifaRack}},{{tarifas.Plan}}"  (change)="seleccionHabRadioButton($event)">{{tarifas.Tarifa}}</mat-radio-button >
-                                                <p><small style="color: red; font-weight: bold;">Regular: {{tarifas.TarifaRack}}</small></p>
-                                                <!-- <p><small style="color: rgb(32, 189, 32); font-weight: bold;">Descuento: {{tarifas.Descuento}}</small></p> -->
-                                            </div>
-                                            <div style="padding: 10px;" class="col-md-2">
-                                                <mat-label style="font-size: 17px; font-weight: bold; ">${{ roundUp(ratesToCalc(tarifas,false,dispo.Codigo))  | currency : 'MXN' :
-                        'symbol' : '1.0-0' }}</mat-label>
-                                            </div>
-                                            <div style="padding: 2px;" class="col-md-2">
-                                                <small style="font-weight: bold;">Adultos</small>
-                                                <select (change)="onSelectChange($event.target)" id="numeroDeAdultos" class="form-select form-select-lg form-select-solid border-gray-300">
-                                                    <ng-container *ngFor="let personas of [].constructor(dispo.Adultos); let i = index">
-                                                        <option value="{{i+1}}">{{i+1}}</option>
-                                                    </ng-container>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <!-- <button type="button" class="btn btn-primary">Seleccionar Habitación</button> -->
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <button [disabled]="!tarifaNotSelected" class="btn btn-primary" type="button" (click)="agregaHab(tarifas,tarifas.Habitacion)">Agregar Habitación</button>
-                                    </div>
-                                </ng-container>    
-                            </ng-container>
-                          <!--end::Tarifas-->
-                      </div>
-                      <!--end::Body-->
-                  </div>
-                  <!--end::Wrapper-->
-              </div>
-              <!--end::Col-->
-        
-          </div>
-          <!--end::Row-->
-        </div>
-</ng-container>
+  <!-- Habitación Card -->
+  <div class="habitacion-card">
+    <div class="room-info">
+      <!-- Imagen -->
+      <div
+        class="room-image"
+        [ngStyle]="{ 'background-image': 'url(' + dispo.URL + ')' }"
+      ></div>
 
+      <!-- Info -->
+      <div class="room-details">
+        <h2 class="room-code">{{ dispo.Codigo.replace('_', ' ') }}</h2>
+
+        <p class="room-desc">{{ dispo.Descripcion }}</p>
+
+        <div class="max-ocupacion">
+          <span><strong>Máx. Adultos:</strong> {{ dispo.Adultos }}</span> |
+          <span><strong>Máx. Niños:</strong> {{ dispo.Ninos }}</span>
+        </div>
+
+        <!-- Amenidades -->
+        <div class="amenidades">
+          <ng-container *ngFor="let amenidad of dispo.Amenidades">
+            <div class="amenidad-item">
+              <img
+                src="../../../../../assets/media/icons/custom/{{ amenidad }}.png"
+                [alt]="amenidad"
+              />
+              <span>{{ amenidad }}</span>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarifas Disponibles -->
+    <div class="tarifas-container">
+      <h4 class="tarifas-title">Tarifas Disponibles</h4>
+      <ng-container *ngFor="let tarifas of tarifasArray">
+        <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
+          <div class="tarifa-row">
+            <mat-radio-button
+              class="tarifa-radio"
+              [value]="dispo.Codigo + ',' + dispo.Numero + ',' + tarifas.TarifaRack + ',' + tarifas.Plan"
+              (change)="seleccionHabRadioButton($event)"
+            ><!--              [checked]="selectedTarifas[dispo.Codigo]?.Tarifa === tarifas.Tarifa"-->
+              {{ tarifas.Tarifa }}
+            </mat-radio-button>
+
+            <div class="precio">
+              {{
+                roundUp(ratesToCalc(tarifas, false, dispo.Codigo))
+                  | currency: 'MXN':'symbol':'1.0-0'
+              }}
+            </div>
+
+            <div class="precio-regular">
+              Regular:
+              {{
+                tarifas.TarifaRack
+                  | currency: 'MXN':'symbol':'1.0-0'
+              }}
+            </div>
+
+            <div class="select-group">
+              <label>Adultos</label>
+              <select
+                (change)="onSelectChange($event.target)"
+                class="form-select"
+              >
+                <ng-container *ngFor="let i of [].constructor(dispo.Adultos); let j = index">
+                  <option [value]="j + 1">{{ j + 1 }}</option>
+                </ng-container>
+              </select>
+            </div>
+
+            <div class="btn-group">
+              <button
+                [disabled]="!tarifaNotSelected"
+                class="btn btn-primary"
+                type="button"
+                (click)="agregaHab(tarifas, tarifas.Habitacion)"
+              >
+                Agregar
+              </button>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</ng-container>
