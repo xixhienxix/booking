@@ -9,13 +9,14 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { AppRoutingModule } from './app-routing.module';
 import { HotelInterceptor } from './_interceptor/http.interceptor';
-
+import {MatCardModule} from '@angular/material/card';
 @NgModule({
   declarations: [
     AppComponent,
   ],
   imports: [
     HttpClientModule,
+    MatCardModule,
     AppRoutingModule,
     MatButtonModule,
     MatNativeDateModule,

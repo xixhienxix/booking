@@ -26,6 +26,7 @@ import { LoaddingSpinnerComponent } from 'src/app/_helpers/loadding-spinner/load
 import { DetalleReservaComponent } from './steps/step2-complement/detalle-reserva/detalle-reserva.component';
 import { ReservaComponent } from './steps/step2-complement/reserva/reserva.component';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
+import { MatCardModule } from '@angular/material/card';
 export const MY_DATE_FORMATS = {
   parse: {
     dateInput: 'LL',
@@ -52,6 +53,7 @@ export const MY_DATE_FORMATS = {
   ],
   imports: [
     MatRadioModule,
+    MatCardModule,
     MatSelectModule,
     MatButtonModule,
     MatCheckboxModule,

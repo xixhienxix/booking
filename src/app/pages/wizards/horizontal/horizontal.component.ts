@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, Output } from '@angular/core';
-import { BehaviorSubject, Subject, Subscription, concat, takeUntil } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, concat, firstValueFrom, takeUntil } from 'rxjs';
 import { ICalendario, defaultCalendario } from 'src/app/_models/calendario.model';
 import { ICreateAccount, inits } from '../create-account.helper';
 import { IDisponibilidad, defaultDispo } from 'src/app/_models/disponibilidad.model';
@@ -30,6 +30,9 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   listaHoteles:Ihoteles[]=[]
 
   isStep1FormValid: boolean = false;
+
+  intialDate:Date
+  endDate:Date
 
 
   currentStep$: BehaviorSubject<number> = new BehaviorSubject(1);
@@ -74,17 +77,23 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   // filtrarTarifario(){
   // }
 
-  nextStep() {
+  async nextStep() {
     const nextStep = this.currentStep$.value + 1;
     if(nextStep === 2){
       const currentData:ICalendario = {
         ...this.account$.value
       }
-      this._disponibilidadService.getDisponibilidad(this.account$.value).subscribe({
-        next:(value)=>{
-          console.log(value);
-        }
-      });
+    this.intialDate = currentData.fechaInicial 
+    this.endDate = currentData.fechaFinal
+
+    const result = await firstValueFrom(this._disponibilidadService.getDisponibilidad(this.account$.value));
+    const dispoResponse = await this._disponibilidadService.calcHabitacionesDisponibles(result, currentData.fechaInicial, currentData.fechaFinal, '1');
+    const tarifasArray = await this.tarifasService.roomRates(currentData.fechaInicial, currentData.fechaFinal)
+    const preAsignadasArray = dispoResponse.preAsignadasArray
+    const availavilityRooms = dispoResponse.avaibilityRooms
+
+    console.log('result');
+
     }
     if (nextStep > this.formsCount) {
       return;

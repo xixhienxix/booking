@@ -62,7 +62,7 @@
           <!-- Step 2 -->
           <ng-container *ngIf="currentStep$.value === 2">
             <div class="step-content flex-wrap">
-              <app-step2 [updateParentModel]="updateAccount" class="step-section"></app-step2>
+              <app-step2 [updateParentModel]="updateAccount" [accountsCurrentData]="account$.value" [intialDate]="intialDate" [endDate]="endDate" class="step-section"></app-step2>
               <div class="wrap">
                 <app-detalle-reserva [updateParentModel]="updateAccount" class="step-section"></app-detalle-reserva>
                 <app-reserva></app-reserva>

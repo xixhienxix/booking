@@ -67,7 +67,7 @@
                           <h4 style="color:#00506a; font-weight: bold;" class="modal-title">Tarifas Disponibles</h4>
                           <!--begin::Tarifas-->
                             <ng-container *ngFor="let tarifas of tarifasArray; let i = index">
-                                <ng-container *ngIf="tarifas.Habitacion == dispo.Codigo">
+                                <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
                                     <div class="border border-gray-300 border-dashed rounded min-w-100px w-100 px-4 me-6 mb-3">
                                         <div class="row">
                                             <div class="col-md-4">
@@ -76,7 +76,8 @@
                                                 <!-- <p><small style="color: rgb(32, 189, 32); font-weight: bold;">Descuento: {{tarifas.Descuento}}</small></p> -->
                                             </div>
                                             <div style="padding: 10px;" class="col-md-2">
-                                                <mat-label style="font-size: 17px; font-weight: bold; ">${{tarifas.TarifaRack}}</mat-label>
+                                                <mat-label style="font-size: 17px; font-weight: bold; ">${{ roundUp(ratesToCalc(tarifas,false,dispo.Codigo))  | currency : 'MXN' :
+                        'symbol' : '1.0-0' }}</mat-label>
                                             </div>
                                             <div style="padding: 2px;" class="col-md-2">
                                                 <small style="font-weight: bold;">Adultos</small>
