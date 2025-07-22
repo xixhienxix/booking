@@ -11,6 +11,8 @@ import { tarifarioTabla, Tarifas } from 'src/app/_models/tarifario.model';
 import { MatRadioButton, MatRadioChange } from '@angular/material/radio';
 import { miReserva } from 'src/app/_models/mireserva.model';
 import { isNumber } from '@ng-bootstrap/ng-bootstrap/util/util';
+import { MatCheckboxChange } from '@angular/material/checkbox';
+import { HabitacionesService } from 'src/app/_service/habitacion.service';
 @Component({
   selector: 'app-step2',
   templateUrl: './step2.component.html',
@@ -37,7 +39,7 @@ export class Step2Component implements OnInit, OnDestroy {
   nombreTarifa: string = ''
   precioTarifa: number;
   codigoCuarto: string = '';
-  numeroCuarto: number;
+  numeroCuarto: string;
   plan: string = '';
   tarifaNotSelected: boolean = false;
   currentData: ICalendario
@@ -45,6 +47,10 @@ export class Step2Component implements OnInit, OnDestroy {
   tarifasStandard:Tarifas[]=[]
   tarifasTemporales:Tarifas[]=[]
   tarifasEspeciales:Tarifas[]=[]
+  roomCodesComplete:IHabitaciones[]=[]
+
+habitacionesArray: number[] = [];
+selectedHabitaciones: number = 1;
 
   @Input() intialDate: Date = new Date();
   @Input() endDate: Date = new Date();
@@ -63,6 +69,7 @@ export class Step2Component implements OnInit, OnDestroy {
   async ngOnInit() {
 
     this.tarifas = await firstValueFrom(this._tarifasServices.currentData);
+    this.roomCodesComplete = await firstValueFrom(this._disponibilidadService.getAllHabitaciones());
 
     this.tarifasStandard = this.tarifas.filter(item => item.Tarifa === 'Tarifa Base');
     this.tarifasTemporales = this.tarifas.filter(item => item.Tarifa === 'Tarifa De Temporada');
@@ -70,8 +77,6 @@ export class Step2Component implements OnInit, OnDestroy {
       item => item.Tarifa !== 'Tarifa Base' && item.Tarifa !== 'Tarifa De Temporada'
     );
 
-    console.log('intialDate', this.intialDate)
-    console.log('endDate', this.endDate)
 
     // One day in milliseconds
     const oneDay = 1000 * 60 * 60 * 24;
@@ -89,6 +94,7 @@ export class Step2Component implements OnInit, OnDestroy {
     }
 
     this._disponibilidadService.currentData.subscribe(res => {
+      console.log('habitaciones: ' , ...res)
       this.habitaciones = [...res];
     });
 
@@ -96,6 +102,13 @@ export class Step2Component implements OnInit, OnDestroy {
       this.tarifasArray = [...res];
     });
   }
+
+generateInventarioArray(codigo: string): number[] {
+  const inventario = this.roomCodesComplete.filter(room => room.Codigo === codigo).length;
+
+  return Array.from({ length: inventario }, (_, i) => i + 1);
+}
+
 
   getTarifasForHabitacion(codigo: string) {
     return this.tarifasArray.filter(t => t.Habitacion.includes(codigo));
@@ -132,7 +145,7 @@ export class Step2Component implements OnInit, OnDestroy {
     }
   }
 
-  seleccionHabRadioButton(evt: MatRadioChange) {
+  seleccionHabRadioButton(evt: any) {
     this.codigoCuarto = evt.value.split(',')[0]
     this.numeroCuarto = evt.value.split(',')[1]
     this.precioTarifa = evt.value.split(',')[2]
@@ -141,12 +154,6 @@ export class Step2Component implements OnInit, OnDestroy {
   }
 
   agregaHab(tarifaSeleccionada: any, codigoCuarto: any, totalTarifa:number, tarifaPromedio:number) {
-
-    console.log(totalTarifa)
-    console.log(tarifaPromedio)
-
-        console.log(this.qty)
-    console.log(this.qtyNin)
 
     const obj: miReserva[] = [{
       codigoCuarto: codigoCuarto,

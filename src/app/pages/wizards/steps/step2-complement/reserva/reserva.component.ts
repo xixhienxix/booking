@@ -9,40 +9,36 @@ import { miReserva } from 'src/app/_models/mireserva.model';
   styleUrls: ['./reserva.component.scss']
 })
 export class ReservaComponent implements OnInit {
-  constructor(    private _disponibilidadService : DisponibilidadService
-    ){
+  constructor(private _disponibilidadService: DisponibilidadService
+  ) {
   }
 
-  fechaInicial:string=''
-  fechaFinal:string=''
-  diff:number
-  fechaIniDateTime:DateTime;
-  FechaFinDateTime:DateTime;
-  miReserva:miReserva[]=[];
-  subtotal:number=0;
-  impuestos:number=0;
+  fechaInicial: string = ''
+  fechaFinal: string = ''
+  diff: number
+  fechaIniDateTime: DateTime;
+  FechaFinDateTime: DateTime;
+  miReserva: miReserva[] = [];
+  subtotal: number = 0;
+  impuestos: number = 0;
 
-  ngOnInit(){
+  ngOnInit() {
 
-combineLatest([this._disponibilidadService.currentFechaIni, this._disponibilidadService.currentFechaFin])
-  .subscribe(([fechaIni, fechaFin]) => {
-        // Validar que no sean undefined ni null
-        if (fechaIni && fechaFin) {
-          this.fechaIniDateTime = DateTime.fromJSDate(fechaIni instanceof Date ? fechaIni : new Date(fechaIni));
-          this.FechaFinDateTime = DateTime.fromJSDate(fechaFin instanceof Date ? fechaFin : new Date(fechaFin));
+    combineLatest([
+      this._disponibilidadService.currentFechaIni,
+      this._disponibilidadService.currentFechaFin
+    ]).subscribe(([fechaIni, fechaFin]) => {
+      if (fechaIni && fechaFin) {
+        this.fechaIniDateTime = DateTime.fromJSDate(fechaIni);
+        this.FechaFinDateTime = DateTime.fromJSDate(fechaFin);
 
-          // Calcular la diferencia solo si ambos existen
-          const diff = this.FechaFinDateTime.diff(this.fechaIniDateTime, ["days"]).toObject().days;
+        const diff = this.FechaFinDateTime.diff(this.fechaIniDateTime, ["days"]).toObject().days;
+        this.diff = diff ?? 0;
+      } else {
+        this.diff = 0;
+      }
+    });
 
-          if (diff !== undefined && diff !== null) {
-            this.diff = diff;
-          } else {
-            this.diff = 0; // valor por defecto
-          }
-        } else {
-          this.diff = 0; // valor por defecto si alguna fecha no está definida
-        }
-      });
 
     this._disponibilidadService.currentReserva.subscribe(val => {
       this.miReserva = val;
@@ -61,13 +57,13 @@ combineLatest([this._disponibilidadService.currentFechaIni, this._disponibilidad
   }
 
 
-  pop(index:number){
-    if(index===0){
-      this.miReserva=[]
-      this.subtotal=0
-      this.impuestos=0;
-    }else{
-      this.miReserva=this.miReserva.splice(index,1)
+  pop(index: number) {
+    if (index === 0) {
+      this.miReserva = []
+      this.subtotal = 0
+      this.impuestos = 0;
+    } else {
+      this.miReserva = this.miReserva.splice(index, 1)
     }
     this._disponibilidadService.changeMiReserva(this.miReserva)
   }

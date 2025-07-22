@@ -66,6 +66,39 @@
   .tarifas-container {
     margin-top: 1.5rem;
 
+    .tarifas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+
+  .tarifas-title {
+    margin: 0;
+  }
+
+  .habitaciones-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    select {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: white;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+
     .tarifas-title {
       color: #00506a;
       font-size: 1.2rem;

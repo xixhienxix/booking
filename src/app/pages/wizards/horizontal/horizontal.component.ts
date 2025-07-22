@@ -9,7 +9,6 @@ import { TarifasService } from 'src/app/_service/tarifas.service';
 import { ITarifas } from 'src/app/_models/tarifas.model';
 import { tarifarioTabla } from 'src/app/_models/tarifario.model';
 import { SpinnerService } from 'src/app/_service/spinner.service';
-import { HabitacionesService } from 'src/app/_service/habitacion.service';
 import { Ihoteles } from 'src/app/_models/hoteles.model';
 
 @Component({
@@ -48,7 +47,6 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     private _disponibilidadService : DisponibilidadService,
     private tarifasService : TarifasService,
     private spinnerService : SpinnerService,
-    private habitacionService : HabitacionesService
   ) {
     this.spinnerService.isLoading$.subscribe((val)=>{
       this.isLoading=val
@@ -79,6 +77,10 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   // filtrarTarifario(){
   // }
+
+  onDateRangeChange(event:any){
+    console.log(event)
+  }
 
   onQuantityChange($event:any){
     this.qty = $event.qty

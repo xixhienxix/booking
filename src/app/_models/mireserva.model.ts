@@ -1,6 +1,6 @@
 export interface miReserva {
     codigoCuarto:string,
-    numeroCuarto:number,
+    numeroCuarto:string,
     cantidadHabitaciones:number,
     nombreTarifa:string,
     precioTarifa:number,

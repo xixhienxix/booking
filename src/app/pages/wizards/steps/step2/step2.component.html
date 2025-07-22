@@ -30,50 +30,59 @@
 
         <!-- Tarifas Disponibles -->
         <div class="tarifas-container">
+            <div class="tarifas-header">
+                <h4 class="tarifas-title">Tarifas Disponibles</h4>
+
+                    <div class="habitaciones-dropdown">
+                        <label for="habitaciones-{{x}}">Habitaciones:</label>
+                        <select id="habitaciones-{{x}}">
+                            <option *ngFor="let num of generateInventarioArray(dispo.Codigo)" [value]="num">
+                                {{ num }}
+                            </option>
+                        </select>
+                    </div>
+
+            </div>
             <div class="noches-info">
                 <small>
                     Tarifa basada en <strong>{{ totalNights }}</strong>
                     {{ totalNights === 1 ? 'noche' : 'noches' }}
                 </small>
             </div>
-
-            <h4 class="tarifas-title">Tarifas Disponibles</h4>
             <ng-container *ngFor="let tarifas of tarifasArray">
                 <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
                     <div class="tarifa-row">
-                        <mat-radio-button
-                            class="tarifa-radio"
+                        <mat-radio-button class="tarifa-radio"
                             [value]="dispo.Codigo + ',' + dispo.Numero + ',' + tarifas.TarifaRack + ',' + tarifas.Plan"
-                            (change)="seleccionHabRadioButton($event); agregaHab(tarifas, tarifas.Habitacion, roundUp(ratesToCalc(tarifas, false, dispo.Codigo)), roundUp(ratesToCalc(tarifas, false, dispo.Codigo)/totalNights)); "
-                            >
+                            (change)="seleccionHabRadioButton($event); agregaHab(tarifas, tarifas.Habitacion, roundUp(ratesToCalc(tarifas, false, dispo.Codigo)), roundUp(ratesToCalc(tarifas, false, dispo.Codigo)/totalNights)); ">
                             <div class="tarifa-texto">
                                 {{ tarifas.Tarifa }}
                             </div>
                         </mat-radio-button>
 
-  <div class="precio-wrapper">
+                        <div class="precio-wrapper">
 
-                        <div class="precio">
-                            <small>Total</small>
-                            <span class="monto">
-                                {{
-                                roundUp(ratesToCalc(tarifas, false, dispo.Codigo))
-                                | currency: 'MXN':'symbol':'1.0-0'
-                                }}
-                            </span>
+                            <div class="precio">
+                                <small>Total</small>
+                                <span class="monto">
+                                    {{
+                                    roundUp(ratesToCalc(tarifas, false, dispo.Codigo))
+                                    | currency: 'MXN':'symbol':'1.0-0'
+                                    }}
+                                </span>
+                            </div>
+
+
+                            <div class="precio-regular">
+                                <small>$ Promedio x Noche</small>
+                                <span class="monto">
+                                    {{
+                                    roundUp(ratesToCalc(tarifas, false, dispo.Codigo)/totalNights)
+                                    | currency: 'MXN':'symbol':'1.0-0'
+                                    }}
+                                </span>
+                            </div>
                         </div>
-
-
-                        <div class="precio-regular">
-                            <small>$ Promedio x Noche</small>
-                            <span class="monto">
-                                {{
-                                roundUp(ratesToCalc(tarifas, false, dispo.Codigo)/totalNights)
-                                | currency: 'MXN':'symbol':'1.0-0'
-                                }}
-                            </span>
-                        </div>
-  </div>
                     </div>
                 </ng-container>
             </ng-container>

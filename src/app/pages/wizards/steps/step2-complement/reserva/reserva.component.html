@@ -6,7 +6,7 @@
     <!-- Summary Info -->
     <div class="summary-row">
       <label>Fecha :</label>
-      <div class="value">{{fechaInicial}} - {{fechaFinal}}</div>
+      <div class="value">{{fechaIniDateTime.toISODate()}} - {{FechaFinDateTime.toISODate()}}</div>
     </div>
     <div class="summary-row">
       <label>Noches:</label>
@@ -29,8 +29,7 @@
             color="warn"
             aria-label="Eliminar habitación"
             (click)="pop(i)"
-            class="btn-remove"
-          >
+            class="btn-remove">
             <mat-icon>close</mat-icon>
           </button>
         </div>

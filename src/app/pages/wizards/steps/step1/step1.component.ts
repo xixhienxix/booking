@@ -69,8 +69,7 @@ export class Step1Component implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private spinnerLoading: SpinnerService,
-
-    private habitacionService: HabitacionesService
+    private _disponibilidadService: DisponibilidadService,
   ) {
     this.formGroup = this.fb.group({
       adultos: [1, Validators.required],
@@ -109,22 +108,27 @@ export class Step1Component implements OnInit, OnDestroy {
 
 
   //**DatePicker */
-  addEventIntialDate(type: string, event: MatDatepickerInputEvent<Date>) {
-    this.intialDateEvent = [];
-    this.intialDateEvent.push(`${type}: ${event.value}`);
-    this.intialDate = new Date(event.value!);
-  }
+addEventIntialDate(type: string, event: MatDatepickerInputEvent<Date>) {
+  this.intialDateEvent = [];
+  this.intialDateEvent.push(`${type}: ${event.value}`);
+  this.intialDate = new Date(event.value!);
 
-  addEventEndDate(type: string, event: MatDatepickerInputEvent<Date>) {
-    this.endDateEvent = [];
-    this.endDateEvent.push(`${type}: ${event.value}`);
-    this.endDate = new Date(event.value!);
+  this._disponibilidadService.changeFechaIni(this.intialDate);
+}
 
-    if (this.intialDate && this.endDate) {
-      let Difference_In_Time = this.endDate.getTime() - this.intialDate.getTime();
-      this.stayNights = Math.ceil(Difference_In_Time / (1000 * 3600 * 24));
-    }
+addEventEndDate(type: string, event: MatDatepickerInputEvent<Date>) {
+  this.endDateEvent = [];
+  this.endDateEvent.push(`${type}: ${event.value}`);
+  this.endDate = new Date(event.value!);
+
+  this._disponibilidadService.changeFechaFinal(this.endDate);
+
+  if (this.intialDate && this.endDate) {
+    let Difference_In_Time = this.endDate.getTime() - this.intialDate.getTime();
+    this.stayNights = Math.ceil(Difference_In_Time / (1000 * 3600 * 24));
   }
+}
+
   
 adjustQuantity(operation: 'plus' | 'minus', min: number, controlName: string) {
   const control = this.formGroup.get(controlName);

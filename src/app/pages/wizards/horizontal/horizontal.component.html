@@ -54,6 +54,7 @@
             <div class="step-content">
               <app-step1
                 (quantityChanged)="onQuantityChange($event)" 
+                (dateChanged)="onDateRangeChange($event)"
                 (formValid)="handleStep1FormValidity($event)"
                 [updateParentModel]="updateAccount">
               </app-step1>
