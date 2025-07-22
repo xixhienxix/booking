@@ -85,8 +85,6 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   onQuantityChange($event:any){
     this.qty = $event.qty
     this.qtyNin = $event.qtyNin
-    console.log('this.qty',this.qty)
-    console.log('this.qtyNin',this.qtyNin)
   }
 
   async nextStep() {
@@ -96,7 +94,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
         ...this.account$.value
       }
     this.intialDate = currentData.fechaInicial 
-    this.endDate = currentData.fechaFinal
+    this.endDate = currentData.fechaFinal;
 
     const result = await firstValueFrom(this._disponibilidadService.getDisponibilidad(this.account$.value));
     const dispoResponse = await this._disponibilidadService.calcHabitacionesDisponibles(result, currentData.fechaInicial, currentData.fechaFinal, '1');
@@ -120,6 +118,8 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     }
     this.currentStep$.next(prevStep);
   }
+
+
   ngOnDestroy(): void {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();    

@@ -33,59 +33,116 @@
             <div class="tarifas-header">
                 <h4 class="tarifas-title">Tarifas Disponibles</h4>
 
-                    <div class="habitaciones-dropdown">
-                        <label for="habitaciones-{{x}}">Habitaciones:</label>
-                        <select id="habitaciones-{{x}}">
-                            <option *ngFor="let num of generateInventarioArray(dispo.Codigo)" [value]="num">
-                                {{ num }}
-                            </option>
-                        </select>
-                    </div>
-
             </div>
-            <div class="noches-info">
+            <!-- <div class="noches-info">
                 <small>
                     Tarifa basada en <strong>{{ totalNights }}</strong>
                     {{ totalNights === 1 ? 'noche' : 'noches' }}
                 </small>
-            </div>
+            </div> -->
             <ng-container *ngFor="let tarifas of tarifasArray">
                 <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
                     <div class="tarifa-row">
-                        <mat-radio-button class="tarifa-radio"
-                            [value]="dispo.Codigo + ',' + dispo.Numero + ',' + tarifas.TarifaRack + ',' + tarifas.Plan"
-                            (change)="seleccionHabRadioButton($event); agregaHab(tarifas, tarifas.Habitacion, roundUp(ratesToCalc(tarifas, false, dispo.Codigo)), roundUp(ratesToCalc(tarifas, false, dispo.Codigo)/totalNights)); ">
-                            <div class="tarifa-texto">
-                                {{ tarifas.Tarifa }}
-                            </div>
-                        </mat-radio-button>
 
-                        <div class="precio-wrapper">
-
-                            <div class="precio">
-                                <small>Total</small>
-                                <span class="monto">
-                                    {{
-                                    roundUp(ratesToCalc(tarifas, false, dispo.Codigo))
-                                    | currency: 'MXN':'symbol':'1.0-0'
-                                    }}
-                                </span>
-                            </div>
-
-
-                            <div class="precio-regular">
-                                <small>$ Promedio x Noche</small>
-                                <span class="monto">
-                                    {{
-                                    roundUp(ratesToCalc(tarifas, false, dispo.Codigo)/totalNights)
-                                    | currency: 'MXN':'symbol':'1.0-0'
-                                    }}
-                                </span>
+                        <!-- Left side: Tarifa name + "Regular" label -->
+                        <!-- Left group unchanged -->
+                        <div class="tarifa-info" style="flex: 1 1 300px;">
+                            <div class="tarifa-nombre">{{ tarifas.Tarifa }}</div>
+                            <div class="precio-regular-row" style="display: flex; gap: 1rem; margin-top: 0.3rem;">
+                                <div class="precio-regular">
+                                    <small>Regular</small>
+                                    <span class="monto" style="color: red; text-decoration: line-through;">
+                                        {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo) / totalNights)*1.2 | currency:
+                                        'MXN':'symbol':'1.0-0' }}
+                                    </span>
+                                </div>
+                                <div class="precio-regular">
+                                    <small>Descuento</small>
+                                    <span class="monto" style="color: rgb(111, 168, 25);">
+                                        {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo) / totalNights) | currency:
+                                        'MXN':'symbol':'1.0-0' }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Total separate on right -->
+                        <div class="precio-wrapper"
+                            style="min-width: 120px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center;">
+                            <span style="font-weight: bold; font-size: 1.5rem;">
+                                {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) | currency: '':'symbol':'1.0-0' }}
+                            </span>
+                        </div>
+
+
+
+                        <div class="select-group" style=" display: flex; flex-direction: column; gap: 0.5rem;">
+
+                            <!-- Top row: two dropdowns side by side -->
+                            <div style="display: flex; gap: 0.5rem; justify-content: space-between;">
+<div style="flex: 1;">
+  <label
+    for="numPpl-{{ dispo.Codigo }}-{{ tarifas.Tarifa }}"
+    [ngStyle]="{
+      color: qty > getMaxFromAdultos(dispo.Codigo) ? 'red' : 'inherit'
+    }"
+    style="display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;"
+  >
+    Adultos: {{ qty }}
+
+    <mat-icon
+      *ngIf="qty > getMaxFromAdultos(dispo.Codigo)"
+      matTooltip="⚠ La cantidad de Adultos que seleccionó excede el máximo disponible para este tipo de cuarto"
+      matTooltipPosition="right"
+      matTooltipShowDelay="300"
+      style="color: red; font-size: 16px; vertical-align: middle; margin-left: 4px;"
+    >
+      warning
+    </mat-icon>
+  </label>
+
+<select
+  id="numPpl-{{dispo.Codigo}}-{{tarifas.Tarifa}}"
+  style="width: 100%;"
+  [(ngModel)]="qty"
+  [ngModel]="getValidQty(dispo.Codigo, qty)"
+  (ngModelChange)="onQtyChange(dispo.Codigo)"
+>
+  <option *ngFor="let n of generateAdultosArray(dispo.Codigo)" [value]="n">
+    {{ n }}
+  </option>
+</select>
+
+</div>
+
+
+
+                                <div style="flex: 1;">
+                                    <label for="quedan-{{dispo.Codigo}}-{{tarifas.Tarifa}}">Quedan: <span style="color: red;">{{getMaxValue(dispo.Codigo)}}</span></label>
+                                    <select id="quedan-{{dispo.Codigo}}-{{tarifas.Tarifa}}"
+                                        style="width: 100%;">
+                                        <option *ngFor="let num of generateInventarioArray(dispo.Codigo)"           
+                                        [selected]="num === getMaxValue(dispo.Codigo)">
+                                            {{ num }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Bottom row: button centered -->
+                            <div class="btn-group" style="display: flex; justify-content: center;">
+                                <button type="button"
+                                    (click)="agregaHab(tarifas, dispo.Codigo, selectedNumPpl[dispo.Codigo + tarifas.Tarifa], selectedQuedan[dispo.Codigo + tarifas.Tarifa])">
+                                    Agregar Habitación
+                                </button>
+                            </div>
+                        </div>
+
+
                     </div>
                 </ng-container>
             </ng-container>
+
         </div>
     </div>
 </ng-container>

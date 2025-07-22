@@ -59,6 +59,20 @@ selectedHabitaciones: number = 1;
 
   totalNights: number = 1
 
+
+
+
+
+    // For dropdown options (example: 1 to 10 people)
+numPplOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
+
+// Example "Quedan" options (room availability)
+quedanOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
+
+// Track selected dropdown values by unique key (roomCode + tarifa)
+selectedNumPpl: { [key: string]: number } = {};
+selectedQuedan: { [key: string]: number } = {};
+
   constructor(
     private _disponibilidadService: DisponibilidadService,
     private _tarifasServices: TarifasService,
@@ -67,6 +81,14 @@ selectedHabitaciones: number = 1;
   ) { }
 
   async ngOnInit() {
+
+    this.habitaciones.forEach(dispo => {
+    this.tarifasArray.forEach(tarifa => {
+      const key = dispo.Codigo + tarifa.Tarifa;
+      this.selectedNumPpl[key] = 1;
+      this.selectedQuedan[key] = 1;
+      });
+    });
 
     this.tarifas = await firstValueFrom(this._tarifasServices.currentData);
     this.roomCodesComplete = await firstValueFrom(this._disponibilidadService.getAllHabitaciones());
@@ -109,29 +131,37 @@ generateInventarioArray(codigo: string): number[] {
   return Array.from({ length: inventario }, (_, i) => i + 1);
 }
 
+generateAdultosArray(codigo: string){
+  const adultosQty = this.roomCodesComplete.filter(room => room.Codigo === codigo)[0].Adultos;
+
+  return Array.from({ length: adultosQty }, (_, i) => i + 1);
+}
+
 
   getTarifasForHabitacion(codigo: string) {
     return this.tarifasArray.filter(t => t.Habitacion.includes(codigo));
   }
 
-
-  initForm() {
-    // this.reservaForm = this.fb.group({
-    //   codigoCuarto: [''],
-    //   nombreTarifa: [''],
-    //   tarifa:[''],
-    //   personas:[''],
-    //   inventario:['']
-
-    // });
-
+  getMaxFromAdultos(codigo: string): number {
+    const arr = this.generateAdultosArray(codigo);
+    return arr.length ? Math.max(...arr) : 0;
   }
 
-  // checkForm() {
-  //   return !(
-  //     this.reservaForm.get('codigoCuarto')?.hasError('required')
-  //   );
-  // }
+
+onQtyChange(codigo: string) {
+  const max = this.getMaxFromAdultos(codigo);
+  if (this.qty <= max) {
+    // No need to do anything else because ngModel already updated `qty`,
+    // and Angular will re-render the label and icon conditionally.
+  }
+}
+
+getValidQty(codigo: string, qty: number): number {
+  const validOptions = this.generateAdultosArray(codigo);
+  return validOptions.includes(qty) ? qty : validOptions[0];
+}
+
+
 
   onSelectChange(evt: any) {
     if (evt.id === 'numeroDeAdultos') {
@@ -153,31 +183,10 @@ generateInventarioArray(codigo: string): number[] {
     this.tarifaNotSelected = true
   }
 
-  agregaHab(tarifaSeleccionada: any, codigoCuarto: any, totalTarifa:number, tarifaPromedio:number) {
-
-    const obj: miReserva[] = [{
-      codigoCuarto: codigoCuarto,
-      numeroCuarto: this.numeroCuarto,
-      cantidadHabitaciones: this.inventario,
-      nombreTarifa: this.nombreTarifa,
-      precioTarifa: totalTarifa,
-      detallesTarifa: this.plan,
-      cantidadAdultos: this.qty,
-      cantidadNinos: this.qtyNin
-    }]
-
-    this._disponibilidadService.addMiReserva(obj)
-  }
-
   ratesToCalc(tarifa: Tarifas, onlyBreakDown: boolean = false, codigosCuarto = '1', tarifaPromedio = false):any {
 
-
-    const match = this.habitaciones.find(item => tarifa.Habitacion.includes(item.Codigo));
-
-    const adultos = match?.Adultos ?? 1; // default to 2
-    const ninos = match?.Ninos ?? 0;     // default to 0
-
-    console.log(adultos, ninos);
+    const adultos = this.qty ?? 1; // default to 2
+    const ninos = this.qtyNin ?? 0;     // default to 0
 
     if (onlyBreakDown) {
       const tarifasValidasArray = this._tarifasServices.ratesTotalCalc(
@@ -221,6 +230,35 @@ generateInventarioArray(codigo: string): number[] {
   roundUp(value: number): number {
     return Math.ceil(value);
   }
+
+
+
+
+agregaHab(tarifas: any, codigo: string, numPpl: number, quedan: number) {
+  console.log('Agregar habitación:', tarifas, codigo, numPpl, quedan);
+  // your logic here...
+
+  //   agregaHab(tarifaSeleccionada: any, codigoCuarto: any, totalTarifa:number, tarifaPromedio:number) {
+
+  //   const obj: miReserva[] = [{
+  //     codigoCuarto: codigoCuarto,
+  //     numeroCuarto: this.numeroCuarto,
+  //     cantidadHabitaciones: this.inventario,
+  //     nombreTarifa: this.nombreTarifa,
+  //     precioTarifa: totalTarifa,
+  //     detallesTarifa: this.plan,
+  //     cantidadAdultos: this.qty,
+  //     cantidadNinos: this.qtyNin
+  //   }]
+
+  //   this._disponibilidadService.addMiReserva(obj)
+  // }
+}
+
+getMaxValue(codigo: string): number | null {
+  const arr = this.generateInventarioArray(codigo);
+  return arr.length ? Math.max(...arr) : null;
+}
 
 
   ngOnDestroy() {

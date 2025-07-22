@@ -109,69 +109,83 @@
 .tarifa-row {
   display: flex;
   align-items: center;
-  flex-wrap: nowrap; // evita que los elementos se rompan de línea
-  gap: .5rem;
+  gap: 1rem;
   padding: 0.75rem;
   border: 1px dashed #ccc;
   border-radius: 8px;
   background: #fafafa;
   margin-bottom: 1rem;
+  //   display: flex;
+  // align-items: center; /* change from flex-end */
+  // gap: 1rem;
+  // padding: 0.75rem;
+  // border: 1px dashed #ccc;
+  // border-radius: 8px;
+  // background: #fafafa;
+  // margin-bottom: 1rem;
 
-  .tarifa-radio {
-    flex: 0 0 200px; // ancho fijo
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .tarifa-info {
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    color: #00506a;
+
+    .regular-label {
+      font-weight: normal;
+      font-size: 0.85rem;
+      color: gray;
+    }
   }
 
   .precio-wrapper {
-  display: flex;
-  flex-shrink: 0;
-  min-width: 200px; // ancho mínimo para contener ambos
-}
-
-
-  .precio {
-    flex: 0 0 120px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #198754;
-  }
-
-  .precio-regular {
-    flex: 0 0 130px;
-    color: red;
-    font-size: 0.9rem;
-    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .select-group {
-    flex: 0 0 100px;
     display: flex;
-    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-end;
 
     label {
-      font-size: 0.8rem;
+      display: block;
+      font-size: 0.85rem;
       font-weight: bold;
+      margin-bottom: 0.25rem;
     }
 
     select {
-      min-width: 70px;
+      min-width: 60px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: white;
+      font-size: 0.9rem;
+    }
+
+    .btn-group button {
+      padding: 6px 12px;
+      background-color: #00506a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.9rem;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #007ba7;
+      }
     }
   }
-
-  .btn-group {
-    margin-left: auto;
-    flex-shrink: 0;
+}
   }
 }
 
-  }
-}
-.precio, .precio-regular {
-  text-align: left;
+
+
+.precio-regular {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -180,15 +194,14 @@
     font-size: 0.75rem;
     color: gray;
     margin-bottom: 2px;
-    line-height: 1;
   }
 
   .monto {
     font-weight: bold;
-    font-size: 1rem;
-    line-height: 1;
+    font-size: .8rem;
   }
 }
+
 
 .noches-info {
   font-size: 13px;
@@ -197,3 +210,6 @@
   text-align: left;
 }
 
+.tarifa-nombre {
+ font-size: 1.5rem;
+}

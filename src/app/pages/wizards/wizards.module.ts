@@ -27,6 +27,7 @@ import { DetalleReservaComponent } from './steps/step2-complement/detalle-reserv
 import { ReservaComponent } from './steps/step2-complement/reserva/reserva.component';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MatCardModule } from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
 export const MY_DATE_FORMATS = {
   parse: {
     dateInput: 'LL',
@@ -52,7 +53,7 @@ export const MY_DATE_FORMATS = {
     ReservaComponent
   ],
   imports: [
-    MatRadioModule,
+    MatTooltipModule,
     MatCardModule,
     MatSelectModule,
     MatButtonModule,

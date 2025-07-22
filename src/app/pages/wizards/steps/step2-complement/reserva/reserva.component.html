@@ -6,7 +6,10 @@
     <!-- Summary Info -->
     <div class="summary-row">
       <label>Fecha :</label>
-      <div class="value">{{fechaIniDateTime.toISODate()}} - {{FechaFinDateTime.toISODate()}}</div>
+<div class="value">
+  {{ fechaIniDateTime.toFormat('dd/MM/yyyy') }} - {{ FechaFinDateTime.toFormat('dd/MM/yyyy') }}
+</div>
+
     </div>
     <div class="summary-row">
       <label>Noches:</label>
