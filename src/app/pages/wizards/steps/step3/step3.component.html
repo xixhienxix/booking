@@ -1,97 +1,153 @@
-<div class="pb-10 pb-lg-12">
-  <h2 class="fw-bolder text-dark">Business Details</h2>
-  <div class="text-gray-400 fw-bold fs-6">
-    If you need more info, please check out
-    <a href="#" class="link-primary fw-bolder">Help Page</a>.
+<div class="reservation-container">
+  <div class="title-container">
+    <h1 class="confirm-title">CONFIRMA RESERVACIÓN</h1>
+  </div>
+
+  <mat-card class="section">
+    <h2>SERVICIOS EXTRAS</h2>
+    <p>Suma experiencias y servicios adicionales a tu viaje.</p>
+
+    <!-- CHARDONNAY SECTION -->
+      <div class="extras-section">
+        <h1 class="extras-title">{{packagesList[0].habitacionesMatch}}</h1>
+        <p class="extras-subtitle">Servicios Extras Disponibles</p>
+    <ng-container *ngFor="let package of packagesList">
+
+      <!-- Paquete Especial 1 -->
+        <mat-card class="extras-grid package-row">
+          <div class="package-details">
+            <div class="package-title">{{package.Nombre}}</div>
+            <ul>
+              <li>
+                {{package.Descripcion}}
+              </li>
+            </ul>
+          </div>
+          <div class="package-price">    {{ (package?.Precio ?? 0) * (package?.selectedCantidad ?? 0) | currency }}  </div>
+          <div class="package-qty">
+
+        <div class="guest-box">
+          <!-- <label class="guest-label">Adultos</label> -->
+          <div class="counter">
+            <button type="button" (click)="minus(package)" aria-label="Menos adultos">-</button>
+            <input
+              type="text"
+              readonly
+              [min]="1"
+              class="counter-input"
+              [value]="package.selectedCantidad" />
+            <button type="button" (click)="plus(package)" aria-label="Más adultos">+</button>
+          </div>
+        </div>
+
+          </div>
+        </mat-card>
+        <div class="package-action row" style="margin-bottom: 1rem;">
+  <div class="btn-group">
+    <button style="padding-bottom: .5rem;" type="button" (click)="agregarExtra(package)">Agregar Extra</button>
   </div>
 </div>
-<div [formGroup]="form">
-  <div class="fv-row mb-10">
-    <label class="form-label required">Business Name</label
-    ><input
-      name="businessName"
-      class="form-control form-control-lg form-control-solid"
-      formControlName="businessName"
-    />
-    <div
-      class="fv-plugins-message-container invalid-feedback"
-      *ngIf="
-        form.get('businessName')?.hasError('required') &&
-        form.get('businessName')?.touched
-      "
-    >
-      Business Name is required
+    </ng-container>
+      </div>
+
+  </mat-card>
+
+  <!-- DATOS DEL HUÉSPED -->
+<mat-card class="section">
+  <h2>DATOS DEL HUÉSPED</h2>
+
+  <form class="guest-form" *ngIf="guestForm" [formGroup]="guestForm">
+    <div class="grid-form">
+
+      <!-- Nombre Completo -->
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre Completo</mat-label>
+        <input matInput formControlName="nombre" required />
+      </mat-form-field>
+
+      <!-- Teléfono -->
+      <mat-form-field appearance="outline">
+        <mat-label>Teléfono</mat-label>
+        <input matInput formControlName="telefono" pattern="^[0-9]{10}$" />
+      </mat-form-field>
+
+      <!-- Email -->
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" />
+      </mat-form-field>
+
+      <!-- País -->
+      <mat-form-field appearance="outline">
+        <mat-label>País</mat-label>
+        <mat-select formControlName="pais">
+          <mat-option value="mexico">México</mat-option>
+          <mat-option value="usa">Estados Unidos</mat-option>
+          <mat-option value="canada">Canadá</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Confirma Email -->
+      <mat-form-field appearance="outline">
+        <mat-label>Confirma Email</mat-label>
+        <input matInput type="email" formControlName="confirmaEmail" />
+      </mat-form-field>
+
+      <!-- Lenguaje -->
+      <mat-form-field appearance="outline">
+        <mat-label>Lenguaje</mat-label>
+        <mat-select formControlName="lenguaje">
+          <mat-option value="es">Español</mat-option>
+          <mat-option value="en">Inglés</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Requerimiento Especial (full width) -->
+      <mat-form-field class="full-span" appearance="outline">
+        <mat-label>Requerimiento Especial</mat-label>
+        <textarea matInput formControlName="requerimiento" rows="3"></textarea>
+      </mat-form-field>
+
     </div>
-  </div>
-  <div class="fv-row mb-10">
-    <label class="d-flex align-items-center form-label"
-      ><span class="required">Shortened Descriptor</span></label
-    ><input
-      name="businessDescriptor"
-      class="form-control form-control-lg form-control-solid"
-      formControlName="businessDescriptor"
-    />
-    <div
-      class="fv-plugins-message-container invalid-feedback"
-      *ngIf="
-        form.get('businessDescriptor')?.hasError('required') &&
-        form.get('businessDescriptor')?.touched
-      "
-    >
-      Shortened Descriptor is required
+  </form>
+</mat-card>
+
+
+  <!-- FORMA DE PAGO -->
+  <mat-card class="section">
+    <h2>FORMA DE PAGO</h2>
+    <p>¿Cómo le gustaría pagar su reservación?</p>
+
+    <mat-radio-group  class="radio-group">
+      <mat-radio-button value="total">PAGO TOTAL: <strong>$19,698.11</strong></mat-radio-button>
+      <mat-radio-button value="deposito">DEPÓSITO DEL 50%: <strong>$9,849</strong></mat-radio-button>
+    </mat-radio-group>
+
+    <mat-divider></mat-divider>
+
+    <mat-checkbox >Transferencia Bancaria</mat-checkbox>
+    <p class="note">
+      Una vez efectuada la reserva, le indicaremos la cuenta donde debe realizar el pago...
+    </p>
+
+    <mat-checkbox >Directo en el Hotel</mat-checkbox>
+    <p class="note">Necesitamos la tarjeta de crédito o débito sólo como garantía, no se cobrará nada ahora.</p>
+
+    <div class="credit-card">
+      <mat-form-field appearance="outline">
+        <mat-label>Número de tarjeta</mat-label>
+        <input matInput />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha expira</mat-label>
+        <input matInput />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>CVV</mat-label>
+        <input matInput />
+      </mat-form-field>
     </div>
-    <div class="form-text">
-      Customers will see this shortened version of your statement descriptor
-    </div>
-  </div>
-  <div class="fv-row mb-10">
-    <label class="form-label required">Corporation Type</label
-    ><select
-      name="businessType"
-      class="form-select form-select-lg form-select-solid"
-      formControlName="businessType"
-    >
-      <option value="1">S Corporation</option>
-      <option value="1">C Corporation</option>
-      <option value="2">Sole Proprietorship</option>
-      <option value="3">Non-profit</option>
-      <option value="4">Limited Liability</option>
-      <option value="5">General Partnership</option>
-    </select>
-  </div>
-  <div class="fv-row mb-10">
-    <label class="form-label">Business Description</label
-    ><textarea
-      name="businessDescription"
-      class="form-control form-control-lg form-control-solid"
-      rows="3"
-      formControlName="businessDescription"
-    ></textarea>
-  </div>
-  <div class="fv-row mb-0">
-    <label class="fs-6 fw-bold form-label required">Contact Email</label
-    ><input
-      name="businessEmail"
-      class="form-control form-control-lg form-control-solid"
-      formControlName="businessEmail"
-    />
-    <div
-      class="fv-plugins-message-container invalid-feedback"
-      *ngIf="
-        form.get('businessEmail')?.hasError('required') &&
-        form.get('businessEmail')?.touched
-      "
-    >
-      Contact Email is required
-    </div>
-    <div
-      class="fv-plugins-message-container invalid-feedback"
-      *ngIf="
-        form.get('businessEmail')?.hasError('email') &&
-        form.get('businessEmail')?.touched
-      "
-    >
-      Wrong email format
-    </div>
-  </div>
+  </mat-card>
 </div>

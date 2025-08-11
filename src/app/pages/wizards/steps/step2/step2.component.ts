@@ -57,10 +57,11 @@ selectedHabitaciones: number = 1;
   @Input() qtyNin:number=0
   @Input() qty:number=1;
 
+  @Output() onQtyHabsUpdate:EventEmitter<number> = new EventEmitter()
+
   totalNights: number = 1
 
-
-
+  maxHabsReached:boolean=false
 
 
     // For dropdown options (example: 1 to 10 people)
@@ -70,8 +71,11 @@ numPplOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
 quedanOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
 
 // Track selected dropdown values by unique key (roomCode + tarifa)
-selectedNumPpl: { [key: string]: number } = {};
-selectedQuedan: { [key: string]: number } = {};
+// For Adultos (qty)
+selectedQty: { [key: string]: number } = {};
+
+// For 'Quedan' dropdowns (if needed)
+numeroHabs: number = 1;
 
   constructor(
     private _disponibilidadService: DisponibilidadService,
@@ -81,14 +85,6 @@ selectedQuedan: { [key: string]: number } = {};
   ) { }
 
   async ngOnInit() {
-
-    this.habitaciones.forEach(dispo => {
-    this.tarifasArray.forEach(tarifa => {
-      const key = dispo.Codigo + tarifa.Tarifa;
-      this.selectedNumPpl[key] = 1;
-      this.selectedQuedan[key] = 1;
-      });
-    });
 
     this.tarifas = await firstValueFrom(this._tarifasServices.currentData);
     this.roomCodesComplete = await firstValueFrom(this._disponibilidadService.getAllHabitaciones());
@@ -137,6 +133,12 @@ generateAdultosArray(codigo: string){
   return Array.from({ length: adultosQty }, (_, i) => i + 1);
 }
 
+generateNinosArray(codigo: string){
+  const ninosQty = this.roomCodesComplete.filter(room => room.Codigo === codigo)[0].Ninos;
+
+  return Array.from({ length: ninosQty }, (_, i) => i + 1);
+}
+
 
   getTarifasForHabitacion(codigo: string) {
     return this.tarifasArray.filter(t => t.Habitacion.includes(codigo));
@@ -147,17 +149,35 @@ generateAdultosArray(codigo: string){
     return arr.length ? Math.max(...arr) : 0;
   }
 
+  getMaxFromNinos(codigo:string): number {
+    const arr = this.generateNinosArray(codigo);
+    return arr.length ? Math.max(...arr) : 0;
+  }
+
 
 onQtyChange(codigo: string) {
   const max = this.getMaxFromAdultos(codigo);
-  if (this.qty <= max) {
-    // No need to do anything else because ngModel already updated `qty`,
-    // and Angular will re-render the label and icon conditionally.
+  if (this.qty < max) {
+  }
+}
+
+onQtyHabsChange(codigo:string, numeroHabs:any){
+  this.inventario = Number(numeroHabs);
+  const max = this.getMaxValue(codigo)
+  if(this.inventario < max){
+      this.onQtyHabsUpdate.emit(this.inventario);
+  }else {
+    this.maxHabsReached=true
   }
 }
 
 getValidQty(codigo: string, qty: number): number {
   const validOptions = this.generateAdultosArray(codigo);
+  return validOptions.includes(qty) ? qty : validOptions[0];
+}
+
+getValidNinQty(codigo: string, qty: number): number {
+  const validOptions = this.generateNinosArray(codigo);
   return validOptions.includes(qty) ? qty : validOptions[0];
 }
 
@@ -234,30 +254,26 @@ getValidQty(codigo: string, qty: number): number {
 
 
 
-agregaHab(tarifas: any, codigo: string, numPpl: number, quedan: number) {
-  console.log('Agregar habitación:', tarifas, codigo, numPpl, quedan);
-  // your logic here...
+agregaHab(tarifas: any, codigo: string,  quedan: number) {
 
-  //   agregaHab(tarifaSeleccionada: any, codigoCuarto: any, totalTarifa:number, tarifaPromedio:number) {
+  const obj: miReserva[] = [{
+      codigoCuarto: codigo,
+      numeroCuarto: '',
+      cantidadHabitaciones: Number(quedan),
+      nombreTarifa: tarifas.Tarifa,
+      precioTarifa: this.roundUp(this.ratesToCalc(tarifas, false, codigo))*this.totalNights,
+      detallesTarifa: this.plan,
+      cantidadAdultos: this.qty,
+      cantidadNinos: this.qtyNin
+    }]
 
-  //   const obj: miReserva[] = [{
-  //     codigoCuarto: codigoCuarto,
-  //     numeroCuarto: this.numeroCuarto,
-  //     cantidadHabitaciones: this.inventario,
-  //     nombreTarifa: this.nombreTarifa,
-  //     precioTarifa: totalTarifa,
-  //     detallesTarifa: this.plan,
-  //     cantidadAdultos: this.qty,
-  //     cantidadNinos: this.qtyNin
-  //   }]
-
-  //   this._disponibilidadService.addMiReserva(obj)
-  // }
+    this._disponibilidadService.addMiReserva(obj)
+  
 }
 
-getMaxValue(codigo: string): number | null {
+getMaxValue(codigo: string): number {
   const arr = this.generateInventarioArray(codigo);
-  return arr.length ? Math.max(...arr) : null;
+  return arr.length ? Math.max(...arr) : 1;
 }
 
 

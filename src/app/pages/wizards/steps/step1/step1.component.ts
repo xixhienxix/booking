@@ -88,6 +88,7 @@ export class Step1Component implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this._disponibilidadService.changeMiReserva([])
     this.formGroup.controls["hotel"].patchValue(this.hotelId);
     console.log('his.formGroup.controls["hotel"]:', this.formGroup.controls["hotel"]?.value);
 

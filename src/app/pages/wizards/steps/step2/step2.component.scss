@@ -163,21 +163,36 @@
       font-size: 0.9rem;
     }
 
-    .btn-group button {
-      padding: 6px 12px;
-      background-color: #00506a;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 0.9rem;
-      transition: background-color 0.3s;
+.btn-group button {
+  padding: 6px 12px;
+  background-color: #00506a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
 
-      &:hover {
-        background-color: #007ba7;
-      }
-    }
+  &:hover {
+    background-color: #007ba7;
+  }
+
+  /* 👇 disabled appearance */
+  &:disabled,            // modern browsers
+  &[disabled] {          // fallback
+    background-color: #b9b9b9;   // grey it out
+    cursor: not-allowed;         // show “forbidden” cursor
+    opacity: 0.6;                // optional dim effect
+  }
+
+  /* stop the hover colour when disabled */
+  &:disabled:hover,
+  &[disabled]:hover {
+    background-color: #b9b9b9;
+  }
+}
+
   }
 }
   }

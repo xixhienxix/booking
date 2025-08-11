@@ -55,7 +55,7 @@ button {
 /* Extra-large desktop */
 @media (min-width: 1440px) {
     .step-content {
-        max-width: 80%; /* Further restrict width for very large screens */
+        max-width: 100%; /* Further restrict width for very large screens */
         margin: 0 auto;
     }
 
@@ -75,8 +75,17 @@ button {
   align-items: flex-start;
 
   // On desktop/tablet:
-    .step2-section {
-    flex: 2 1 500px;  /* Use 500px or any desired min width */
+.step2-section {
+  flex: 0 1 600px;  // no grow, can shrink, base 100px
+  min-width: 600px;
+  max-width: 600px; // limit max width if you want
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+
+  .step3-section {
+    flex: 0 1 500px;  /* Use 500px or any desired min width */
     min-width: 500px; /* ensures minimum width at start */
     overflow-y: auto;
     max-height: 80vh;
@@ -111,9 +120,9 @@ button {
 }
 
 .fixed-reserva-wrapper {
-  flex: 1 1 300px;   /* Give a fixed-ish basis width for reserva */
-  max-width: 400px;  /* max width to keep it compact */
-  height: 600px;     /* fixed height for reserva area */
+  flex: 1 1 200px;   /* Give a fixed-ish basis width for reserva */
+  max-width: 300px;  /* max width to keep it compact */
+  height: 100%;     /* fixed height for reserva area */
   overflow-y: auto;  /* scroll inside if content overflows */
   box-sizing: border-box;
   border-radius: 8px;
@@ -129,3 +138,34 @@ button {
   display: block;
 }
 
+
+
+.btn-group button {
+  padding: 6px 12px;
+  background-color: #00506a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #007ba7;
+  }
+
+  /* 👇 disabled appearance */
+  &:disabled,            // modern browsers
+  &[disabled] {          // fallback
+    background-color: #b9b9b9;   // grey it out
+    cursor: not-allowed;         // show “forbidden” cursor
+    opacity: 0.6;                // optional dim effect
+  }
+
+  /* stop the hover colour when disabled */
+  &:disabled:hover,
+  &[disabled]:hover {
+    background-color: #b9b9b9;
+  }
+}

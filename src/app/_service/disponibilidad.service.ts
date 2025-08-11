@@ -26,6 +26,12 @@ export class DisponibilidadService {
   private fechaFinal$: BehaviorSubject<Date> = new BehaviorSubject<Date>(new Date(Date.now() + ( 3600 * 1000 * 24)))
   currentFechaFin = this.fechaFinal$.asObservable();
 
+  private adultos$: BehaviorSubject<number> = new BehaviorSubject<number>(1)
+  currentAdultosValue = this.adultos$.asObservable();
+
+  private numeroHabs$: BehaviorSubject<number> = new BehaviorSubject<number>(1)
+  currentNumHabs = this.numeroHabs$.asObservable();
+
   private miReserva$: BehaviorSubject<miReserva[]> = new BehaviorSubject<miReserva[]>([])
   currentReserva = this.miReserva$.asObservable();
 
@@ -36,6 +42,10 @@ export class DisponibilidadService {
   set setCuartosNoDisponibles (val:string[]){
     this.cuartosNoDisponibles$.next(val)
   }
+
+getMiReserva() {
+  return this.miReserva$.value; 
+}
 
   addMiReserva(data:miReserva[]){
     this.miReserva$.next(this.miReserva$.getValue().concat(data))
@@ -51,6 +61,14 @@ export class DisponibilidadService {
 
   changeFechaFinal(data:Date){
     this.fechaFinal$.next(data)
+  }
+
+  changeAdultos(value:number){
+    this.adultos$.next(value)
+  }
+
+  changeCurrentNumeroHabs(value:number){
+    this.numeroHabs$.next(value)
   }
 
   changeData(data:any){

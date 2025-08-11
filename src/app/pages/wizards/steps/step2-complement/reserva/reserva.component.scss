@@ -1,7 +1,7 @@
 .mi-reserva-card {
   border-radius: 12px;
   overflow: hidden;
-  max-width: 800px;
+  max-width: 300px;
 
   .modal-header {
     background-color: #00506a;
@@ -45,11 +45,11 @@
       overflow-x: hidden;
 
       .room-item {
-        width: 100%;
+        // width: 100%;
         box-sizing: border-box;
 
         mat-card {
-          width: 100%;
+          // width: 100%;
           box-sizing: border-box;
         }
 
@@ -117,7 +117,7 @@
 
             .detail-group {
               display: flex;
-              justify-content: space-between;
+              justify-content: space-around;
               align-items: center;
 
               label {
@@ -178,12 +178,122 @@
           }
         }
       }
+
+      /* --- New styles for inner package items --- */
+      .package-item {
+        box-sizing: border-box; // include padding and border in width calculation
+        width: calc(100% - 2rem); // 100% minus left+right margin (1rem + 1rem)
+        margin: 0.75rem 1rem 1rem 1rem;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 0.5rem;
+        background-color: #f9f9f9;
+        overflow-wrap: break-word; // break long words if any
+        position: relative;
+
+        mat-card-header {
+    .header-content {
+      display: flex;
+      justify-content: flex-start;  // let title use full width
+      align-items: flex-start;      // align to top
+
+      .room-code {
+        flex-grow: 1;
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        word-break: break-word;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #00506a;
+        margin: 0;
+      }
     }
+
+    .btn-remove {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      font-size: 0.85rem;
+      border-radius: 50%;
+      background-color: #fa6d7c;
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: #d94e5c;
+      }
+    }
+
+          .btn-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            font-size: 0.85rem;
+            border-radius: 50%;
+            background-color: #fa6d7c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+
+            &:hover {
+              background-color: #d94e5c;
+            }
+          }
+        }
+
+        mat-card-content {
+          padding: 0.5rem 1rem;
+        }
+
+        mat-card-footer {
+          padding: 0.5rem 1rem;
+          border-top: 1px solid #ddd;
+          text-align: left;
+
+          .total-price {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #198754;
+
+            .price {
+              font-weight: 900;
+              font-size: 1.3rem;
+              float: right;
+              color: #0b5e3a;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .price-summary {
+    margin-top: 10px;
+  }
+
+  .btn-reserva {
+    width: -webkit-fill-available;
+    margin-top: 10px;
   }
 
   // Responsive
   @media (max-width: 576px) {
     .modal-body {
+
       .summary-row,
       .price-summary .summary-row {
         flex-direction: column;

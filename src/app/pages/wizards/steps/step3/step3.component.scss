@@ -1,0 +1,263 @@
+.reservation-container {
+  max-width: none;
+  margin: auto;
+  padding: 1rem;
+
+  .full-width {
+    width: 100%;
+  }
+
+  .section {
+    margin-top: 2rem;
+    padding: 1rem;
+      h2 {
+    margin-bottom: 0.3rem; // tighten space between h2 and p
+  }
+
+  p {
+    margin-top: 0; // remove gap from paragraph top
+  }
+  }
+
+  .package-group {
+    margin-top: 1rem;
+
+    h3 {
+      margin-top: 1rem;
+      color: #003b71;
+    }
+
+    .package-card {
+      margin-bottom: 1rem;
+
+      .header {
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+
+      ul {
+        padding-left: 1.2rem;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+      }
+
+      .action-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+
+        .price {
+          font-weight: bold;
+          font-size: 1.1rem;
+        }
+      }
+    }
+  }
+
+  .guest-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .note {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 0.5rem 0;
+  }
+
+  .credit-card {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    mat-form-field {
+      flex: 1 1 30%;
+    }
+  }
+  .confirm-title {
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.title-container {
+    background-color: #3e87a7;
+}
+
+}
+
+
+
+.extras-section {
+//   margin: 2rem 0;
+
+  .extras-title {
+    color: #3e87a7;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: left;
+    margin-bottom: 0.2rem;
+  }
+
+  .extras-subtitle {
+    font-size: 1rem;
+    color: #666;
+  }
+
+  .extras-grid {
+    display: grid;
+    grid-template-columns: 3fr 1fr 1fr auto;
+    gap: 1rem;
+    align-items: start;
+    padding: 1rem 0;
+
+    &.header-row {
+      font-weight: bold;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 1rem;
+    }
+
+    &.package-row {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+    //   margin-bottom: 1rem;
+    }
+  }
+
+  .package-details {
+    .package-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1rem;
+
+      li {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+    }
+  }
+
+  .package-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    align-self: center;
+  }
+
+  .package-qty {
+    align-self: center;
+    // padding-top: 1.5rem;
+    mat-form-field {
+      width: 100px;
+    }
+  }
+
+  .package-action {
+    align-self: center;
+    button {
+      white-space: nowrap;
+    }
+  }
+}
+
+.btn-group button {
+  padding: 6px 12px;
+  background-color: #00506a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #007ba7;
+  }
+
+  /* 👇 disabled appearance */
+  &:disabled,            // modern browsers
+  &[disabled] {          // fallback
+    background-color: #b9b9b9;   // grey it out
+    cursor: not-allowed;         // show “forbidden” cursor
+    opacity: 0.6;                // optional dim effect
+  }
+
+  /* stop the hover colour when disabled */
+  &:disabled:hover,
+  &[disabled]:hover {
+    background-color: #b9b9b9;
+  }
+}
+
+
+.guest-form {
+  width: 100%;
+  margin-top: 1rem;
+
+  .grid-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    .full-span {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.guest-box {
+  flex: 1 1 45%;
+  display: flex;
+//   flex-direction: column;
+  align-items: center;
+}
+
+.guest-label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #00506a;
+}
+.counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.counter button {
+  background-color: #e6e9ed;
+  border: none;
+  padding: 8px 12px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.counter-input {
+  width: 50px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 40px;
+}

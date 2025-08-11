@@ -1,62 +1,110 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { combineLatest, map, Subscription, switchMap, tap } from 'rxjs';
 import { ICreateAccount } from '../../create-account.helper';
 import { ICalendario } from 'src/app/_models/calendario.model';
-
+import { PackagesService } from 'src/app/_service/packages.service';
+import { Packages } from 'src/app/_models/packages.model';
+import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
+import { miReserva } from 'src/app/_models/mireserva.model';
+export interface PackagesSimplex extends Packages {
+  habitacionesMatch: string[]
+  selectedCantidad?: number
+}
 @Component({
   selector: 'app-step3',
   templateUrl: './step3.component.html',
+  styleUrls: ['./step3.component.scss']
 })
-export class Step3Component implements OnInit, OnDestroy {
-  @Input('updateParentModel') updateParentModel: (
-    part: Partial<ICalendario>,
-    isFormValid: boolean
-  ) => void;
-  form: FormGroup;
-  @Input() defaultValues: Partial<ICalendario>;
+export class Step3Component implements OnInit {
+  constructor(private _packagesServices: PackagesService, private _disponibilidadService: DisponibilidadService, private fb: FormBuilder) { }
 
-  private unsubscribe: Subscription[] = [];
+  @Input('updateParentModel') updateParentModel: (part: Partial<ICalendario>, isFormValid: boolean) => void;
 
-  constructor(private fb: FormBuilder) {}
+  packagesList: PackagesSimplex[] = [];
+  selectedQuantity = 1; // default value
+  guestForm: FormGroup
+  quantity = 1;
+
+
 
   ngOnInit() {
     this.initForm();
-    this.updateParentModel({}, this.checkForm());
+
+
+    this._disponibilidadService.currentReserva.pipe(
+      switchMap(rsv => {
+        const codigosCuarto = rsv.map(t => t.codigoCuarto);
+
+        return this._packagesServices.getAllPackages().pipe(
+          map(packages => {
+            return packages
+              .map(pkg => {
+                const habitacionesMatch = pkg.Habitacion.filter(h =>
+                  codigosCuarto.includes(h)
+                );
+
+                return {
+                  ...pkg,
+                  habitacionesMatch // 👈 new property added
+                };
+              })
+              .filter(pkg => pkg.habitacionesMatch.length > 0); // keep only relevant ones
+          })
+        );
+      })
+    ).subscribe(filteredPackages => {
+      this.packagesList = filteredPackages
+        .filter(item => item.Categoria.includes('Paquetes'))
+        .map(item => ({
+          ...item,
+          selectedCantidad: 1
+        }));
+    });
+
   }
 
-  initForm() {
-    // this.form = this.fb.group({
-    //   businessName: [this.defaultValues.businessName, [Validators.required]],
-    //   businessDescriptor: [
-    //     this.defaultValues.businessDescriptor,
-    //     [Validators.required],
-    //   ],
-    //   businessType: [this.defaultValues.businessType, [Validators.required]],
-    //   businessDescription: [this.defaultValues.businessDescription],
-    //   businessEmail: [
-    //     this.defaultValues.businessEmail,
-    //     [Validators.required, Validators.email],
-    //   ],
-    // });
+agregarExtra(packages: PackagesSimplex) {
+  const currentReserva = this._disponibilidadService.getMiReserva();
 
-    // const formChangesSubscr = this.form.valueChanges.subscribe((val) => {
-    //   this.updateParentModel(val, this.checkForm());
-    // });
-    // this.unsubscribe.push(formChangesSubscr);
+  currentReserva.forEach(item => {
+    if (item.codigoCuarto === packages.habitacionesMatch[0]) {
+      // Initialize packageList if missing
+      if (!item.packageList) {
+        item.packageList = [];
+      }
+      const { habitacionesMatch, selectedCantidad, ...packageToAdd } = packages;
+      
+      packageToAdd.Cantidad = selectedCantidad ?? 1
+      item.packageList.push(packageToAdd);
+    }
+  });
+
+  this._disponibilidadService.changeMiReserva([...currentReserva]);
+}
+
+
+  plus(pkg: any) {
+    pkg.selectedCantidad++;
   }
 
-  checkForm() {
-    return !(
-      this.form.get('businessName')?.hasError('required') ||
-      this.form.get('businessDescriptor')?.hasError('required') ||
-      this.form.get('businessType')?.hasError('required') ||
-      this.form.get('businessEmail')?.hasError('required') ||
-      this.form.get('businessEmail')?.hasError('email')
-    );
+  minus(pkg: any) {
+    if (pkg.selectedCantidad > 1) {
+      pkg.selectedCantidad--;
+    }
   }
 
-  ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
+
+
+  initForm(): void {
+    this.guestForm = this.fb.group({
+      nombre: ['', Validators.required],
+      telefono: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      email: ['', [Validators.required, Validators.email]],
+      confirmaEmail: ['', [Validators.required, Validators.email]],
+      pais: ['mexico', Validators.required],
+      lenguaje: ['es', Validators.required],
+      requerimiento: ['']
+    });
   }
 }

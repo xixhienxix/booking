@@ -28,6 +28,9 @@ import { ReservaComponent } from './steps/step2-complement/reserva/reserva.compo
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { MatCardModule } from '@angular/material/card';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatGridListModule} from '@angular/material/grid-list';
+import { MatDividerModule } from '@angular/material/divider';
+
 export const MY_DATE_FORMATS = {
   parse: {
     dateInput: 'LL',
@@ -53,6 +56,8 @@ export const MY_DATE_FORMATS = {
     ReservaComponent
   ],
   imports: [
+    MatDividerModule,
+    MatGridListModule,
     MatTooltipModule,
     MatCardModule,
     MatSelectModule,

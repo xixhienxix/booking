@@ -1,3 +1,10 @@
+
+<div class="row">
+<h5 style="font-weight: bold;"> Se encontraron {{habitaciones.length}} habitaciones disponibles para su busqueda del: {{intialDate | date:'dd/MM/yyyy'}} - {{endDate | date:'dd/MM/yyyy'}} <span style="color: red;">{{totalNights}}</span> Noches </h5>
+</div>
+<div class="row">
+<h5 style="font-weight: bold;">Todos los precios se presentan en MXN (MX$ Pesos Mexicanos) y ya incluyen impuestos de Mexico (IVA (16%) + ISH (3%))</h5>
+</div>
 <ng-container *ngFor="let dispo of habitaciones; let x = index">
     <!-- Habitación Card -->
     <div class="habitacion-card">
@@ -52,14 +59,15 @@
                                 <div class="precio-regular">
                                     <small>Regular</small>
                                     <span class="monto" style="color: red; text-decoration: line-through;">
-                                        {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo) / totalNights)*1.2 | currency:
+                                        {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo))*1.2 |
+                                        currency:
                                         'MXN':'symbol':'1.0-0' }}
                                     </span>
                                 </div>
                                 <div class="precio-regular">
                                     <small>Descuento</small>
                                     <span class="monto" style="color: rgb(111, 168, 25);">
-                                        {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo) / totalNights) | currency:
+                                        {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) | currency:
                                         'MXN':'symbol':'1.0-0' }}
                                     </span>
                                 </div>
@@ -70,7 +78,7 @@
                         <div class="precio-wrapper"
                             style="min-width: 120px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center;">
                             <span style="font-weight: bold; font-size: 1.5rem;">
-                                {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) | currency: '':'symbol':'1.0-0' }}
+                                {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo))*totalNights | currency: '':'symbol':'1.0-0' }}
                             </span>
                         </div>
 
@@ -80,59 +88,76 @@
 
                             <!-- Top row: two dropdowns side by side -->
                             <div style="display: flex; gap: 0.5rem; justify-content: space-between;">
-<div style="flex: 1;">
-  <label
-    for="numPpl-{{ dispo.Codigo }}-{{ tarifas.Tarifa }}"
-    [ngStyle]="{
-      color: qty > getMaxFromAdultos(dispo.Codigo) ? 'red' : 'inherit'
-    }"
-    style="display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;"
-  >
-    Adultos: {{ qty }}
-
-    <mat-icon
-      *ngIf="qty > getMaxFromAdultos(dispo.Codigo)"
-      matTooltip="⚠ La cantidad de Adultos que seleccionó excede el máximo disponible para este tipo de cuarto"
-      matTooltipPosition="right"
-      matTooltipShowDelay="300"
-      style="color: red; font-size: 16px; vertical-align: middle; margin-left: 4px;"
-    >
-      warning
-    </mat-icon>
-  </label>
-
-<select
-  id="numPpl-{{dispo.Codigo}}-{{tarifas.Tarifa}}"
-  style="width: 100%;"
-  [(ngModel)]="qty"
-  [ngModel]="getValidQty(dispo.Codigo, qty)"
-  (ngModelChange)="onQtyChange(dispo.Codigo)"
->
-  <option *ngFor="let n of generateAdultosArray(dispo.Codigo)" [value]="n">
-    {{ n }}
-  </option>
-</select>
-
-</div>
-
-
-
+                                <!--Adutlos-->
                                 <div style="flex: 1;">
-                                    <label for="quedan-{{dispo.Codigo}}-{{tarifas.Tarifa}}">Quedan: <span style="color: red;">{{getMaxValue(dispo.Codigo)}}</span></label>
-                                    <select id="quedan-{{dispo.Codigo}}-{{tarifas.Tarifa}}"
-                                        style="width: 100%;">
-                                        <option *ngFor="let num of generateInventarioArray(dispo.Codigo)"           
-                                        [selected]="num === getMaxValue(dispo.Codigo)">
+                                    <label for="numPpl-{{ dispo.Codigo }}-{{ tarifas.Tarifa }}" [ngStyle]="{
+                                    color: qty > getMaxFromAdultos(dispo.Codigo) ? 'red' : 'inherit'
+                                    }"
+                                        style="display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                                        Adultos: {{ qty }}
+
+                                        <mat-icon *ngIf="qty > getMaxFromAdultos(dispo.Codigo)"
+                                            matTooltip="⚠ La cantidad de Adultos que seleccionó excede el máximo disponible para este tipo de cuarto"
+                                            matTooltipPosition="right" matTooltipShowDelay="300"
+                                            style="color: red; font-size: 16px; vertical-align: middle; margin-left: 4px;">
+                                            warning
+                                        </mat-icon>
+                                    </label>
+
+                                    <select id="numPpl-{{dispo.Codigo}}-{{tarifas.Tarifa}}" style="width: 100%;"
+                                        [(ngModel)]="qty" [ngModel]="getValidQty(dispo.Codigo, qty)"
+                                        (ngModelChange)="onQtyChange(dispo.Codigo)">
+                                        <option *ngFor="let n of generateAdultosArray(dispo.Codigo)" [value]="n">
+                                            {{ n }}
+                                        </option>
+                                    </select>
+
+                                </div>
+                                <!--Ninos-->
+                                <div style="flex: 1;">
+                                    <label for="numPpl-{{ dispo.Codigo }}-{{ tarifas.Tarifa }}" [ngStyle]="{
+                                    color: qtyNin > getMaxFromNinos(dispo.Codigo) ? 'red' : 'inherit'
+                                    }"
+                                        style="display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+                                        Niños: {{ qtyNin }}
+
+                                        <mat-icon *ngIf="qtyNin > getMaxFromNinos(dispo.Codigo)"
+                                            matTooltip="⚠ La cantidad de Niños que seleccionó excede el máximo disponible para este tipo de cuarto"
+                                            matTooltipPosition="right" matTooltipShowDelay="300"
+                                            style="color: red; font-size: 16px; vertical-align: middle; margin-left: 4px;">
+                                            warning
+                                        </mat-icon>
+                                    </label>
+
+                                    <select id="numPpl-{{dispo.Codigo}}-{{tarifas.Tarifa}}" style="width: 100%;"
+                                        [(ngModel)]="qtyNin" [ngModel]="getValidNinQty(dispo.Codigo, qtyNin)"
+                                        (ngModelChange)="onQtyChange(dispo.Codigo)">
+                                        <option *ngFor="let n of generateNinosArray(dispo.Codigo)" [value]="n">
+                                            {{ n }}
+                                        </option>
+                                    </select>
+
+                                </div>
+                                <!--Numero de Habs-->
+                                <div style="flex: 1;">
+                                    <label for="quedan-{{dispo.Codigo}}-{{tarifas.Tarifa}}">Quedan: <span
+                                            style="color: red;">{{getMaxValue(dispo.Codigo)}}</span></label>
+                                    <select [(ngModel)]="numeroHabs"
+                                        (ngModelChange)="onQtyHabsChange(dispo.Codigo, $event)"
+                                        id="quedan-{{dispo.Codigo}}-{{tarifas.Tarifa}}" style="width: 100%;">
+                                        <option *ngFor="let num of generateInventarioArray(dispo.Codigo)" [value]="num">
                                             {{ num }}
                                         </option>
                                     </select>
+
                                 </div>
                             </div>
 
                             <!-- Bottom row: button centered -->
                             <div class="btn-group" style="display: flex; justify-content: center;">
                                 <button type="button"
-                                    (click)="agregaHab(tarifas, dispo.Codigo, selectedNumPpl[dispo.Codigo + tarifas.Tarifa], selectedQuedan[dispo.Codigo + tarifas.Tarifa])">
+                                    [disabled]="(+qtyNin > getMaxFromNinos(dispo.Codigo)) || (+qty > getMaxFromAdultos(dispo.Codigo))" 
+                                    (click)="agregaHab(tarifas, dispo.Codigo, numeroHabs)">
                                     Agregar Habitación
                                 </button>
                             </div>

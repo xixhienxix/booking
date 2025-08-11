@@ -2,43 +2,31 @@
   <div class="card-body">
     <div class="stepper stepper-links d-flex flex-column pt-15" id="kt_create_account_stepper">
       <div class="stepper-nav mb-5">
-        <div
-          class="stepper-item"
-          [ngClass]="{
+        <div class="stepper-item" [ngClass]="{
             current: currentStep$.value === 1,
             completed: currentStep$.value > 1
-          }"
-        >
+          }">
           <h3 class="stepper-title">Selección de Fechas</h3>
         </div>
 
-        <div
-          class="stepper-item"x
-          [ngClass]="{
+        <div class="stepper-item" x [ngClass]="{
             current: currentStep$.value === 2,
             completed: currentStep$.value > 2
-          }"
-        >
+          }">
           <h3 class="stepper-title">Disponibilidad</h3>
         </div>
 
-        <div
-          class="stepper-item"
-          [ngClass]="{
+        <div class="stepper-item" [ngClass]="{
             current: currentStep$.value === 3,
             completed: currentStep$.value > 3
-          }"
-        >
+          }">
           <h3 class="stepper-title">Confirmar Reservación</h3>
         </div>
 
-        <div
-          class="stepper-item"
-          [ngClass]="{
+        <div class="stepper-item" [ngClass]="{
             current: currentStep$.value === 4,
             completed: currentStep$.value > 4
-          }"
-        >
+          }">
           <h3 class="stepper-title">Forma de Pago</h3>
         </div>
 
@@ -52,11 +40,8 @@
           <!-- Step 1 -->
           <ng-container *ngIf="currentStep$.value === 1">
             <div class="step-content">
-              <app-step1
-                (quantityChanged)="onQuantityChange($event)" 
-                (dateChanged)="onDateRangeChange($event)"
-                (formValid)="handleStep1FormValidity($event)"
-                [updateParentModel]="updateAccount">
+              <app-step1 (quantityChanged)="onQuantityChange($event)" (dateChanged)="onDateRangeChange($event)"
+                (formValid)="handleStep1FormValidity($event)" [updateParentModel]="updateAccount">
               </app-step1>
             </div>
           </ng-container>
@@ -64,15 +49,9 @@
           <!-- Step 2 -->
           <ng-container *ngIf="currentStep$.value === 2">
             <div class="step-content">
-              <app-step2
-              [qtyNin]="qtyNin"
-              [qty]="qty"
-                [updateParentModel]="updateAccount"
-                [accountsCurrentData]="account$.value"
-                [intialDate]="intialDate"
-                [endDate]="endDate"
-                class="step-section step2-section"
-              ></app-step2>
+              <app-step2 [qtyNin]="qtyNin" [qty]="qty" [updateParentModel]="updateAccount"
+                [accountsCurrentData]="account$.value" [intialDate]="intialDate" [endDate]="endDate"
+                class="step-section step2-section" (onQtyHabsUpdate)="honQtyHabsUpdate($event)"></app-step2>
 
               <div class="fixed-reserva-wrapper">
                 <app-reserva class="step-section reserva-section"></app-reserva>
@@ -84,7 +63,14 @@
 
           <!-- Step 3 -->
           <ng-container *ngIf="currentStep$.value === 3">
-            <app-step3 class="w-100" [updateParentModel]="updateAccount" [defaultValues]="account$.value"></app-step3>
+<div class="step-content">
+  <app-step3 class="step-section step3-section"></app-step3>
+
+  <div class="fixed-reserva-wrapper">
+    <app-reserva class="step-section reserva-section"></app-reserva>
+  </div>
+</div>
+
           </ng-container>
 
           <!-- Step 4 -->
@@ -99,22 +85,25 @@
         </div>
 
         <div class="d-flex flex-stack pt-15">
-          <div class="mr-2">
+          <div class="btn-group mr-2">
             <ng-container *ngIf="currentStep$.value !== 1">
-              <button type="button" class="btn btn-lg btn-light-primary me-3" (click)="prevStep()">
-                <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr063.svg'" class="svg-icon svg-icon-4 me-1"></span>
+              <button type="button" (click)="prevStep()">
+                <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr063.svg'"
+                  class="svg-icon svg-icon-4 me-1"></span>
                 Back
               </button>
             </ng-container>
           </div>
 
           <ng-container *ngIf="currentStep$.value !== formsCount">
-            <div>
-              <button type="button" class="btn btn-lg btn-primary me-3" [disabled]="!isCurrentFormValid$.value" (click)="nextStep()">
+            <div class="btn-group">
+              <button type="button"  [disabled]="!isCurrentFormValid$.value"
+                (click)="nextStep()">
                 <span class="indicator-label">
                   <ng-container *ngIf="currentStep$.value < formsCount - 1">
                     Continue
-                    <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr064.svg'" class="svg-icon svg-icon-3 ms-2 me-0"></span>
+                    <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr064.svg'"
+                      class="svg-icon svg-icon-3 ms-2 me-0"></span>
                   </ng-container>
                   <ng-container *ngIf="currentStep$.value === formsCount - 1">
                     Submit

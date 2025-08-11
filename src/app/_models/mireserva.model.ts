@@ -1,3 +1,5 @@
+import { Packages } from "./packages.model";
+
 export interface miReserva {
     codigoCuarto:string,
     numeroCuarto:string,
@@ -6,6 +8,7 @@ export interface miReserva {
     precioTarifa:number,
     detallesTarifa:string,
     cantidadAdultos:number,
-    cantidadNinos:number
+    cantidadNinos:number,
+    packageList?:Packages[]
   }
   

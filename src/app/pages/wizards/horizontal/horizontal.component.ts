@@ -119,6 +119,10 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     this.currentStep$.next(prevStep);
   }
 
+  honQtyHabsUpdate(numeroHabs:number){
+    this._disponibilidadService.changeCurrentNumeroHabs(numeroHabs);
+  }
+
 
   ngOnDestroy(): void {
     this.ngUnsubscribe.next();

@@ -17,7 +17,7 @@
     </div>
     <div class="summary-row">
       <label>Habitaciones:</label>
-      <div class="value">2</div>
+      <div class="value">{{habs}}</div>
     </div>
     <hr />
 
@@ -26,7 +26,7 @@
     <mat-card class="room-item mat-elevation-z3">
       <mat-card-header>
         <div class="header-content">
-          <h2 class="room-code">[{{ reservas.codigoCuarto }}]</h2>
+          <h2 class="room-code">{{ reservas.codigoCuarto }}</h2>
           <button
             mat-icon-button
             color="warn"
@@ -40,7 +40,7 @@
 
       <mat-card-content>
         <div class="room-details">
-          <div class="detail-group full-width">
+          <div class="detail-group small">
             <label>Habitaciones</label>
             <div class="value">{{ reservas.cantidadHabitaciones }}</div>
           </div>
@@ -58,10 +58,46 @@
         </div>
       </mat-card-content>
 
+<ng-container *ngFor="let packages of reservas.packageList; let j = index">
+  <hr>
+  <mat-card class="package-item mat-elevation-z1">
+<mat-card-header>
+  <div class="header-content">
+    <h1 class="room-code">{{ packages.Nombre }}</h1>
+  </div>
+  <button
+    mat-icon-button
+    color="warn"
+    aria-label="Eliminar paquete"
+    (click)="popPackage(i, j)"
+    class="btn-remove">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-card-header>
+
+
+
+    <mat-card-content>
+      <!-- example label below, adjust as needed -->
+      <label>{{ packages.Descripcion }}</label>
+      <!-- add more fields if you want -->
+    </mat-card-content>
+
+<mat-card-footer>
+  <div class="total-price">
+    Total Paquete:
+    <span class="price">{{ packages.Precio * packages.Cantidad | currency }}</span>
+  </div>
+</mat-card-footer>
+
+  </mat-card>
+</ng-container>
+
+
       <mat-card-footer>
         <div class="total-price">
           Total por Estancia:
-          <span class="price">${{ reservas.precioTarifa * diff || 1 }}</span>
+          <span class="price">{{ reservas.precioTarifa || 1 | currency}}</span>
         </div>
       </mat-card-footer>
     </mat-card>
@@ -74,17 +110,25 @@
     <div class="price-summary">
       <div class="summary-row">
         <label>Subtotal:</label>
-        <div class="value">{{subtotal}}</div>
+        <div class="value">{{subtotal| currency}}</div>
       </div>
       <div class="summary-row">
-        <label>Impuestos:</label>
-        <div class="value">{{impuestos}}</div>
+        <label>Subtotal Impuestos:</label>
+        <div class="value">{{iva+ish | currency}}</div>
+      </div>
+      <div class="summary-row">
+        <label>IVA:</label>
+        <div class="value">{{iva| currency}}</div>
+      </div>
+      <div class="summary-row">
+        <label>ISH:</label>
+        <div class="value">{{ish| currency}}</div>
       </div>
       <div class="summary-row">
         <label>Total:</label>
-        <div class="value">{{subtotal + impuestos}}</div>
+        <div class="value">{{total| currency}}</div>
       </div>
-      <button type="button" class="btn btn-success btn-reserva">RESERVA AHORA</button>
+      <!-- <button type="button" class="btn btn-success btn-reserva">RESERVA AHORA</button> -->
     </div>
   </div>
 </div>
