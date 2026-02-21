@@ -82,7 +82,15 @@ numeroHabs: number = 1;
     private _tarifasServices: TarifasService,
     private fb: FormBuilder,
 
-  ) { }
+  ) {
+    this.reservaForm = this.fb.group({
+  codigoCuarto: ['', Validators.required],
+  numeroCuarto: ['', Validators.required],
+  plan: ['', Validators.required],
+  tarifaNotSelected: [false, Validators.requiredTrue]
+});
+
+   }
 
   async ngOnInit() {
 
@@ -94,6 +102,11 @@ numeroHabs: number = 1;
     this.tarifasEspeciales = this.tarifas.filter(
       item => item.Tarifa !== 'Tarifa Base' && item.Tarifa !== 'Tarifa De Temporada'
     );
+
+    this._disponibilidadService.currentReserva.subscribe(reservas => {
+      const hasReserva = reservas.length > 0;
+      this.updateParentModel({}, hasReserva);
+    });
 
 
     // One day in milliseconds
@@ -133,11 +146,18 @@ generateAdultosArray(codigo: string){
   return Array.from({ length: adultosQty }, (_, i) => i + 1);
 }
 
-generateNinosArray(codigo: string){
+generateNinosArray(codigo: string) {
   const ninosQty = this.roomCodesComplete.filter(room => room.Codigo === codigo)[0].Ninos;
 
-  return Array.from({ length: ninosQty }, (_, i) => i + 1);
+  // Create array [1, 2, ..., ninosQty]
+  const arr = Array.from({ length: ninosQty }, (_, i) => i + 1);
+
+  // Add 0 at the start
+  arr.unshift(0);
+
+  return arr;
 }
+
 
 
   getTarifasForHabitacion(codigo: string) {
@@ -268,7 +288,9 @@ agregaHab(tarifas: any, codigo: string,  quedan: number) {
     }]
 
     this._disponibilidadService.addMiReserva(obj)
-  
+
+    const hasReserva = (this._disponibilidadService.getMiReserva()?.length ?? 0) > 0;
+    this.updateParentModel({}, hasReserva);
 }
 
 getMaxValue(codigo: string): number {

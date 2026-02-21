@@ -100,16 +100,54 @@
     </fieldset>
 
     <!-- Código Promocional -->
-    <mat-form-field appearance="outline" class="full-width mt-3">
-      <mat-label>Código Promocional</mat-label>
-      <input matInput type="text" formControlName="codigoPromo">
-      <button *ngIf="codigoPromocional"
-              matSuffix mat-icon-button
-              aria-label="Borrar"
-              (click)="codigoPromocional = ''">
-        <mat-icon>close</mat-icon>
-      </button>
-    </mat-form-field>
+    <fieldset class="form-section">
+      <legend>Código Promocional</legend>
+    <div class="row-container">
+      <div class="promo-input-wrapper">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Código Promocional</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="codigoPromo"
+            (input)="onPromoInputChange()"
+            placeholder="Opcional">
+          <button *ngIf="formGroup.get('codigoPromo')?.value"
+            matSuffix mat-icon-button
+            aria-label="Borrar código"
+            (click)="clearPromo()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <!-- Only show feedback AFTER validation was triggered (on Continue click) -->
+        <div *ngIf="promoValidationStatus === 'invalid'" 
+            style="color: red; font-size: 0.85rem; margin-top: -12px; padding-left: 4px;">
+          ❌ {{ promoValidationMessage }}
+        </div>
+      </div>
+
+      <!-- Valid promo preview card — only shown after successful validation -->
+      <div *ngIf="validatedPromo" class="promo-preview" 
+          style="display:flex; align-items:center; gap: 8px; margin-top: 8px; padding: 8px 12px; background: #e6f4ea; border-radius: 8px;">
+        <div>
+          <strong>{{ validatedPromo.nombre }}</strong><br>
+          <small *ngIf="validatedPromo.discountType">{{ validatedPromo.qtyPrecio }}% de descuento</small>
+          <small *ngIf="!validatedPromo.discountType">${{ validatedPromo.qtyPrecio }} de descuento por noche</small>
+        </div>
+      </div>
+    </div>
+
+      <!-- Valid promo preview card -->
+      <div *ngIf="validatedPromo" class="promo-preview">
+        <mat-icon style="color:green">local_offer</mat-icon>
+        <div>
+          <strong>{{ validatedPromo.nombre }}</strong><br>
+          <small *ngIf="validatedPromo.discountType">{{ validatedPromo.qtyPrecio }}% de descuento</small>
+          <small *ngIf="!validatedPromo.discountType">${{ validatedPromo.qtyPrecio }} de descuento por noche</small>
+        </div>
+      </div>
+    </fieldset>
 
   </form>
 </div>

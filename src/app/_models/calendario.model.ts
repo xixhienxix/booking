@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon'
+import { Promos } from './promos.model';
 
 
 export interface ICalendario {
@@ -8,6 +9,7 @@ export interface ICalendario {
   adultos:number,
   ninos:number,
   hotel:string;
+  validatedPromo?: Promos | null;
 }
 export let defaultCalendario = {
   fechaInicial:undefined,

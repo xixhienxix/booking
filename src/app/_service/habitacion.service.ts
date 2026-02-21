@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { HttpClient,HttpParams } from "@angular/common/http";
 import { catchError, map, tap } from 'rxjs/operators';
 import { IHabitaciones } from '../_models/habitaciones.model'
@@ -12,9 +12,14 @@ import { Ihoteles } from '../_models/hoteles.model';
 export class HabitacionesService {
   private listaFolios: IHabitaciones[] = [];
 
+  private _habitaciones$ = new BehaviorSubject<IHabitaciones[]>([]);
+  readonly habitaciones$ = this._habitaciones$.asObservable();
+
+  get currentHabitaciones(){
+    return this._habitaciones$.value
+  }
 
   getHoteles() : Observable<string[]>{
-
     return  (this.http.get<string[]>(environment.apiUrl+"/listahoteles")
     .pipe(
       map(responseData=>{
@@ -34,7 +39,6 @@ export class HabitacionesService {
   }
 
   getHabitacionbyNumero(numero:string) : Observable<IHabitaciones[]> {
-
     return  (this.http.get<IHabitaciones[]>(environment.apiUrl+"/reportes/habitacion/"+numero)
         .pipe(
           map(responseData=>{
@@ -44,8 +48,8 @@ export class HabitacionesService {
     }
 
   getHabitaciones() :Observable<IHabitaciones[]> {
-   return this.http
-    .get<IHabitaciones[]>(environment.apiUrl + '/reportes/habitaciones')
+    return this.http.get<IHabitaciones[]>(environment.apiUrl + '/habitaciones')
+          .pipe(tap(habs => this._habitaciones$.next(habs)));
   }
 
   getInfoHabitaciones(numero:string,tipo:string) :Observable<IHabitaciones[]> {

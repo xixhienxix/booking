@@ -119,13 +119,13 @@
     <p>¿Cómo le gustaría pagar su reservación?</p>
 
     <mat-radio-group  class="radio-group">
-      <mat-radio-button value="total">PAGO TOTAL: <strong>$19,698.11</strong></mat-radio-button>
-      <mat-radio-button value="deposito">DEPÓSITO DEL 50%: <strong>$9,849</strong></mat-radio-button>
+      <mat-radio-button value="total">PAGO TOTAL: <strong> {{ totalPayment | currency}}</strong></mat-radio-button>
+      <mat-radio-button value="deposito">DEPÓSITO DEL 50%: <strong>{{ partialPayment | currency}}</strong></mat-radio-button>
     </mat-radio-group>
 
     <mat-divider></mat-divider>
 
-    <mat-checkbox >Transferencia Bancaria</mat-checkbox>
+    <mat-checkbox [disabled]="true">Transferencia Bancaria</mat-checkbox>
     <p class="note">
       Una vez efectuada la reserva, le indicaremos la cuenta donde debe realizar el pago...
     </p>
@@ -133,21 +133,35 @@
     <mat-checkbox >Directo en el Hotel</mat-checkbox>
     <p class="note">Necesitamos la tarjeta de crédito o débito sólo como garantía, no se cobrará nada ahora.</p>
 
-    <div class="credit-card">
-      <mat-form-field appearance="outline">
-        <mat-label>Número de tarjeta</mat-label>
-        <input matInput />
-      </mat-form-field>
+ <form [formGroup]="cardForm" novalidate>
+  <div class="credit-card">
 
-      <mat-form-field appearance="outline">
-        <mat-label>Fecha expira</mat-label>
-        <input matInput />
-      </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Número de tarjeta</mat-label>
+      <input matInput formControlName="cardNumber" maxlength="19" autocomplete="cc-number" />
+      <mat-error *ngIf="cardForm.get('cardNumber')?.hasError('required')">El número de tarjeta es requerido</mat-error>
+      <mat-error *ngIf="cardForm.get('cardNumber')?.hasError('pattern')">Número de tarjeta inválido</mat-error>
+    </mat-form-field>
 
-      <mat-form-field appearance="outline">
-        <mat-label>CVV</mat-label>
-        <input matInput />
-      </mat-form-field>
-    </div>
+    <mat-form-field appearance="outline">
+      <mat-label>Fecha expira (MM/YY)</mat-label>
+      <input matInput formControlName="expiryDate" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp" />
+      <mat-error *ngIf="cardForm.get('expiryDate')?.hasError('required')">La fecha de expiración es requerida</mat-error>
+      <mat-error *ngIf="cardForm.get('expiryDate')?.hasError('invalidExpiryDate')">Formato inválido. Use MM/YY o MM/YYYY</mat-error>
+      <mat-error *ngIf="cardForm.get('expiryDate')?.hasError('expired')">La tarjeta está expirada</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>CVV</mat-label>
+      <input matInput formControlName="cvv" maxlength="4" autocomplete="cc-csc" />
+      <mat-error *ngIf="cardForm.get('cvv')?.hasError('required')">El CVV es requerido</mat-error>
+      <mat-error *ngIf="cardForm.get('cvv')?.hasError('pattern')">CVV inválido</mat-error>
+    </mat-form-field>
+
+  </div>
+
+  <button mat-raised-button color="primary" [disabled]="cardForm.invalid">Pagar</button>
+</form>
+
   </mat-card>
 </div>

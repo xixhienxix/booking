@@ -325,3 +325,16 @@
     }
   }
 }
+// reserva.component.scss
+.promo-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #e6f4ea;
+  border: 1px solid #b7dfbf;
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: #198754;
+}

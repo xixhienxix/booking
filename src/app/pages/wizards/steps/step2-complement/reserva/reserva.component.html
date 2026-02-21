@@ -6,9 +6,9 @@
     <!-- Summary Info -->
     <div class="summary-row">
       <label>Fecha :</label>
-<div class="value">
-  {{ fechaIniDateTime.toFormat('dd/MM/yyyy') }} - {{ FechaFinDateTime.toFormat('dd/MM/yyyy') }}
-</div>
+    <div class="value">
+      {{ fechaIniDateTime.toFormat('dd/MM/yyyy') }} - {{ FechaFinDateTime.toFormat('dd/MM/yyyy') }}
+    </div>
 
     </div>
     <div class="summary-row">
@@ -19,9 +19,58 @@
       <label>Habitaciones:</label>
       <div class="value">{{habs}}</div>
     </div>
-    <hr />
 
-<div class="rooms-list">
+<ng-container *ngIf="validatedPromo">
+  <div class="summary-row">
+    <label>Promoción:</label>
+    <div class="value" style="color: #198754; font-weight: 700;">
+      {{ validatedPromo.nombre }}
+    </div>
+  </div>
+
+  <div class="summary-row">
+    <label>Descuento:</label>
+    <div class="value" style="color: #198754;">
+      <span *ngIf="validatedPromo.discountType">
+        {{ validatedPromo.qtyPrecio }}%
+      </span>
+      <span *ngIf="!validatedPromo.discountType">
+        ${{ validatedPromo.qtyPrecio }} por noche
+      </span>
+    </div>
+  </div>
+
+  <!-- Promo badge -->
+  <div style="
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #e6f4ea;
+    border: 1px solid #b7dfbf;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #198754;">
+    <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: #198754;">
+      local_offer
+    </mat-icon>
+    <span>{{ validatedPromo.codigo }} aplicado</span>
+    <!-- Let user remove promo -->
+    <button
+      mat-icon-button
+      style="width: 20px; height: 20px; line-height: 20px; margin-left: auto;"
+      (click)="removePromo()"
+      aria-label="Quitar promoción">
+      <mat-icon style="font-size: 0.85rem; color: #888;">close</mat-icon>
+    </button>
+  </div>
+</ng-container>
+
+<hr />
+
+<ng-container *ngIf="miReserva.length !== 0">
+  <div class="rooms-list">
   <ng-container *ngFor="let reservas of miReserva; let i = index">
     <mat-card class="room-item mat-elevation-z3">
       <mat-card-header>
@@ -103,8 +152,7 @@
     </mat-card>
   </ng-container>
 </div>
-
-
+</ng-container>
 
     <!-- Price Summary -->
     <div class="price-summary">

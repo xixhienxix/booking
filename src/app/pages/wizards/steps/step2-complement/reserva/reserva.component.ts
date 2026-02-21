@@ -3,6 +3,7 @@ import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { DateTime } from 'luxon'
 import { combineLatest, concat, forkJoin } from 'rxjs';
 import { miReserva } from 'src/app/_models/mireserva.model';
+import { Promos } from 'src/app/_models/promos.model';
 @Component({
   selector: 'app-reserva',
   templateUrl: './reserva.component.html',
@@ -26,6 +27,9 @@ export class ReservaComponent implements OnInit {
   ish: number = 0;
   total: number = 0;
 
+  validatedPromo: Promos | null = null;
+
+
   ngOnInit() {
 
     combineLatest([
@@ -45,6 +49,10 @@ export class ReservaComponent implements OnInit {
       } else {
         this.diff = 0;
       }
+    });
+
+    this._disponibilidadService.currentValidatedPromo.subscribe(promo => {
+      this.validatedPromo = promo;
     });
 
 
@@ -101,6 +109,10 @@ export class ReservaComponent implements OnInit {
 
   }
 
+  removePromo(): void {
+    this._disponibilidadService.changeValidatedPromo(null);
+  }
+
   popPackage(reservaIndex: number, packageIndex: number) {
     const reserva = this.miReserva[reservaIndex];
     if (reserva && reserva.packageList) {
@@ -109,9 +121,6 @@ export class ReservaComponent implements OnInit {
       this._disponibilidadService.changeMiReserva(this.miReserva);
     }
   }
-
-
-
 
   pop(index: number) {
     if (index === 0) {

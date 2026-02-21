@@ -9,6 +9,7 @@ import { miReserva } from '../_models/mireserva.model';
 import { ICalendario } from '../_models/calendario.model';
 import { Bloqueo } from '../_models/bloqueos.model';
 import { Habitacion } from '../_models/habitacion.model';
+import { Promos } from '../_models/promos.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -35,6 +36,9 @@ export class DisponibilidadService {
   private miReserva$: BehaviorSubject<miReserva[]> = new BehaviorSubject<miReserva[]>([])
   currentReserva = this.miReserva$.asObservable();
 
+  private _validatedPromo = new BehaviorSubject<Promos | null>(null);
+  readonly currentValidatedPromo = this._validatedPromo.asObservable();
+
   constructor(
     private http:HttpClient
   ) { }
@@ -45,6 +49,10 @@ export class DisponibilidadService {
 
 getMiReserva() {
   return this.miReserva$.value; 
+}
+
+changeValidatedPromo(promo: Promos | null): void {
+  this._validatedPromo.next(promo);
 }
 
   addMiReserva(data:miReserva[]){
