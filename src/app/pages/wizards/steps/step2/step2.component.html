@@ -77,9 +77,29 @@
                         <!-- Total separate on right -->
                         <div class="precio-wrapper"
                             style="min-width: 120px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center;">
-                            <span style="font-weight: bold; font-size: 1.5rem;">
-                                {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo))*totalNights | currency: '':'symbol':'1.0-0' }}
-                            </span>
+                            <!-- No promo: show normal total -->
+                            <ng-container *ngIf="!validatedPromo">
+                                <span style="font-weight: bold; font-size: 1.5rem;">
+                                {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights | currency: '':'symbol':'1.0-0' }}
+                                </span>
+                                <small style="color: gray;">Total {{ totalNights }} noches</small>
+                            </ng-container>
+
+                            <!-- Promo active: show before/after -->
+                            <ng-container *ngIf="validatedPromo">
+                                <span style="font-size: 1rem; color: #999; text-decoration: line-through;">
+                                {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights | currency: '':'symbol':'1.0-0' }}
+                                </span>
+                                <span style="font-weight: bold; font-size: 1.5rem; color: #198754;">
+                                {{ calcPromoTotal(tarifas, dispo.Codigo) | currency: '':'symbol':'1.0-0' }}
+                                </span>
+                                <small style="color: #198754; font-weight: 600;">
+                                🎟 {{ validatedPromo.nombre }}
+                                </small>
+                                <small style="color: #198754;">
+                                Ahorras {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights - calcPromoTotal(tarifas, dispo.Codigo) | currency: '':'symbol':'1.0-0' }}
+                                </small>
+                            </ng-container>
                         </div>
 
 

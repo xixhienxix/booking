@@ -13,6 +13,9 @@ import { miReserva } from 'src/app/_models/mireserva.model';
 import { isNumber } from '@ng-bootstrap/ng-bootstrap/util/util';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { HabitacionesService } from 'src/app/_service/habitacion.service';
+import { PromosBookingService } from 'src/app/_service/promos.service';
+import { PromoValidationResult, PromoValidatorService } from 'src/app/_service/promo.validation.service';
+import { Promos } from 'src/app/_models/promos.model';
 @Component({
   selector: 'app-step2',
   templateUrl: './step2.component.html',
@@ -64,24 +67,27 @@ selectedHabitaciones: number = 1;
   maxHabsReached:boolean=false
 
 
-    // For dropdown options (example: 1 to 10 people)
-numPplOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
+  // For dropdown options (example: 1 to 10 people)
+  numPplOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
 
-// Example "Quedan" options (room availability)
-quedanOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
+  // Example "Quedan" options (room availability)
+  quedanOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
 
-// Track selected dropdown values by unique key (roomCode + tarifa)
-// For Adultos (qty)
-selectedQty: { [key: string]: number } = {};
+  // Track selected dropdown values by unique key (roomCode + tarifa)
+  // For Adultos (qty)
+  selectedQty: { [key: string]: number } = {};
 
-// For 'Quedan' dropdowns (if needed)
-numeroHabs: number = 1;
+  // For 'Quedan' dropdowns (if needed)
+  numeroHabs: number = 1;
+
+  validatedPromo: Promos | null = null; // ← add
+
 
   constructor(
     private _disponibilidadService: DisponibilidadService,
     private _tarifasServices: TarifasService,
     private fb: FormBuilder,
-
+    private _promoValidatorService: PromoValidatorService,
   ) {
     this.reservaForm = this.fb.group({
   codigoCuarto: ['', Validators.required],
@@ -102,6 +108,10 @@ numeroHabs: number = 1;
     this.tarifasEspeciales = this.tarifas.filter(
       item => item.Tarifa !== 'Tarifa Base' && item.Tarifa !== 'Tarifa De Temporada'
     );
+
+    this._disponibilidadService.currentValidatedPromo.subscribe(promo => {
+      this.validatedPromo = promo;
+    });
 
     this._disponibilidadService.currentReserva.subscribe(reservas => {
       const hasReserva = reservas.length > 0;
@@ -274,28 +284,77 @@ getValidNinQty(codigo: string, qty: number): number {
 
 
 
-agregaHab(tarifas: any, codigo: string,  quedan: number) {
+agregaHab(tarifas: any, codigo: string, quedan: number) {
+    const basePrice = this.roundUp(this.ratesToCalc(tarifas, false, codigo)) * this.totalNights;
 
-  const obj: miReserva[] = [{
+    // Apply promo discount if active
+    let finalPrice = basePrice;
+    let discountAmount = 0;
+
+    if (this.validatedPromo) {
+      const desglose = Array.from({ length: this.totalNights }, (_, i) => ({
+        tarifa: tarifas.Tarifa,
+        fecha: `night_${i}`,
+        tarifaTotal: this.roundUp(this.ratesToCalc(tarifas, false, codigo)),
+      }));
+
+      const result = this._promoValidatorService.applyPromo(
+        this.validatedPromo,
+        desglose,
+        basePrice,
+        this.totalNights,
+      );
+
+      finalPrice = result.pendiente;
+      discountAmount = result.discountAmount;
+    }
+
+    const obj: miReserva[] = [{
       codigoCuarto: codigo,
       numeroCuarto: '',
       cantidadHabitaciones: Number(quedan),
       nombreTarifa: tarifas.Tarifa,
-      precioTarifa: this.roundUp(this.ratesToCalc(tarifas, false, codigo))*this.totalNights,
+      precioTarifa: finalPrice,           // ← discounted price
+      precioOriginal: basePrice,          // ← original price for display
+      descuentoAplicado: discountAmount,  // ← how much was saved
+      promoNombre: this.validatedPromo?.nombre ?? '',
       detallesTarifa: this.plan,
       cantidadAdultos: this.qty,
-      cantidadNinos: this.qtyNin
-    }]
+      cantidadNinos: this.qtyNin,
+    }];
 
-    this._disponibilidadService.addMiReserva(obj)
+    this._disponibilidadService.addMiReserva(obj);
 
     const hasReserva = (this._disponibilidadService.getMiReserva()?.length ?? 0) > 0;
     this.updateParentModel({}, hasReserva);
-}
+  }
 
 getMaxValue(codigo: string): number {
   const arr = this.generateInventarioArray(codigo);
   return arr.length ? Math.max(...arr) : 1;
+}
+
+// step2.component.ts
+calcPromoTotal(tarifas: any, codigo: string): number {
+  if (!this.validatedPromo) {
+    return this.roundUp(this.ratesToCalc(tarifas, false, codigo)) * this.totalNights;
+  }
+
+  const nightlyRate = this.roundUp(this.ratesToCalc(tarifas, false, codigo));
+  const desglose = Array.from({ length: this.totalNights }, (_, i) => ({
+    tarifa: tarifas.Tarifa,
+    fecha: `night_${i}`,
+    tarifaTotal: nightlyRate,
+  }));
+
+  const result = this._promoValidatorService.applyPromo(
+    this.validatedPromo,
+    desglose,
+    nightlyRate * this.totalNights,
+    this.totalNights,
+  );
+
+  return result.pendiente;
 }
 
 

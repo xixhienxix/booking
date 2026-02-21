@@ -9,6 +9,9 @@ export interface miReserva {
     detallesTarifa:string,
     cantidadAdultos:number,
     cantidadNinos:number,
-    packageList?:Packages[]
+    packageList?:Packages[],
+    precioOriginal?: number; 
+    descuentoAplicado?: number; 
+    promoNombre?: string;  
   }
   

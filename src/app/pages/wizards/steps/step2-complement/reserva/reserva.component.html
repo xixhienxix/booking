@@ -3,13 +3,13 @@
     <div class="modal-title">Mi Reserva</div>      
   </div>
   <div class="modal-body">
+
     <!-- Summary Info -->
     <div class="summary-row">
       <label>Fecha :</label>
-    <div class="value">
-      {{ fechaIniDateTime.toFormat('dd/MM/yyyy') }} - {{ FechaFinDateTime.toFormat('dd/MM/yyyy') }}
-    </div>
-
+      <div class="value">
+        {{ fechaIniDateTime.toFormat('dd/MM/yyyy') }} - {{ FechaFinDateTime.toFormat('dd/MM/yyyy') }}
+      </div>
     </div>
     <div class="summary-row">
       <label>Noches:</label>
@@ -20,163 +20,176 @@
       <div class="value">{{habs}}</div>
     </div>
 
-<ng-container *ngIf="validatedPromo">
-  <div class="summary-row">
-    <label>Promoción:</label>
-    <div class="value" style="color: #198754; font-weight: 700;">
-      {{ validatedPromo.nombre }}
-    </div>
-  </div>
-
-  <div class="summary-row">
-    <label>Descuento:</label>
-    <div class="value" style="color: #198754;">
-      <span *ngIf="validatedPromo.discountType">
-        {{ validatedPromo.qtyPrecio }}%
-      </span>
-      <span *ngIf="!validatedPromo.discountType">
-        ${{ validatedPromo.qtyPrecio }} por noche
-      </span>
-    </div>
-  </div>
-
-  <!-- Promo badge -->
-  <div style="
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #e6f4ea;
-    border: 1px solid #b7dfbf;
-    border-radius: 8px;
-    padding: 6px 10px;
-    margin-bottom: 8px;
-    font-size: 0.85rem;
-    color: #198754;">
-    <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: #198754;">
-      local_offer
-    </mat-icon>
-    <span>{{ validatedPromo.codigo }} aplicado</span>
-    <!-- Let user remove promo -->
-    <button
-      mat-icon-button
-      style="width: 20px; height: 20px; line-height: 20px; margin-left: auto;"
-      (click)="removePromo()"
-      aria-label="Quitar promoción">
-      <mat-icon style="font-size: 0.85rem; color: #888;">close</mat-icon>
-    </button>
-  </div>
-</ng-container>
-
-<hr />
-
-<ng-container *ngIf="miReserva.length !== 0">
-  <div class="rooms-list">
-  <ng-container *ngFor="let reservas of miReserva; let i = index">
-    <mat-card class="room-item mat-elevation-z3">
-      <mat-card-header>
-        <div class="header-content">
-          <h2 class="room-code">{{ reservas.codigoCuarto }}</h2>
-          <button
-            mat-icon-button
-            color="warn"
-            aria-label="Eliminar habitación"
-            (click)="pop(i)"
-            class="btn-remove">
-            <mat-icon>close</mat-icon>
-          </button>
+    <!-- Promo Summary -->
+    <ng-container *ngIf="validatedPromo">
+      <div class="summary-row">
+        <label>Promoción:</label>
+        <div class="value" style="color: #198754; font-weight: 700;">
+          {{ validatedPromo.nombre }}
         </div>
-      </mat-card-header>
-
-      <mat-card-content>
-        <div class="room-details">
-          <div class="detail-group small">
-            <label>Habitaciones</label>
-            <div class="value">{{ reservas.cantidadHabitaciones }}</div>
-          </div>
-
-          <div class="detail-row">
-            <div class="detail-group small">
-              <label>Adultos</label>
-              <div class="value">{{ reservas.cantidadAdultos }}</div>
-            </div>
-            <div class="detail-group small">
-              <label>Niños</label>
-              <div class="value">{{ reservas.cantidadNinos }}</div>
-            </div>
-          </div>
+      </div>
+      <div class="summary-row">
+        <label>Descuento:</label>
+        <div class="value" style="color: #198754;">
+          <span *ngIf="validatedPromo.discountType">{{ validatedPromo.qtyPrecio }}%</span>
+          <span *ngIf="!validatedPromo.discountType">${{ validatedPromo.qtyPrecio }} por noche</span>
         </div>
-      </mat-card-content>
+      </div>
+      <!-- Promo badge -->
+      <div style="
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #e6f4ea;
+        border: 1px solid #b7dfbf;
+        border-radius: 8px;
+        padding: 6px 10px;
+        margin-bottom: 8px;
+        font-size: 0.85rem;
+        color: #198754;">
+        <mat-icon style="font-size: 1rem; width: 1rem; height: 1rem; color: #198754;">local_offer</mat-icon>
+        <span>{{ validatedPromo.codigo }} aplicado</span>
+        <!-- <button
+          mat-icon-button
+          style="width: 20px; height: 20px; line-height: 20px; margin-left: auto;"
+          (click)="removePromo()"
+          aria-label="Quitar promoción">
+          <mat-icon style="font-size: 0.85rem; color: #888;">close</mat-icon>
+        </button> -->
+      </div>
+    </ng-container>
 
-<ng-container *ngFor="let packages of reservas.packageList; let j = index">
-  <hr>
-  <mat-card class="package-item mat-elevation-z1">
-<mat-card-header>
-  <div class="header-content">
-    <h1 class="room-code">{{ packages.Nombre }}</h1>
-  </div>
-  <button
-    mat-icon-button
-    color="warn"
-    aria-label="Eliminar paquete"
-    (click)="popPackage(i, j)"
-    class="btn-remove">
-    <mat-icon>close</mat-icon>
-  </button>
-</mat-card-header>
+    <hr />
 
+    <!-- Rooms List -->
+    <ng-container *ngIf="miReserva.length !== 0">
+      <div class="rooms-list">
+        <ng-container *ngFor="let reservas of miReserva; let i = index">
+          <mat-card class="room-item mat-elevation-z3">
 
+            <mat-card-header>
+              <div class="header-content">
+                <h2 class="room-code">{{ reservas.codigoCuarto }}</h2>
+                <button
+                  mat-icon-button
+                  color="warn"
+                  aria-label="Eliminar habitación"
+                  (click)="pop(i)"
+                  class="btn-remove">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </mat-card-header>
 
-    <mat-card-content>
-      <!-- example label below, adjust as needed -->
-      <label>{{ packages.Descripcion }}</label>
-      <!-- add more fields if you want -->
-    </mat-card-content>
+            <mat-card-content>
+              <div class="room-details">
+                <div class="detail-group small">
+                  <label>Habitaciones</label>
+                  <div class="value">{{ reservas.cantidadHabitaciones }}</div>
+                </div>
+                <div class="detail-row">
+                  <div class="detail-group small">
+                    <label>Adultos</label>
+                    <div class="value">{{ reservas.cantidadAdultos }}</div>
+                  </div>
+                  <div class="detail-group small">
+                    <label>Niños</label>
+                    <div class="value">{{ reservas.cantidadNinos }}</div>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
 
-<mat-card-footer>
-  <div class="total-price">
-    Total Paquete:
-    <span class="price">{{ packages.Precio * packages.Cantidad | currency }}</span>
-  </div>
-</mat-card-footer>
+            <!-- Packages loop — footer stays INSIDE package mat-card, NOT room card -->
+            <ng-container *ngFor="let packages of reservas.packageList; let j = index">
+              <hr>
+              <mat-card class="package-item mat-elevation-z1">
 
-  </mat-card>
-</ng-container>
+                <mat-card-header>
+                  <div class="header-content">
+                    <h1 class="room-code">{{ packages.Nombre }}</h1>
+                  </div>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    aria-label="Eliminar paquete"
+                    (click)="popPackage(i, j)"
+                    class="btn-remove">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </mat-card-header>
 
+                <mat-card-content>
+                  <label>{{ packages.Descripcion }}</label>
+                </mat-card-content>
 
-      <mat-card-footer>
-        <div class="total-price">
-          Total por Estancia:
-          <span class="price">{{ reservas.precioTarifa || 1 | currency}}</span>
-        </div>
-      </mat-card-footer>
-    </mat-card>
-  </ng-container>
-</div>
-</ng-container>
+                <mat-card-footer>
+                  <div class="total-price">
+                    Total Paquete:
+                    <span class="price">{{ packages.Precio * packages.Cantidad | currency }}</span>
+                  </div>
+                </mat-card-footer>
+
+              </mat-card>
+            </ng-container>
+            <!-- END packages loop -->
+
+            <!-- Room footer — outside packages loop, inside room mat-card -->
+            <mat-card-footer>
+              <div class="total-price">
+
+                <!-- Promo breakdown — only when discount was applied -->
+                <ng-container *ngIf="reservas.descuentoAplicado && reservas.descuentoAplicado > 0">
+                  <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #999; margin-bottom: 4px;">
+                    <span>Precio original:</span>
+                    <span style="text-decoration: line-through;">{{ reservas.precioOriginal | currency }}</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.85rem; color: #198754; margin-bottom: 4px;">
+                    <span>🎟 {{ reservas.promoNombre }}</span>
+                    <span>- {{ reservas.descuentoAplicado | currency }}</span>
+                  </div>
+                  <hr style="margin: 4px 0;">
+                </ng-container>
+
+                <!-- Final total — always shown -->
+                <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                  <span>Total por Estancia:</span>
+                  <span class="price" [style.color]="reservas.descuentoAplicado ? '#198754' : '#0b5e3a'">
+                    {{ reservas.precioTarifa | currency }}
+                  </span>
+                </div>
+
+              </div>
+            </mat-card-footer>
+
+          </mat-card>
+        </ng-container>
+      </div>
+    </ng-container>
 
     <!-- Price Summary -->
     <div class="price-summary">
       <div class="summary-row">
         <label>Subtotal:</label>
-        <div class="value">{{subtotal| currency}}</div>
+        <div class="value">{{ subtotal | currency }}</div>
       </div>
       <div class="summary-row">
         <label>Subtotal Impuestos:</label>
-        <div class="value">{{iva+ish | currency}}</div>
+        <div class="value">{{ iva + ish | currency }}</div>
       </div>
       <div class="summary-row">
         <label>IVA:</label>
-        <div class="value">{{iva| currency}}</div>
+        <div class="value">{{ iva | currency }}</div>
       </div>
       <div class="summary-row">
         <label>ISH:</label>
-        <div class="value">{{ish| currency}}</div>
+        <div class="value">{{ ish | currency }}</div>
       </div>
       <div class="summary-row">
         <label>Total:</label>
-        <div class="value">{{total| currency}}</div>
+        <div class="value">{{ total | currency }}</div>
       </div>
-      <!-- <button type="button" class="btn btn-success btn-reserva">RESERVA AHORA</button> -->
     </div>
+
   </div>
 </div>
