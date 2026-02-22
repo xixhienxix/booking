@@ -1,7 +1,7 @@
 <div class="card">
   <div class="card-body">
-    <div class="stepper stepper-links d-flex flex-column pt-15" id="kt_create_account_stepper">
-      <div class="stepper-nav mb-5">
+    <div class="stepper stepper-links d-flex flex-column" id="kt_create_account_stepper">
+      <div class="stepper-nav mb-2">
         <div class="stepper-item" [ngClass]="{
             current: currentStep$.value === 1,
             completed: currentStep$.value > 1
@@ -35,7 +35,7 @@
         </div>
       </div>
 
-      <form class="mx-auto pt-15 pb-10" noValidate id="kt_create_account_form">
+      <form class="mx-auto pb-10" noValidate id="kt_create_account_form">
         <div class="current">
           <!-- Step 1 -->
           <ng-container *ngIf="currentStep$.value === 1">

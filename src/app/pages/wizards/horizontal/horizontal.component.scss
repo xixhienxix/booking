@@ -1,144 +1,80 @@
-/* Mobile-first CSS */
+/* ── Mobile-first base ─────────────────────────────────── */
 .step-content {
-    width: 100%;
-    padding: 0 1rem;
-}
-
-.step-section {
-    width: 100%;
-}
-
-.wrap {
-    display: flex;
-    flex-wrap: wrap;
-    width: 100%;
-}
-
-button {
-    width: 100%;
-    margin-bottom: 1rem;
-}
-
-/* Tablet & Small Desktop */
-@media (min-width: 768px) {
-    .step-section {
-        width: 100%;
-    }
-
-    .step-content {
-        padding: 0 2rem;
-    }
-}
-
-/* Desktop */
-@media (min-width: 1024px) {
-    .step-content {
-        width: 100%; /* Use full width of the parent */
-        padding: 0 3rem;
-    }
-
-    .step-section {
-        width: 100%; /* Ensure full width for step sections */
-    }
-
-    .wrap {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-
-    button {
-        width: auto; /* Button can scale as per content */
-    }
-}
-
-/* Extra-large desktop */
-@media (min-width: 1440px) {
-    .step-content {
-        max-width: 100%; /* Further restrict width for very large screens */
-        margin: 0 auto;
-    }
-
-    .step-section {
-        width: 70%;
-    }
-
-    .wrap {
-        justify-content: space-around;
-    }
-}
-
-
-.step-content {
+  width: 100%;
+  padding: 0 1rem;
+  margin-top: 1rem;
   display: flex;
   gap: 1rem;
   align-items: flex-start;
+}
 
-  // On desktop/tablet:
+.step-section {
+  width: 100%;
+}
+
+.wrap {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* ── Kill Metronic's massive padding ───────────────────── */
+.stepper.stepper-links {
+  padding-top: 0 !important;
+}
+
+form#kt_create_account_form {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  padding-bottom: 1rem !important;
+}
+
+.stepper-nav {
+  margin-bottom: 0.5rem !important;
+}
+
+.d-flex.flex-stack {
+  padding-top: 1rem !important;
+}
+
+/* ── Step 2 & 3 layout ─────────────────────────────────── */
 .step2-section {
-  flex: 0 1 600px;  // no grow, can shrink, base 100px
-  min-width: 600px;
-  max-width: 600px; // limit max width if you want
+  flex: 0 1 600px;
+  min-width: 0;
+  max-width: 600px;
   overflow-y: auto;
   max-height: 80vh;
 }
 
-
-  .step3-section {
-    flex: 0 1 500px;  /* Use 500px or any desired min width */
-    min-width: 500px; /* ensures minimum width at start */
-    overflow-y: auto;
-    max-height: 80vh;
-    }
-
-
-  .reserva-section {
-    flex: 1 1 0;   // Takes about 1/3 of width
-    position: sticky; 
-    top: 1rem;     // stays visible when scrolling
-    max-height: 80vh;
-    overflow-y: auto;
-    //background: #f5f5f5;  // subtle background
-    // padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  }
-}
-
-// Responsive: stack vertically on small screens
-@media (max-width: 768px) {
-  .step-content {
-    flex-direction: column;
-
-    .step2-section,
-    .reserva-section {
-      max-height: none;
-      position: static;
-      flex: none;
-    }
-  }
+.step3-section {
+  flex: 0 1 500px;
+  min-width: 0;
+  max-width: 500px;
+  overflow-y: auto;
+  max-height: 80vh;
 }
 
 .fixed-reserva-wrapper {
-  flex: 1 1 200px;   /* Give a fixed-ish basis width for reserva */
-  max-width: 300px;  /* max width to keep it compact */
-  height: 100%;     /* fixed height for reserva area */
-  overflow-y: auto;  /* scroll inside if content overflows */
+  flex: 1 1 200px;
+  max-width: 300px;
+  overflow-y: auto;
   box-sizing: border-box;
   border-radius: 8px;
-//   background-color: #f5f5f5;
   position: sticky;
-  top: 1rem;          /* keep sticky if you want */
+  top: 1rem;
 }
 
-/* Optional: ensure reserva-section fills container */
 .reserva-section {
   height: 100%;
   width: 100%;
   display: block;
 }
 
-
+/* ── Buttons ───────────────────────────────────────────── */
+button {
+  width: 100%;
+  margin-bottom: 1rem;
+}
 
 .btn-group button {
   padding: 6px 12px;
@@ -155,17 +91,90 @@ button {
     background-color: #007ba7;
   }
 
-  /* 👇 disabled appearance */
-  &:disabled,            // modern browsers
-  &[disabled] {          // fallback
-    background-color: #b9b9b9;   // grey it out
-    cursor: not-allowed;         // show “forbidden” cursor
-    opacity: 0.6;                // optional dim effect
+  &:disabled,
+  &[disabled] {
+    background-color: #b9b9b9;
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
-  /* stop the hover colour when disabled */
   &:disabled:hover,
   &[disabled]:hover {
     background-color: #b9b9b9;
+  }
+}
+
+/* ── Tablet ────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .step-section {
+    width: 100%;
+  }
+
+  .step-content {
+    padding: 0 2rem;
+    margin-top: 1rem;
+  }
+
+  button {
+    width: auto;
+  }
+}
+
+/* ── Desktop ───────────────────────────────────────────── */
+@media (min-width: 1024px) {
+  .step-content {
+    width: 100%;
+    padding: 0 3rem;
+    margin-top: 1rem;
+  }
+
+  .step-section {
+    width: 100%;
+  }
+
+  .wrap {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  button {
+    width: auto;
+  }
+}
+
+/* ── Extra-large ───────────────────────────────────────── */
+@media (min-width: 1440px) {
+  .step-content {
+    max-width: 100%;
+    margin: 0 auto;
+    margin-top: 1rem;
+  }
+
+  .step-section {
+    width: 70%;
+  }
+
+  .wrap {
+    justify-content: space-around;
+  }
+}
+
+/* ── Mobile stack ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .step-content {
+    flex-direction: column;
+  }
+
+  .step2-section,
+  .step3-section,
+  .fixed-reserva-wrapper,
+  .reserva-section {
+    max-height: none;
+    position: static;
+    flex: none;
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
   }
 }
