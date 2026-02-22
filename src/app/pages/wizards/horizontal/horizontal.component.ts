@@ -14,6 +14,7 @@ import { PromosBookingService } from 'src/app/_service/promos.service';
 import { Promos } from 'src/app/_models/promos.model';
 import { Step1Component } from '../steps/step1/step1.component';
 import { HabitacionesService } from 'src/app/_service/habitacion.service';
+import { Step3Component } from '../steps/step3/step3.component';
 
 @Component({
   selector: 'app-horizontal',
@@ -21,7 +22,7 @@ import { HabitacionesService } from 'src/app/_service/habitacion.service';
   styleUrls:['./horizontal.component.scss']
 })
 export class HorizontalComponent implements OnInit, OnDestroy {
-  formsCount = 5;
+  formsCount = 4;
   account$: BehaviorSubject<ICalendario> = new BehaviorSubject<ICalendario>(defaultCalendario);
   private ngUnsubscribe = new Subject<void>();
 
@@ -49,6 +50,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   );
   
   @ViewChild(Step1Component) step1!: Step1Component;
+  @ViewChild(Step3Component) step3!: Step3Component;
 
   constructor(
     private _disponibilidadService : DisponibilidadService,
@@ -106,10 +108,24 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 async nextStep() {
   const currentStep = this.currentStep$.value;
 
-  // ── Step 1 gate ──
   if (currentStep === 1) {
     const promoOk = this.step1.checkPromoCode();
-    if (!promoOk) return; // only blocks if a code was entered AND is invalid
+    if (!promoOk) return;
+  }
+
+  // ── Step 3 gate: validate form AND save reservation ──
+  if (currentStep === 3) {
+    this.step3.guestForm.markAllAsTouched();
+    this.step3.cardForm.markAllAsTouched();
+    if (!this.step3.guestForm.valid || !this.step3.cardForm.valid) return;
+
+    // Save to database before advancing to confirmation
+    const saved = await this.step3.submitBooking();
+    if (!saved) {
+      // Show error — don't advance
+      console.error('Reservation could not be saved');
+      return;
+    }
   }
 
   const nextStep = currentStep + 1;
@@ -117,7 +133,6 @@ async nextStep() {
 
   if (nextStep === 2) {
     const currentData: ICalendario = { ...this.account$.value };
-
     this.intialDate = currentData.fechaInicial;
     this.endDate = currentData.fechaFinal;
 
@@ -127,8 +142,6 @@ async nextStep() {
 
     const currentHabs = this._habitacionService.currentHabitaciones;
     const validatedPromo = this.account$.value.validatedPromo ?? null;
-
-    // ── Only filter if a promo was actually validated ──
     let filteredResult: string[] = result;
 
     if (validatedPromo && validatedPromo.habs?.length > 0) {
@@ -137,25 +150,15 @@ async nextStep() {
         if (!roomObj) return false;
         return validatedPromo.habs.includes(roomObj.Codigo);
       });
-
-      console.log(`🎟 Promo filter — allowed: [${validatedPromo.habs.join(', ')}] | ${result.length} → ${filteredResult.length} rooms`);
     }
-    // ── No promo: filteredResult === result, all rooms shown ──
 
     const dispoResponse = await this._disponibilidadService.calcHabitacionesDisponibles(
-      filteredResult,
-      currentData.fechaInicial,
-      currentData.fechaFinal,
-      '1'
+      filteredResult, currentData.fechaInicial, currentData.fechaFinal, '1'
     );
 
     const tarifasArray = await this.tarifasService.roomRates(
-      currentData.fechaInicial,
-      currentData.fechaFinal
+      currentData.fechaInicial, currentData.fechaFinal
     );
-
-    const preAsignadasArray = dispoResponse.preAsignadasArray;
-    const availavilityRooms = dispoResponse.avaibilityRooms;
   }
 
   this.currentStep$.next(nextStep);
@@ -174,9 +177,11 @@ async nextStep() {
   }
 
   updateStep3Validity(isValid: boolean) {
-  this.step3Valid = isValid;
-  this.updateCurrentFormValid();
-}
+    this.step3Valid = isValid;
+    if (this.currentStep$.value === 3) {
+      this.isCurrentFormValid$.next(isValid);
+    }
+  }
 
   updateCurrentFormValid() {
     // Example logic if you have an Observable or BehaviorSubject for isCurrentFormValid$

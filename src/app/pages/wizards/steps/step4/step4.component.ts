@@ -1,63 +1,109 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { ICreateAccount } from '../../create-account.helper';
-import { ICalendario } from 'src/app/_models/calendario.model';
+// step5.component.ts — complete fixed version
+import { Component, OnInit } from '@angular/core';
+import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
+import { miReserva } from 'src/app/_models/mireserva.model';
+import { Promos } from 'src/app/_models/promos.model';
+import { DateTime } from 'luxon';
+import { combineLatest } from 'rxjs';
 
 @Component({
-  selector: 'app-step4',
+  selector: 'app-step5',
   templateUrl: './step4.component.html',
+  styleUrls: ['./step4.component.scss']
 })
-export class Step4Component implements OnInit, OnDestroy {
-  @Input('updateParentModel') updateParentModel: (
-    part: Partial<ICalendario>,
-    isFormValid: boolean
-  ) => void;
-  form: FormGroup;
-  @Input() defaultValues: Partial<ICalendario>;
+export class Step4Component implements OnInit {
 
-  private unsubscribe: Subscription[] = [];
+  miReserva: miReserva[] = [];
+  validatedPromo: Promos | null = null;
+  confirmationNumber: string = '';
 
-  constructor(private fb: FormBuilder) {}
+  checkIn: Date;
+  checkOut: Date;
+  checkInFormatted: string = '';
+  checkOutFormatted: string = '';
+  nights: number = 0;
+  adultos: number = 1;
+  ninos: number = 0;
+  guestEmail: string = '';
 
-  ngOnInit() {
-    this.initForm();
-    this.updateParentModel({}, this.checkForm());
+  subtotal: number = 0;
+  iva: number = 0;
+  ish: number = 0;
+  total: number = 0;
+  totalDescuento: number = 0;
+
+  constructor(private _disponibilidadService: DisponibilidadService) {}
+
+  ngOnInit(): void {
+    this.confirmationNumber = 'HPK-' + Date.now().toString().slice(-8).toUpperCase();
+
+    // ── Dates ──
+    combineLatest([
+      this._disponibilidadService.currentFechaIni,
+      this._disponibilidadService.currentFechaFin,
+    ]).subscribe(([ini, fin]) => {
+      this.checkIn = ini;
+      this.checkOut = fin;
+
+      const iniLuxon = DateTime.fromJSDate(ini).setLocale('es-MX');
+      const finLuxon = DateTime.fromJSDate(fin).setLocale('es-MX');
+
+      this.checkInFormatted = iniLuxon.toFormat('cccc dd MMMM yyyy');
+      this.checkOutFormatted = finLuxon.toFormat('cccc dd MMMM yyyy');
+      this.nights = Math.round(finLuxon.diff(iniLuxon, 'days').days);
+    });
+
+    // ── Reserva list + totals — same source as app-reserva ──
+    this._disponibilidadService.currentReserva.subscribe(reservas => {
+      this.miReserva = reservas;
+      this.calcTotals(reservas);
+    });
+
+    // ── Validated promo — same source as app-reserva ──
+    this._disponibilidadService.currentValidatedPromo.subscribe(promo => {
+      this.validatedPromo = promo;
+    });
+
+    // ── Guest count ──
+    this._disponibilidadService.currentAdultosValue.subscribe(val => {
+      this.adultos = val;
+    });
+
+    // ── Guest email saved in step3 ──
+    this.guestEmail = localStorage.getItem('guestEmail') ?? '';
   }
 
-  initForm() {
-    // this.form = this.fb.group({
-    //   nameOnCard: [this.defaultValues.nameOnCard, [Validators.required]],
-    //   cardNumber: [this.defaultValues.cardNumber, [Validators.required]],
-    //   cardExpiryMonth: [
-    //     this.defaultValues.cardExpiryMonth,
-    //     [Validators.required],
-    //   ],
-    //   cardExpiryYear: [
-    //     this.defaultValues.cardExpiryYear,
-    //     [Validators.required],
-    //   ],
-    //   cardCvv: [this.defaultValues.cardCvv, [Validators.required]],
-    //   saveCard: ['1'],
-    // });
+  calcTotals(reservas: miReserva[]): void {
+    this.subtotal = 0;
+    this.iva = 0;
+    this.ish = 0;
+    this.total = 0;
+    this.totalDescuento = 0;
 
-    // const formChangesSubscr = this.form.valueChanges.subscribe((val) => {
-    //   this.updateParentModel(val, this.checkForm());
-    // });
-    // this.unsubscribe.push(formChangesSubscr);
+    for (const r of reservas) {
+      // Same tax logic as app-reserva (rooms: IVA 16% + ISH 3% = 1.19)
+      const net = (r.precioTarifa || 0) / 1.19;
+      this.subtotal += net;
+      this.iva += net * 0.16;
+      this.ish += net * 0.03;
+      this.total += r.precioTarifa || 0;
+
+      // Track total discount across all rooms
+      if (r.descuentoAplicado) {
+        this.totalDescuento += r.descuentoAplicado;
+      }
+
+      // Packages (IVA 16% only)
+      for (const pkg of r.packageList ?? []) {
+        const pkgNet = (pkg.Precio * pkg.Cantidad) / 1.16;
+        this.subtotal += pkgNet;
+        this.iva += pkgNet * 0.16;
+        this.total += pkg.Precio * pkg.Cantidad;
+      }
+    }
   }
 
-  checkForm() {
-    return !(
-      this.form.get('nameOnCard')?.hasError('required') ||
-      this.form.get('cardNumber')?.hasError('required') ||
-      this.form.get('cardExpiryMonth')?.hasError('required') ||
-      this.form.get('cardExpiryYear')?.hasError('required') ||
-      this.form.get('cardCvv')?.hasError('required')
-    );
-  }
-
-  ngOnDestroy() {
-    this.unsubscribe.forEach((sb) => sb.unsubscribe());
+  printConfirmation(): void {
+    window.print();
   }
 }

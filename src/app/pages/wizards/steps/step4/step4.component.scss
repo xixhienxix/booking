@@ -1,0 +1,264 @@
+.step5-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.success-hero {
+  text-align: center;
+  padding: 2rem;
+
+  .checkmark-circle {
+    mat-icon {
+      font-size: 5rem;
+      width: 5rem;
+      height: 5rem;
+      color: #198754;
+    }
+  }
+
+  .success-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #00506a;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .success-subtitle {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+  }
+}
+
+.confirmation-card {
+  text-align: center;
+  padding: 1.5rem;
+  background: #00506a;
+  color: white;
+  border-radius: 12px;
+
+  .confirmation-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin-bottom: 0.5rem;
+  }
+
+  .confirmation-number {
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 4px;
+  }
+
+  .confirmation-hint {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 0.5rem;
+  }
+}
+
+.detail-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+
+  .detail-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #00506a;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .detail-item {
+      label {
+        display: block;
+        font-size: 0.8rem;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+      }
+      span {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+        text-transform: capitalize;
+      }
+    }
+  }
+}
+
+.rooms-summary {
+  h4 {
+    color: #00506a;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .room-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+
+    .room-summary-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      div {
+        display: flex;
+        flex-direction: column;
+        strong { font-size: 1rem; color: #00506a; }
+        small  { font-size: 0.8rem; color: #888; }
+      }
+    }
+
+    .room-summary-price {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+
+      .original-price {
+        font-size: 0.8rem;
+        color: #999;
+        text-decoration: line-through;
+      }
+      .promo-tag {
+        font-size: 0.75rem;
+        color: #198754;
+      }
+    }
+  }
+
+  .package-summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0 0.4rem 2rem;
+    font-size: 0.9rem;
+    color: #555;
+    border-bottom: 1px dashed #eee;
+
+    div { display: flex; align-items: center; gap: 4px; }
+  }
+}
+
+.totals-section {
+  margin-top: 1rem;
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    font-size: 0.9rem;
+    color: #555;
+
+    &.grand {
+      border-top: 2px solid #00506a;
+      margin-top: 0.5rem;
+      padding-top: 0.75rem;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #00506a;
+    }
+  }
+}
+
+.notice-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: #e6f4ea;
+  border: 1px solid #b7dfbf;
+  border-radius: 12px;
+
+  .notice-icon {
+    color: #198754;
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
+    flex-shrink: 0;
+  }
+
+  .notice-content {
+    h4 { color: #198754; margin: 0 0 0.25rem; }
+    p  { font-size: 0.9rem; color: #444; margin: 0; line-height: 1.5; }
+  }
+}
+
+.next-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .next-step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #00506a;
+      color: white;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    div {
+      strong { display: block; color: #333; margin-bottom: 2px; }
+      p { margin: 0; font-size: 0.9rem; color: #666; }
+    }
+  }
+}
+
+.actions-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 2rem;
+}
+
+@media (max-width: 576px) {
+  .detail-grid { grid-template-columns: 1fr; }
+  .actions-row { flex-direction: column; }
+}
+// step5.component.scss — add to existing styles
+.promo-applied-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e6f4ea;
+  border: 1px solid #b7dfbf;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #198754;
+
+  mat-icon { font-size: 1rem; width: 1rem; height: 1rem; }
+}

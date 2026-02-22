@@ -10,7 +10,6 @@ import { Step1Component } from './steps/step1/step1.component';
 import { Step2Component } from './steps/step2/step2.component';
 import { Step3Component } from './steps/step3/step3.component';
 import { Step4Component } from './steps/step4/step4.component';
-import { Step5Component } from './steps/step5/step5.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -50,7 +49,6 @@ export const MY_DATE_FORMATS = {
     Step2Component,
     Step3Component,
     Step4Component,
-    Step5Component,
     LoaddingSpinnerComponent,
     DetalleReservaComponent,
     ReservaComponent

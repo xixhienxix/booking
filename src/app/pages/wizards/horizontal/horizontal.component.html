@@ -68,8 +68,10 @@
           <!-- Step 3 -->
           <ng-container *ngIf="currentStep$.value === 3">
           <div class="step-content">
-            <app-step3       (formValid)="updateStep3Validity($event)" class="step-section step3-section"></app-step3>
-
+            <app-step3       
+              (formValid)="updateStep3Validity($event)"
+              class="step-section step3-section">
+            </app-step3>
             <div class="fixed-reserva-wrapper">
               <app-reserva class="step-section reserva-section"></app-reserva>
             </div>
@@ -101,7 +103,8 @@
 
           <ng-container *ngIf="currentStep$.value !== formsCount">
             <div class="btn-group">
-              <button type="button"  [disabled]="!isCurrentFormValid$.value || step3Valid"
+              <button type="button"  
+                [disabled]="!isCurrentFormValid$.value"
                 (click)="nextStep()">
                 <span class="indicator-label">
                   <ng-container *ngIf="currentStep$.value < formsCount - 1">

@@ -1,187 +1,176 @@
-<div class="pb-10 pb-lg-15">
-  <h2 class="fw-bolder text-dark">Billing Details</h2>
-  <div class="text-gray-400 fw-bold fs-6">
-    If you need more info, please check out
-    <a href="#" class="text-primary fw-bolder">Help Page</a>.
-  </div>
-</div>
-<div [formGroup]="form">
-  <div class="d-flex flex-column mb-7 fv-row">
-    <label class="d-flex align-items-center fs-6 fw-bold form-label mb-2"
-      ><span class="required">Name On Card</span
-      ><i
-        class="fas fa-exclamation-circle ms-2 fs-7"
-        ngbTooltip="Specify a card holder's name"
-      ></i></label
-    ><input
-      formControlName="nameOnCard"
-      type="text"
-      class="form-control form-control-solid"
-      placeholder="Name on card"
-    />
-    <div
-      class="fv-plugins-message-container invalid-feedback"
-      *ngIf="
-        form.get('nameOnCard')?.hasError('required') &&
-        form.get('nameOnCard')?.touched
-      "
-    >
-      Name on card is required
+<div class="step5-container">
+
+  <!-- Hero -->
+  <div class="success-hero">
+    <div class="checkmark-circle">
+      <mat-icon>check_circle</mat-icon>
     </div>
+    <h1 class="success-title">¡Reservación Confirmada!</h1>
+    <p class="success-subtitle">
+      Gracias por elegir <strong>Hotel Pokemon</strong>.<br>
+      Los detalles de tu reservación han sido enviados a tu correo electrónico.
+    </p>
   </div>
-  <div class="d-flex flex-column mb-7 fv-row">
-    <label class="required fs-6 fw-bold form-label mb-2">Card Number</label>
-    <div class="position-relative">
-      <input
-        formControlName="cardNumber"
-        type="text"
-        class="form-control form-control-solid"
-        placeholder="Enter card number"
-      />
-      <div
-        class="fv-plugins-message-container invalid-feedback"
-        *ngIf="
-          form.get('cardNumber')?.hasError('required') &&
-          form.get('cardNumber')?.touched
-        "
-      >
-        Card number is required
+
+  <!-- Confirmation number -->
+  <mat-card class="confirmation-card">
+    <div class="confirmation-header">
+      <mat-icon>confirmation_number</mat-icon>
+      <span>Número de Confirmación</span>
+    </div>
+    <div class="confirmation-number">{{ confirmationNumber }}</div>
+    <p class="confirmation-hint">Guarda este número para cualquier consulta futura.</p>
+  </mat-card>
+
+  <!-- Stay details -->
+  <mat-card class="detail-card">
+    <h3 class="detail-title">
+      <mat-icon>hotel</mat-icon> Detalles de tu Estancia
+    </h3>
+
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>Check-in</label>
+        <span>{{ checkInFormatted }}</span>
       </div>
-      <div class="position-absolute translate-middle-y top-50 end-0 me-5">
-        <img
-          src="./assets/media/svg/card-logos/visa.svg"
-          alt=""
-          class="h-25px"
-        /><img
-          src="./assets/media/svg/card-logos/mastercard.svg"
-          alt=""
-          class="h-25px"
-        /><img
-          src="./assets/media/svg/card-logos/american-express.svg"
-          alt=""
-          class="h-25px"
-        />
+      <div class="detail-item">
+        <label>Check-out</label>
+        <span>{{ checkOutFormatted }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Noches</label>
+        <span>{{ nights }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Huéspedes</label>
+        <span>{{ adultos }} adulto(s) · {{ ninos }} niño(s)</span>
       </div>
     </div>
-  </div>
-  <div class="row mb-10">
-    <div class="col-md-8 fv-row">
-      <label class="required fs-6 fw-bold form-label mb-2"
-        >Expiration Date</label
-      >
-      <div class="row fv-row">
-        <div class="col-6">
-          <select
-            formControlName="cardExpiryMonth"
-            class="form-select form-select-solid"
-          >
-            <option></option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-            <option value="9">9</option>
-            <option value="10">10</option>
-            <option value="11">11</option>
-            <option value="12">12</option>
-          </select>
-          <div
-            class="fv-plugins-message-container invalid-feedback"
-            *ngIf="
-              form.get('cardExpiryMonth')?.hasError('required') &&
-              form.get('cardExpiryMonth')?.touched
-            "
-          >
-            Expiration month is required
+
+    <!-- Promo badge if applied -->
+    <ng-container *ngIf="validatedPromo">
+      <div class="promo-applied-badge">
+        <mat-icon>local_offer</mat-icon>
+        <span>
+          Promoción <strong>{{ validatedPromo.nombre }}</strong> aplicada —
+          <span *ngIf="validatedPromo.discountType">{{ validatedPromo.qtyPrecio }}% de descuento</span>
+          <span *ngIf="!validatedPromo.discountType">${{ validatedPromo.qtyPrecio }} por noche</span>
+        </span>
+      </div>
+    </ng-container>
+
+    <!-- Rooms -->
+    <div class="rooms-summary">
+      <h4>Habitaciones Reservadas</h4>
+
+      <ng-container *ngFor="let reserva of miReserva">
+        <div class="room-summary-row">
+          <div class="room-summary-info">
+            <mat-icon>bed</mat-icon>
+            <div>
+              <strong>{{ reserva.codigoCuarto }}</strong>
+              <small>{{ reserva.nombreTarifa }} · {{ reserva.cantidadHabitaciones }} hab. · {{ reserva.cantidadAdultos }} adulto(s) · {{ reserva.cantidadNinos }} niño(s)</small>
+            </div>
+          </div>
+          <div class="room-summary-price">
+            <ng-container *ngIf="reserva.descuentoAplicado && reserva.descuentoAplicado > 0">
+              <span class="original-price">{{ reserva.precioOriginal | currency }}</span>
+              <span class="promo-tag">- {{ reserva.descuentoAplicado | currency }}</span>
+            </ng-container>
+            <strong>{{ reserva.precioTarifa | currency }}</strong>
           </div>
         </div>
-        <div class="col-6">
-          <select
-            formControlName="cardExpiryYear"
-            class="form-select form-select-solid"
-          >
-            <option></option>
-            <option value="2021">2021</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="2027">2027</option>
-            <option value="2028">2028</option>
-            <option value="2029">2029</option>
-            <option value="2030">2030</option>
-            <option value="2031">2031</option>
-          </select>
-          <div
-            class="fv-plugins-message-container invalid-feedback"
-            *ngIf="
-              form.get('cardExpiryYear')?.hasError('required') &&
-              form.get('cardExpiryYear')?.touched
-            "
-          >
-            Expiration year is required
+
+        <!-- Packages -->
+        <ng-container *ngIf="(reserva.packageList?.length ?? 0) > 0">
+          <div *ngFor="let pkg of reserva.packageList ?? []" class="package-summary-row">
+            <div>
+              <mat-icon style="font-size: 1rem; vertical-align: middle;">room_service</mat-icon>
+              {{ pkg.Nombre }} x{{ pkg.Cantidad }}
+            </div>
+            <span>{{ pkg.Precio * pkg.Cantidad | currency }}</span>
           </div>
+        </ng-container>
+
+      </ng-container>
+    </div>
+
+    <!-- Totals — mirrors app-reserva exactly -->
+    <div class="totals-section">
+      <div class="total-row" *ngIf="totalDescuento > 0" style="color: #198754;">
+        <span>🎟 Descuento promoción</span>
+        <span>- {{ totalDescuento | currency }}</span>
+      </div>
+      <div class="total-row">
+        <span>Subtotal (sin impuestos)</span>
+        <span>{{ subtotal | currency }}</span>
+      </div>
+      <div class="total-row">
+        <span>IVA (16%)</span>
+        <span>{{ iva | currency }}</span>
+      </div>
+      <div class="total-row">
+        <span>ISH (3%)</span>
+        <span>{{ ish | currency }}</span>
+      </div>
+      <div class="total-row grand">
+        <span>TOTAL</span>
+        <span>{{ total | currency }}</span>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Email notice -->
+  <mat-card class="notice-card">
+    <mat-icon class="notice-icon">mark_email_read</mat-icon>
+    <div class="notice-content">
+      <h4>Confirmación enviada</h4>
+      <p>
+        Hemos enviado los detalles completos de tu reservación a
+        <strong>{{ guestEmail }}</strong>.<br>
+        Si no lo ves en tu bandeja de entrada, revisa la carpeta de spam.
+      </p>
+    </div>
+  </mat-card>
+
+  <!-- Next steps -->
+  <mat-card class="detail-card">
+    <h3 class="detail-title">
+      <mat-icon>info</mat-icon> ¿Qué sigue?
+    </h3>
+    <div class="next-steps">
+      <div class="next-step-item">
+        <div class="step-number">1</div>
+        <div>
+          <strong>Revisa tu correo</strong>
+          <p>Recibirás un email con todos los detalles e instrucciones de pago.</p>
+        </div>
+      </div>
+      <div class="next-step-item">
+        <div class="step-number">2</div>
+        <div>
+          <strong>Realiza tu pago</strong>
+          <p>Completa el pago antes de tu fecha de llegada para garantizar tu reservación.</p>
+        </div>
+      </div>
+      <div class="next-step-item">
+        <div class="step-number">3</div>
+        <div>
+          <strong>Check-in</strong>
+          <p>Preséntate en recepción con tu número de confirmación e identificación oficial.</p>
         </div>
       </div>
     </div>
-    <div class="col-md-4 fv-row">
-      <label class="d-flex align-items-center fs-6 fw-bold form-label mb-2"
-        ><span class="required">CVV</span
-        ><i
-          class="fas fa-exclamation-circle ms-2 fs-7"
-          ngbTooltip="Enter a card CVV code"
-        ></i
-      ></label>
-      <div class="position-relative">
-        <input
-          formControlName="cardCvv"
-          type="text"
-          class="form-control form-control-solid"
-          minlength="3"
-          maxlength="4"
-          placeholder="CVV"
-        />
-        <div
-          class="fv-plugins-message-container invalid-feedback"
-          *ngIf="
-            form.get('cardCvv')?.hasError('required') &&
-            form.get('cardCvv')?.touched
-          "
-        >
-          CVV is required
-        </div>
-        <div class="position-absolute translate-middle-y top-50 end-0 me-3">
-          <span
-            class="svg-icon svg-icon-2hx"
-            [inlineSVG]="'./assets/media/icons/duotune/finance/fin002.svg'"
-          ></span>
-        </div>
-      </div>
-    </div>
+  </mat-card>
+
+  <!-- Actions -->
+  <div class="actions-row">
+    <button mat-raised-button color="warm" (click)="printConfirmation()">
+      <mat-icon>print</mat-icon> Imprimir confirmación
+    </button>
+    <button mat-raised-button color="primary" routerLink="/">
+      <mat-icon>home</mat-icon> Volver al inicio
+    </button>
   </div>
-  <div class="d-flex flex-stack">
-    <div class="me-5">
-      <label class="fs-6 fw-bold form-label"
-        >Save Card for further billing?</label
-      >
-      <div class="fs-7 fw-bold text-gray-400">
-        If you need more info, please check budget planning
-      </div>
-    </div>
-    <label class="form-check form-switch form-check-custom form-check-solid"
-      ><input
-        formControlName="saveCard"
-        class="form-check-input"
-        type="checkbox"
-        value="1"
-      /><span class="form-check-label fw-bold text-gray-400"
-        >Save Card</span
-      ></label
-    >
-  </div>
+
 </div>

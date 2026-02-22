@@ -170,20 +170,20 @@
     <!-- Price Summary -->
     <div class="price-summary">
       <div class="summary-row">
-        <label>Subtotal:</label>
-        <div class="value">{{ subtotal | currency }}</div>
-      </div>
-      <div class="summary-row">
-        <label>Subtotal Impuestos:</label>
-        <div class="value">{{ iva + ish | currency }}</div>
-      </div>
-      <div class="summary-row">
         <label>IVA:</label>
         <div class="value">{{ iva | currency }}</div>
       </div>
       <div class="summary-row">
         <label>ISH:</label>
         <div class="value">{{ ish | currency }}</div>
+      </div>
+      <div class="summary-row">
+        <label>Subtotal Impuestos:</label>
+        <div class="value">{{ iva + ish | currency }}</div>
+      </div>
+      <div class="summary-row">
+        <label>Subtotal:</label>
+        <div class="value">{{ subtotal | currency }}</div>
       </div>
       <div class="summary-row">
         <label>Total:</label>
