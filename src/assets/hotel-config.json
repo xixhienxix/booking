@@ -1,7 +1,7 @@
 {
   "hotelID": "Hotel Pokemon",
   "hotelNombre": "Hotel Pokemon",
-  "hotelLogo": "https://...",
+  "hotelLogo": "https://storage.googleapis.com/hotel-pokemon/logo.png",
   "hotelColor": "#00506a",
-  "apiUrl": "https://milobify.com"
+  "apiUrl": "https://api.milobify.com"
 }
