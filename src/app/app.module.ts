@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule,  APP_INITIALIZER } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -10,6 +10,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { AppRoutingModule } from './app-routing.module';
 import { HotelInterceptor } from './_interceptor/http.interceptor';
 import {MatCardModule} from '@angular/material/card';
+import { HotelConfigService } from './_service/hotel-config.service';
+function initHotelConfig(configService: HotelConfigService) {
+  return () => configService.load();
+}
 @NgModule({
   declarations: [
     AppComponent,
@@ -29,6 +33,12 @@ import {MatCardModule} from '@angular/material/card';
     {    
       provide: HTTP_INTERCEPTORS,
       useClass: HotelInterceptor,
+      multi:true
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory:initHotelConfig,
+      deps: [HotelConfigService],
       multi:true
     }
   ],

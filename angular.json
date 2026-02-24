@@ -20,7 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/y",
+            "outputPath": "dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -46,8 +46,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "510kb",
+                  "maximumError": "10kb"
                 }
               ],
               "fileReplacements": [
@@ -65,7 +65,64 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+
+            "hotel-pokemon": {
+              "outputPath": "dist/hotel-pokemon",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "3mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "510kb",
+                  "maximumError": "10kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false
+            },
+
+            "hotel-bingo": {
+              "outputPath": "dist/hotel-bingo",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "3mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "510kb",
+                  "maximumError": "10kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false
             }
+
           },
           "defaultConfiguration": "production"
         },
@@ -77,6 +134,12 @@
             },
             "development": {
               "buildTarget": "y:build:development"
+            },
+            "hotel-pokemon": {
+              "buildTarget": "y:build:hotel-pokemon"
+            },
+            "hotel-bingo": {
+              "buildTarget": "y:build:hotel-bingo"
             }
           },
           "defaultConfiguration": "development"

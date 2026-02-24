@@ -22,7 +22,6 @@ export interface BookingHuesped {
   habitacion: string;
   telefono: string;
   email: string;
-  numeroDeCuarto: string;
   creada: string;
   motivo: string;
   fechaNacimiento: string;

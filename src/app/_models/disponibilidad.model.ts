@@ -23,3 +23,10 @@ export let defaultDispo: IDisponibilidad = {
   hotel: '',
   Folio: ''
 };
+
+export interface preAsignadas {
+checked: boolean
+codigo: string
+disabled: boolean
+numero: string
+}

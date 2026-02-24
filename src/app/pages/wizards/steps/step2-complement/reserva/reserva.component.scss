@@ -1,340 +1,393 @@
+$brand:       #00506a;
+$brand-light: #e8f4f7;
+$brand-mid:   #1a7a9a;
+$accent:      #c8963e;
+$text-dark:   #1a2332;
+$text-mid:    #4a5568;
+$text-soft:   #8a9bb0;
+$surface:     #fafbfc;
+$border:      #e2e8f0;
+$white:       #ffffff;
+$success:     #198754;
+$danger:      #dc3545;
+$shadow-sm:   0 2px 8px rgba(0, 80, 106, 0.08);
+$shadow-md:   0 8px 32px rgba(0, 80, 106, 0.12);
+$radius-sm:   8px;
+$radius-md:   14px;
+$radius-lg:   20px;
+
 .mi-reserva-card {
-  border-radius: 12px;
+  background: $white;
+  border-radius: $radius-lg;
   overflow: hidden;
+  box-shadow: $shadow-md;
   max-width: 300px;
+  width: 100%;
+}
 
-  .modal-header {
-    background-color: #00506a;
-    padding: 1rem;
-    text-align: center;
-    color: #fff;
+// ── Header ──────────────────────────────────────────────────
+.reserva-header {
+  background: linear-gradient(135deg, $brand, $brand-mid);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: $white;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $accent, transparent);
+  }
+
+  .header-icon {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    opacity: 0.85;
+  }
+
+  .header-title {
+    font-size: 1rem;
     font-weight: 700;
-    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: Arial, sans-serif;
   }
+}
 
-  .modal-body {
-    background-color: #e6e9ed;
-    padding: 1.5rem;
+// ── Body ────────────────────────────────────────────────────
+.modal-body {
+  background: $surface;
+  padding: 1.125rem;
+}
 
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 0;
+// ── Stay summary ────────────────────────────────────────────
+.stay-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;        // ← force single row always
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.875rem;
 
-      label {
-        font-weight: 600;
-        font-size: 1rem;
-        color: #333;
-      }
+  .stay-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    flex: 1 1 0;            // ← equal share of space, no overflow
+    min-width: 0;           // ← allows text to shrink below content size
 
-      .value {
-        font-weight: 500;
-        font-size: 1rem;
-        color: #00506a;
-      }
+    .stay-label {
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: $text-soft;
+      font-family: Arial, sans-serif;
+      white-space: nowrap;  // ← label never wraps
     }
 
-    .rooms-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      max-width: 600px;
-      width: 100%;
-      margin: 0 auto;
-      min-height: 100px;
-      overflow-x: hidden;
-
-      .room-item {
-        // width: 100%;
-        box-sizing: border-box;
-
-        mat-card {
-          // width: 100%;
-          box-sizing: border-box;
-        }
-
-        mat-card-header,
-        mat-card-content,
-        mat-card-footer {
-          width: 100%;
-          box-sizing: border-box;
-        }
-
-        mat-card-header {
-          padding: 0.75rem 1rem;
-
-          .header-content {
-            flex-wrap: wrap;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-
-            .room-code {
-              font-weight: 700;
-              font-size: 1.4rem;
-              color: #00506a;
-              margin: 0;
-              user-select: none;
-              max-width: 80%;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-            }
-
-            .btn-remove {
-              border-radius: 50%;
-              width: 36px;
-              height: 36px;
-              padding: 0;
-              font-weight: bold;
-              font-size: 1.1rem;
-              line-height: 1;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              cursor: pointer;
-              background-color: #fa6d7c;
-              color: #fff;
-              border: none;
-              transition: background-color 0.3s ease;
-
-              &:hover {
-                background-color: #d94e5c;
-                color: #fff;
-              }
-            }
-          }
-        }
-
-        mat-card-content {
-          padding: 0.5rem 1.5rem 1rem;
-
-          .room-details {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-
-            .detail-group {
-              display: flex;
-              justify-content: space-around;
-              align-items: center;
-
-              label {
-                font-weight: 600;
-                font-size: 1rem;
-                color: #333;
-              }
-
-              .value {
-                font-weight: 700;
-                color: #00506a;
-                font-size: 1rem;
-              }
-
-              &.full-width {
-                width: 100%;
-              }
-            }
-
-            .detail-row {
-              display: flex;
-              gap: 2.5rem;
-              justify-content: flex-start;
-
-              .detail-group.small {
-                min-width: 80px;
-
-                label {
-                  font-size: 0.9rem;
-                  color: #555;
-                }
-
-                .value {
-                  font-size: 1.1rem;
-                  color: #198754;
-                }
-              }
-            }
-          }
-        }
-
-        mat-card-footer {
-          border-top: 1px solid #ddd;
-          padding: 1rem 1.5rem;
-          text-align: center;
-
-          .total-price {
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: #198754;
-
-            .price {
-              font-weight: 900;
-              font-size: 1.5rem;
-              margin-left: 0.5rem;
-              color: #0b5e3a;
-            }
-          }
-        }
-      }
-
-      /* --- New styles for inner package items --- */
-      .package-item {
-        box-sizing: border-box; // include padding and border in width calculation
-        width: calc(100% - 2rem); // 100% minus left+right margin (1rem + 1rem)
-        margin: 0.75rem 1rem 1rem 1rem;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 0.5rem;
-        background-color: #f9f9f9;
-        overflow-wrap: break-word; // break long words if any
-        position: relative;
-
-        mat-card-header {
-    .header-content {
-      display: flex;
-      justify-content: flex-start;  // let title use full width
-      align-items: flex-start;      // align to top
-
-      .room-code {
-        flex-grow: 1;
-        white-space: normal !important;
-        overflow: visible !important;
-        text-overflow: unset !important;
-        word-break: break-word;
-        font-weight: 600;
-        font-size: 1rem;
-        color: #00506a;
-        margin: 0;
-      }
-    }
-
-    .btn-remove {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 28px;
-      height: 28px;
-      font-size: 0.85rem;
-      border-radius: 50%;
-      background-color: #fa6d7c;
-      color: white;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.3s ease;
-
-      &:hover {
-        background-color: #d94e5c;
-      }
-    }
-
-          .btn-remove {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 28px;
-            height: 28px;
-            font-size: 0.85rem;
-            border-radius: 50%;
-            background-color: #fa6d7c;
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s ease;
-
-            &:hover {
-              background-color: #d94e5c;
-            }
-          }
-        }
-
-        mat-card-content {
-          padding: 0.5rem 1rem;
-        }
-
-        mat-card-footer {
-          padding: 0.5rem 1rem;
-          border-top: 1px solid #ddd;
-          text-align: left;
-
-          .total-price {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #198754;
-
-            .price {
-              font-weight: 900;
-              font-size: 1.3rem;
-              float: right;
-              color: #0b5e3a;
-            }
-          }
-        }
-      }
+    .stay-value {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: $text-dark;
+      font-family: 'Georgia', serif;
+      white-space: nowrap;  // ← "01 Mar 2026" stays on one line
     }
   }
 
-  .price-summary {
-    margin-top: 10px;
+  .stay-arrow {
+    color: $text-soft;
+    font-size: 0.9rem;
+    flex-shrink: 0;         // ← arrow never compresses
   }
 
-  .btn-reserva {
-    width: -webkit-fill-available;
-    margin-top: 10px;
-  }
+  .stay-nights {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: linear-gradient(135deg, $brand, $brand-mid);
+    color: $white;
+    border-radius: $radius-sm;
+    padding: 0.3rem 0.6rem;
+    flex-shrink: 0;         // ← nights pill never compresses
 
-  // Responsive
-  @media (max-width: 576px) {
-    .modal-body {
+    .stay-nights-num {
+      font-size: 1.2rem;
+      font-weight: 900;
+      font-family: 'Georgia', serif;
+      line-height: 1;
+    }
 
-      .summary-row,
-      .price-summary .summary-row {
-        flex-direction: column;
-        align-items: flex-start;
-
-        .value {
-          margin-top: 0.25rem;
-        }
-      }
-
-      .rooms-list .room-item {
-        flex-direction: column;
-
-        .header-content {
-          flex-direction: column;
-          align-items: flex-start;
-
-          .btn-remove {
-            align-self: flex-end;
-            margin-top: 0.5rem;
-          }
-        }
-
-        .detail-row {
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-      }
+    .stay-nights-label {
+      font-size: 0.55rem;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.8;
+      font-family: Arial, sans-serif;
     }
   }
 }
-// reserva.component.scss
-.promo-badge {
+
+// ── Promo block ─────────────────────────────────────────────
+.promo-block {
+  background: linear-gradient(135deg, #f0faf4, #e6f4ea);
+  border: 1px solid #b7dfbf;
+  border-radius: $radius-md;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.875rem;
+
+  .promo-block-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: $success;
+    margin-bottom: 0.25rem;
+    font-family: Arial, sans-serif;
+
+    mat-icon { font-size: 0.9rem; width: 0.9rem; height: 0.9rem; }
+  }
+
+  .promo-block-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding-left: 1.3rem;
+
+    strong { font-size: 0.82rem; color: #1a5c35; }
+    span   { font-size: 0.75rem; color: #2d8653; font-family: Arial, sans-serif; }
+  }
+}
+
+// ── Divider ─────────────────────────────────────────────────
+.section-divider {
+  height: 1px;
+  background: $border;
+  margin: 0.5rem 0 0.875rem;
+}
+
+// ── Empty state ─────────────────────────────────────────────
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  color: $text-soft;
+  text-align: center;
+
+  mat-icon { font-size: 2rem; width: 2rem; height: 2rem; opacity: 0.4; }
+  span { font-size: 0.82rem; font-family: Arial, sans-serif; }
+}
+
+// ── Rooms list ───────────────────────────────────────────────
+.rooms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+// ── Room card ───────────────────────────────────────────────
+.room-card {
+  background: $white;
+  border: 1.5px solid $border;
+  border-radius: $radius-md;
+  overflow: hidden;
+  transition: border-color 0.2s;
+
+  &:hover { border-color: $brand-mid; }
+}
+
+.room-card-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: #e6f4ea;
-  border: 1px solid #b7dfbf;
-  border-radius: 8px;
-  padding: 6px 10px;
-  margin-bottom: 8px;
-  font-size: 0.85rem;
-  color: #198754;
+  justify-content: space-between;
+  padding: 0.6rem 0.875rem;
+  background: linear-gradient(135deg, rgba(0,80,106,0.05), rgba(26,122,154,0.05));
+  border-bottom: 1px solid $border;
+
+  .room-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: $brand;
+    font-family: 'Georgia', serif;
+
+    mat-icon { font-size: 1rem; width: 1rem; height: 1rem; }
+  }
+}
+
+// ── Chips ───────────────────────────────────────────────────
+.room-card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.6rem 0.875rem;
+  border-bottom: 1px solid $border;
+
+  .chip {
+    font-size: 0.68rem;
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    background: $brand-light;
+    color: $brand;
+    letter-spacing: 0.02em;
+
+    &.tarifa {
+      background: rgba($accent, 0.12);
+      color: darken($accent, 15%);
+    }
+  }
+}
+
+// ── Package row ─────────────────────────────────────────────
+.package-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.875rem;
+  border-bottom: 1px dashed $border;
+  gap: 0.5rem;
+
+  .package-row-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    flex: 1;
+
+    mat-icon { font-size: 0.9rem; width: 0.9rem; height: 0.9rem; color: $text-soft; margin-top: 2px; flex-shrink: 0; }
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+
+      .pkg-name { font-size: 0.8rem; font-weight: 700; color: $text-dark; }
+      small { font-size: 0.7rem; color: $text-soft; font-family: Arial, sans-serif; }
+    }
+  }
+
+  .package-row-right {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+
+    .pkg-price { font-size: 0.82rem; font-weight: 700; color: $success; }
+  }
+}
+
+// ── Remove button ───────────────────────────────────────────
+.btn-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba($danger, 0.1);
+  border: none;
+  cursor: pointer;
+  color: $danger;
+  transition: background 0.2s;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 0.9rem; width: 0.9rem; height: 0.9rem; }
+
+  &:hover { background: rgba($danger, 0.2); }
+
+  &.small {
+    width: 22px;
+    height: 22px;
+    mat-icon { font-size: 0.75rem; width: 0.75rem; height: 0.75rem; }
+  }
+}
+
+// ── Room price footer ───────────────────────────────────────
+.room-card-footer {
+  padding: 0.6rem 0.875rem;
+  background: rgba($success, 0.03);
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.78rem;
+    font-family: Arial, sans-serif;
+    padding: 2px 0;
+
+    &.muted { color: $text-soft; .line-through { text-decoration: line-through; } }
+    &.promo { color: $success; font-weight: 600; }
+    &.total {
+      font-weight: 700;
+      color: $text-dark;
+      font-size: 0.85rem;
+      margin-top: 2px;
+
+      .price-total {
+        font-size: 1.05rem;
+        font-weight: 900;
+        color: $success;
+        font-family: 'Georgia', serif;
+      }
+    }
+  }
+
+  .price-divider {
+    height: 1px;
+    background: $border;
+    margin: 4px 0;
+  }
+}
+
+// ── Price summary ───────────────────────────────────────────
+.price-summary {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 0.875rem 1rem;
+  margin-top: 0.25rem;
+
+  .price-summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    font-family: Arial, sans-serif;
+    color: $text-mid;
+    padding: 3px 0;
+
+    &.grand {
+      font-size: 1rem;
+      font-weight: 900;
+      color: $brand;
+      font-family: 'Georgia', serif;
+      margin-top: 4px;
+    }
+  }
+
+  .price-summary-divider {
+    height: 1px;
+    background: $border;
+    margin: 6px 0;
+  }
+}
+
+// ── Responsive ──────────────────────────────────────────────
+@media (max-width: 576px) {
+  .mi-reserva-card { max-width: 100%; }
+  .stay-summary { flex-wrap: wrap; }
 }

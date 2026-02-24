@@ -12,7 +12,18 @@ Run `ng generate component component-name` to generate a new component. You can 
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+# Hotel Pokemon → outputs to dist/hotel-pokemon
+ng build --configuration=hotel-pokemon
+
+# Hotel Bingo → outputs to dist/hotel-bingo
+ng build --configuration=hotel-bingo
+
+# Original production → outputs to dist (unchanged)
+ng build --configuration=production
+
+# Serve locally as a specific hotel (useful for testing)
+ng serve --configuration=hotel-pokemon
+ng serve --configuration=hotel-bingo
 
 ## Running unit tests
 

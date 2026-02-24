@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { IDisponibilidad } from '../_models/disponibilidad.model'
+import { IDisponibilidad, preAsignadas } from '../_models/disponibilidad.model'
 import { environment } from 'src/environments/environment';
 import { BehaviorSubject, firstValueFrom, map, Observable } from 'rxjs';
 import { IHabitaciones } from '../_models/habitaciones.model';
@@ -36,8 +36,15 @@ export class DisponibilidadService {
   private miReserva$: BehaviorSubject<miReserva[]> = new BehaviorSubject<miReserva[]>([])
   currentReserva = this.miReserva$.asObservable();
 
+  private preAsignadas$: BehaviorSubject<preAsignadas[]> = new BehaviorSubject<preAsignadas[]>([])
+  currentDispoRooms = this.preAsignadas$.asObservable();
+
   private _validatedPromo = new BehaviorSubject<Promos | null>(null);
   readonly currentValidatedPromo = this._validatedPromo.asObservable();
+
+  get currentPreAsignadas(): preAsignadas[] {
+    return this.preAsignadas$.value;
+  }
 
   constructor(
     private http:HttpClient
@@ -81,6 +88,10 @@ changeValidatedPromo(promo: Promos | null): void {
 
   changeData(data:any){
     this.disponibilidad$.next(data);
+  }
+
+  changePreAsignadas(data:any){
+    this.preAsignadas$.next(data);
   }
 
   getDisponibilidad(currentSearch:ICalendario) :Observable<any>{

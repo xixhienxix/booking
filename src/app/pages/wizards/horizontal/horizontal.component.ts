@@ -15,6 +15,8 @@ import { Promos } from 'src/app/_models/promos.model';
 import { Step1Component } from '../steps/step1/step1.component';
 import { HabitacionesService } from 'src/app/_service/habitacion.service';
 import { Step3Component } from '../steps/step3/step3.component';
+import { ParametersService } from 'src/app/_service/parameters.service';
+import { PARAMETERS } from 'src/app/_models/parameters.model';
 
 @Component({
   selector: 'app-horizontal',
@@ -43,7 +45,6 @@ export class HorizontalComponent implements OnInit, OnDestroy {
 
   step3Valid = false;
 
-
   currentStep$: BehaviorSubject<number> = new BehaviorSubject(1);
   isCurrentFormValid$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
     false
@@ -57,7 +58,8 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     private tarifasService : TarifasService,
     private spinnerService : SpinnerService,
     private _promosBookingService: PromosBookingService,  
-    private _habitacionService: HabitacionesService
+    private _habitacionService: HabitacionesService,
+    private _parametrosSerice: ParametersService
   ) {
     this.spinnerService.isLoading$.subscribe((val)=>{
       this.isLoading=val
@@ -65,11 +67,13 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     )
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.spinnerService.loadingState=true
     this._promosBookingService.fetchPromos().subscribe();
     this._habitacionService.getHabitaciones().subscribe();
-
+    this._parametrosSerice.getAll().subscribe();
+    
+    
     this.currentStep$.subscribe(step => {
         switch (step) {
           case 1: this.isCurrentFormValid$.next(this.isStep1FormValid); break;
@@ -139,6 +143,8 @@ async nextStep() {
     const result = await firstValueFrom(
       this._disponibilidadService.getDisponibilidad(this.account$.value)
     );
+  
+    console.log('get ALL Dispo: ', result);
 
     const currentHabs = this._habitacionService.currentHabitaciones;
     const validatedPromo = this.account$.value.validatedPromo ?? null;
@@ -156,12 +162,18 @@ async nextStep() {
       filteredResult, currentData.fechaInicial, currentData.fechaFinal, '1'
     );
 
+    this._disponibilidadService.changePreAsignadas(dispoResponse.preAsignadasArray);
+
     const tarifasArray = await this.tarifasService.roomRates(
       currentData.fechaInicial, currentData.fechaFinal
     );
   }
 
   this.currentStep$.next(nextStep);
+}
+
+resetStepper(){
+  this.currentStep$.next(1)
 }
 
   prevStep() {

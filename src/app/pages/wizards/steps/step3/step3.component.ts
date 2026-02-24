@@ -12,6 +12,9 @@ import { BookingHuesped, BookingReservaService } from 'src/app/_service/booking-
 import { TarifasService } from 'src/app/_service/tarifas.service';
 import { PromoValidatorService } from 'src/app/_service/promo.validation.service';
 import { SpinnerService } from 'src/app/_service/spinner.service';
+import { ParametersService } from 'src/app/_service/parameters.service';
+import { PARAMETERS } from 'src/app/_models/parameters.model';
+import { HabitacionesService } from 'src/app/_service/habitacion.service';
 
 export interface PackagesSimplex extends Packages {
   habitacionesMatch: string[]
@@ -24,15 +27,18 @@ export interface PackagesSimplex extends Packages {
 })
 export class Step3Component implements OnInit {
   cardForm: FormGroup;
+  currentParametros:PARAMETERS
 
   constructor(
     private _packagesServices: PackagesService, 
     private _disponibilidadService: DisponibilidadService, 
-  private _folioService: FolioService,
-  private _bookingReservaService: BookingReservaService,
-  private _tarifasService: TarifasService,
-  private _promoValidatorService: PromoValidatorService,
-  private _spinnerService: SpinnerService,
+    private _folioService: FolioService,
+    private _bookingReservaService: BookingReservaService,
+    private _tarifasService: TarifasService,
+    private _promoValidatorService: PromoValidatorService,
+    private _spinnerService: SpinnerService,
+    private _parametrosService: ParametersService,
+    private _habitacionesService: HabitacionesService,
     private fb: FormBuilder) 
   {
     this.cardForm = this.fb.group({
@@ -59,8 +65,13 @@ export class Step3Component implements OnInit {
   stayNights: number = 1;
 
 
-  ngOnInit() {
+  async ngOnInit() {
     this.initForm();
+    this._parametrosService.getAll().subscribe();
+    this.currentParametros = this._parametrosService.currentParameters;
+
+    console.log('this._parametrosService.getAll()', this.currentParametros)
+
 
     this._disponibilidadService.currentValidatedPromo.subscribe(p => this.validatedPromo = p);
     this._disponibilidadService.currentFechaIni.subscribe(d => this.checkIn = d);
@@ -281,10 +292,10 @@ luhnCheck(num: string): boolean {
     // Format with dashes every 4 digits
     const formatted = digits.match(/.{1,4}/g)?.join('-') ?? digits;
 
-    // ✅ Update DOM first, then set form value with clean digits
+    // Update DOM first, then set form value with clean digits
     input.value = formatted;
 
-    // ✅ Pass only the digits to the form control — validator receives clean value
+    // Pass only the digits to the form control — validator receives clean value
     this.cardForm.get('cardNumber')?.setValue(digits, { emitEvent: false });
     this.cardForm.get('cardNumber')?.updateValueAndValidity();
   }
@@ -361,7 +372,7 @@ luhnCheck(num: string): boolean {
         const salida = DateTime.fromJSDate(this.checkOut)
           .set({ hour: 12, minute: 0, second: 0 }).toISO()!;
 
-        // ✅ Find full tarifa object matching room type and tarifa name
+        //  Find full tarifa object matching room type and tarifa name
         const fullTarifa = allTarifas.find(t =>
           t.Tarifa === reserva.nombreTarifa &&
           t.Habitacion.includes(reserva.codigoCuarto)
@@ -404,6 +415,13 @@ luhnCheck(num: string): boolean {
           finalPendiente = result.pendiente;
         }
 
+        const roomsArray = this._disponibilidadService.currentPreAsignadas;
+        const room = roomsArray.find(
+          r => r.codigo === reserva.codigoCuarto
+        );
+
+        const numero = room?.numero ?? '';
+
         const huesped: BookingHuesped = {
           folio: folioStr,
           adultos: reserva.cantidadAdultos,
@@ -413,14 +431,13 @@ luhnCheck(num: string): boolean {
           llegada,
           salida,
           noches: this.stayNights,
-          tarifa: fullTarifa,                // ✅ full object
+          tarifa: fullTarifa,                
           porPagar: finalPendiente,
           pendiente: finalPendiente,
           origen: 'WEB',
           habitacion: reserva.codigoCuarto,
           telefono: formData.telefono,
           email: formData.email,
-          numeroDeCuarto: '',
           creada: new Date().toISOString(),
           motivo: '',
           fechaNacimiento: '',
@@ -432,13 +449,13 @@ luhnCheck(num: string): boolean {
           ciudad: '',
           codigoPostal: '',
           lenguaje: '',
-          numeroCuarto: '',                  // ✅ empty — room assigned at check-in
+          numeroCuarto: this.currentParametros.room_auto_assign ? numero : '',                  
           tipoHuesped: '',
           notas: formData.requerimiento ?? '',
           vip: '',
           ID_Socio: 0,
-          estatus_Ama_De_Llaves: 'LIMPIA',   // ✅
-          desgloseEdoCuenta: finalDesglose,  // ✅ from ratesTotalCalc
+          estatus_Ama_De_Llaves: 'LIMPIA',   
+          desgloseEdoCuenta: finalDesglose, 
           lateCheckOut: '',
           promoCode: this.validatedPromo?.codigo ?? '',
         };

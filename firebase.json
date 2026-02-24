@@ -1,0 +1,16 @@
+{
+  "hosting": [
+    {
+      "site": "hotel-pokemon-booking",
+      "public": "dist/hotel-pokemon",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [{ "source": "**", "destination": "/index.html" }]
+    },
+    {
+      "site": "hotel-bingo-booking",
+      "public": "dist/hotel-bingo",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [{ "source": "**", "destination": "/index.html" }]
+    }
+  ]
+}

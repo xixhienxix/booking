@@ -86,14 +86,14 @@
 
           <!-- Step 5 -->
           <ng-container *ngIf="currentStep$.value === 4">
-            <app-step5 class="w-100"></app-step5>
+            <app-step5 (honHomeButton)="resetStepper()" class="w-100"></app-step5>
           </ng-container>
         </div>
 
         <div class="d-flex flex-stack pt-15">
           <div class="btn-group mr-2">
             <ng-container *ngIf="currentStep$.value !== 1">
-              <button type="button" (click)="prevStep()">
+              <button [attr.disabled]="currentStep$.value !== 4" type="button" (click)="prevStep()">
                 <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr063.svg'"
                   class="svg-icon svg-icon-4 me-1"></span>
                 Back

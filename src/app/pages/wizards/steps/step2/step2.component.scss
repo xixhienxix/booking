@@ -1,230 +1,475 @@
-.habitacion-card {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  padding: 1rem;
+$brand:       #00506a;
+$brand-light: #e8f4f7;
+$brand-mid:   #1a7a9a;
+$accent:      #c8963e;
+$text-dark:   #1a2332;
+$text-mid:    #4a5568;
+$text-soft:   #8a9bb0;
+$surface:     #fafbfc;
+$border:      #e2e8f0;
+$white:       #ffffff;
+$success:     #198754;
+$danger:      #dc3545;
+$shadow-sm:   0 2px 8px rgba(0, 80, 106, 0.08);
+$shadow-md:   0 8px 32px rgba(0, 80, 106, 0.12);
+$radius-sm:   8px;
+$radius-md:   16px;
+$radius-lg:   24px;
 
-  .room-info {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-
-    .room-image {
-      width: 250px;
-      height: 150px;
-      background-size: cover;
-      background-position: center;
-      border-radius: 10px;
-      flex-shrink: 0;
-    }
-
-    .room-details {
-      flex: 1;
-
-      .room-code {
-        color: #00506a;
-        font-weight: bold;
-        font-size: 1.3rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .room-desc {
-        font-size: 0.95rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .max-ocupacion {
-        font-size: 0.9rem;
-        color: #555;
-        margin-bottom: 1rem;
-      }
-
-      .amenidades {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-
-        .amenidad-item {
-          display: flex;
-          align-items: center;
-          gap: 0.4rem;
-
-          img {
-            width: 24px;
-            height: 24px;
-          }
-
-          span {
-            font-size: 0.85rem;
-          }
-        }
-      }
-    }
-  }
-
-  .tarifas-container {
-    margin-top: 1.5rem;
-
-    .tarifas-header {
+// ── Search summary banner ───────────────────────────────────
+.search-summary {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
+  background: linear-gradient(135deg, $brand, $brand-mid);
+  border-radius: $radius-md;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: $shadow-md;
+  color: $white;
+  animation: fadeUp 0.35s ease both;
 
-  .tarifas-title {
-    margin: 0;
-  }
-
-  .habitaciones-dropdown {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    label {
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: #333;
-    }
-
-    select {
-      padding: 4px 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: white;
-      font-size: 0.9rem;
-    }
-  }
-}
-
-
-    .tarifas-title {
-      color: #00506a;
-      font-size: 1.2rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-    }
-
-.tarifa-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.75rem;
-  border: 1px dashed #ccc;
-  border-radius: 8px;
-  background: #fafafa;
-  margin-bottom: 1rem;
-  //   display: flex;
-  // align-items: center; /* change from flex-end */
-  // gap: 1rem;
-  // padding: 0.75rem;
-  // border: 1px dashed #ccc;
-  // border-radius: 8px;
-  // background: #fafafa;
-  // margin-bottom: 1rem;
-
-  .tarifa-info {
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: #00506a;
-
-    .regular-label {
-      font-weight: normal;
-      font-size: 0.85rem;
-      color: gray;
-    }
-  }
-
-  .precio-wrapper {
+  .summary-item {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
+    text-align: center;
+
+    .summary-label {
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.75;
+      font-family: Arial, sans-serif;
+    }
+
+    .summary-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      font-family: 'Georgia', serif;
+    }
   }
 
-  .select-group {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-end;
+  .summary-divider {
+    width: 1px;
+    height: 32px;
+    background: rgba(255,255,255,0.25);
+    flex-shrink: 0;
+  }
 
-    label {
+  .summary-rooms-found {
+    margin-left: auto;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: $radius-sm;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.82rem;
+    font-family: Arial, sans-serif;
+    text-align: center;
+
+    strong {
       display: block;
-      font-size: 0.85rem;
-      font-weight: bold;
-      margin-bottom: 0.25rem;
+      font-size: 1.3rem;
+      font-family: 'Georgia', serif;
+      line-height: 1;
     }
+  }
+}
 
-    select {
-      min-width: 60px;
-      padding: 4px 6px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      background: white;
-      font-size: 0.9rem;
-    }
+// ── Tax notice ──────────────────────────────────────────────
+.tax-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fffbf0;
+  border: 1px solid #f0d98a;
+  border-radius: $radius-sm;
+  padding: 0.55rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.8rem;
+  color: #7a5c00;
+  font-family: Arial, sans-serif;
+  animation: fadeUp 0.35s ease 0.05s both;
 
-.btn-group button {
-  padding: 6px 12px;
-  background-color: #00506a;
-  color: white;
+  mat-icon {
+    font-size: 1rem;
+    width: 1rem;
+    height: 1rem;
+    color: $accent;
+    flex-shrink: 0;
+  }
+}
+
+// ── Habitacion card ─────────────────────────────────────────
+.habitacion-card {
+  background: $white;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9rem;
-  transition: background-color 0.3s;
+  border-radius: $radius-lg;
+  margin-bottom: 1.5rem;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  animation: fadeUp 0.4s ease both;
+  position: relative;
 
   &:hover {
-    background-color: #007ba7;
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
   }
 
-  /* 👇 disabled appearance */
-  &:disabled,            // modern browsers
-  &[disabled] {          // fallback
-    background-color: #b9b9b9;   // grey it out
-    cursor: not-allowed;         // show “forbidden” cursor
-    opacity: 0.6;                // optional dim effect
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, $brand, $brand-mid, $accent);
+    z-index: 1;
   }
 
-  /* stop the hover colour when disabled */
-  &:disabled:hover,
-  &[disabled]:hover {
-    background-color: #b9b9b9;
+  &:nth-child(1) { animation-delay: 0.05s; }
+  &:nth-child(2) { animation-delay: 0.10s; }
+  &:nth-child(3) { animation-delay: 0.15s; }
+  &:nth-child(4) { animation-delay: 0.20s; }
+}
+
+// ── Room info ───────────────────────────────────────────────
+.room-info {
+  display: flex;
+  flex-wrap: nowrap;
+
+  @media (max-width: 580px) { flex-wrap: wrap; }
+}
+
+.room-image {
+  width: 200px;
+  min-height: 175px;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+
+  @media (max-width: 580px) {
+    width: 100%;
+    height: 180px;
   }
 }
 
+.room-details {
+  flex: 1;
+  padding: 1.25rem 1.5rem;
+
+  .room-code {
+    color: $brand;
+    font-weight: 700;
+    font-size: 1.35rem;
+    margin-bottom: 0.35rem;
+    font-family: 'Georgia', serif;
   }
-}
+
+  .room-desc {
+    font-size: 0.875rem;
+    color: $text-mid;
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .max-ocupacion {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.78rem;
+    color: $text-soft;
+    margin-bottom: 0.875rem;
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: 20px;
+    padding: 0.2rem 0.75rem;
+    font-family: Arial, sans-serif;
+
+    .separator { opacity: 0.4; }
+    strong { color: $text-dark; }
+  }
+
+  .amenidades {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+
+    .amenidad-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: $brand-light;
+      border-radius: 20px;
+      padding: 0.2rem 0.6rem;
+      transition: background 0.2s;
+
+      &:hover { background: darken($brand-light, 4%); }
+
+      img { width: 14px; height: 14px; opacity: 0.75; }
+
+      span {
+        font-size: 0.72rem;
+        color: $brand;
+        font-weight: 600;
+        font-family: Arial, sans-serif;
+        letter-spacing: 0.02em;
+      }
+    }
   }
 }
 
+// ── Tarifas section ─────────────────────────────────────────
+.tarifas-container {
+  border-top: 1px solid $border;
+  padding: 1.25rem 1.5rem;
+  background: $surface;
+}
 
+.tarifas-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: $accent;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $border;
+  }
+}
+
+// ── Tarifa row ──────────────────────────────────────────────
+.tarifa-row {
+  display: flex;
+  align-items: stretch;
+  gap: 1rem;
+  flex-wrap: nowrap;        // ← prevent wrapping so cols stay in line
+  padding: 1rem 1.25rem;
+  border: 1.5px solid $border;
+  border-radius: $radius-md;
+  background: $white;
+  margin-bottom: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    border-color: $brand;
+    box-shadow: 0 0 0 3px rgba(0, 80, 106, 0.06);
+  }
+}
+
+// ── Tarifa info left ────────────────────────────────────────
+.tarifa-info {
+  flex: 0 0 120px;       
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+}
+
+
+.tarifa-nombre {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: $brand;
+  font-family: 'Georgia', serif;
+}
+
+.precio-regular-row {
+  display: flex;
+  gap: 1.25rem;
+}
 
 .precio-regular {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 1px;
 
   small {
-    font-size: 0.75rem;
-    color: gray;
-    margin-bottom: 2px;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $text-soft;
+    font-family: Arial, sans-serif;
   }
 
   .monto {
-    font-weight: bold;
-    font-size: .8rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+
+    &.tachado { color: $danger; text-decoration: line-through; }
+    &.verde    { color: #6fa819; }
   }
 }
 
+// ── Price wrapper center ────────────────────────────────────
+.precio-wrapper {
+  flex: 0 0 140px;          // ← fixed width, always rightmost
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 0.75rem;
+  background: $surface;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  text-align: center;
+  align-self: stretch;
 
-.noches-info {
-  font-size: 13px;
-  margin-bottom: 4px;
-  color: #444;
-  text-align: left;
+  .total-amount {
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: $text-dark;
+    font-family: 'Georgia', serif;
+    line-height: 1.1;
+
+    &.tachado { font-size: 0.95rem; font-weight: 400; }
+    &.gris    { color: #aaa; text-decoration: line-through; }
+    &.verde   { color: $success; font-size: 1.4rem; }
+  }
+
+  .total-label {
+    font-size: 0.65rem;
+    color: $text-soft;
+    letter-spacing: 0.05em;
+    font-family: Arial, sans-serif;
+  }
+
+  .promo-tag {
+    font-size: 0.72rem;
+    color: $success;
+    font-weight: 700;
+    font-family: Arial, sans-serif;
+  }
+
+  .ahorro-tag {
+    font-size: 0.7rem;
+    color: $success;
+    font-family: Arial, sans-serif;
+  }
 }
 
-.tarifa-nombre {
- font-size: 1.5rem;
+// ── Select group right ──────────────────────────────────────
+.select-group {
+  flex: 1 1 auto;        
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.6rem;
+  min-width: 0;
+  align-self: stretch;
+}
+
+.selects-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: nowrap;
+}
+
+.select-item {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+
+  label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: $text-soft;
+    font-family: Arial, sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+  }
+
+  select {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: $radius-sm;
+    border: 1.5px solid $border;
+    background: $white;
+    font-size: 0.875rem;
+    color: $text-dark;
+    cursor: pointer;
+    transition: border-color 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $brand;
+      box-shadow: 0 0 0 3px rgba(0, 80, 106, 0.08);
+    }
+  }
+}
+
+.warn-icon {
+  color: $danger;
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.quedan-badge {
+  color: $danger;
+  font-weight: 700;
+}
+
+// ── Add room button ─────────────────────────────────────────
+.btn-group {
+  display: flex;
+  justify-content: stretch;
+
+  button {
+    width: 100%;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, $brand, $brand-mid);
+    color: $white;
+    border: none;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    font-family: Arial, sans-serif;
+    transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 80, 106, 0.25);
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 80, 106, 0.35);
+    }
+
+    &:active:not(:disabled) { transform: translateY(0); }
+
+    &:disabled {
+      background: #c8d0d8;
+      box-shadow: none;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+  }
+}
+
+// ── Animations ──────────────────────────────────────────────
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ── Mobile ──────────────────────────────────────────────────
+@media (max-width: 600px) {
+  .tarifa-row    { flex-wrap: wrap; }
+  .tarifa-info   { flex: 1 1 100%; }
+  .select-group  { flex: 1 1 100%; }
+  .precio-wrapper { flex: 1 1 100%; }
 }

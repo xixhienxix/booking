@@ -1,5 +1,5 @@
 // step5.component.ts — complete fixed version
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { miReserva } from 'src/app/_models/mireserva.model';
 import { Promos } from 'src/app/_models/promos.model';
@@ -31,6 +31,8 @@ export class Step4Component implements OnInit {
   ish: number = 0;
   total: number = 0;
   totalDescuento: number = 0;
+
+  @Output() honHomeButton = new EventEmitter<void>();
 
   constructor(private _disponibilidadService: DisponibilidadService) {}
 
@@ -101,6 +103,10 @@ export class Step4Component implements OnInit {
         this.total += pkg.Precio * pkg.Cantidad;
       }
     }
+  }
+
+  backToHome(){
+    this.honHomeButton.emit();
   }
 
   printConfirmation(): void {
