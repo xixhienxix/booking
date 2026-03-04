@@ -5,11 +5,13 @@ import { catchError, map, tap } from 'rxjs/operators';
 import { IHabitaciones } from '../_models/habitaciones.model'
 import { environment } from 'src/environments/environment';
 import { Ihoteles } from '../_models/hoteles.model';
+import { HotelConfigService } from './hotel-config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HabitacionesService {
+  
   private listaFolios: IHabitaciones[] = [];
 
   private _habitaciones$ = new BehaviorSubject<IHabitaciones[]>([]);
@@ -20,7 +22,7 @@ export class HabitacionesService {
   }
 
   getHoteles() : Observable<string[]>{
-    return  (this.http.get<string[]>(environment.apiUrl+"/listahoteles")
+    return  (this.http.get<string[]>(this._hotelConfig.current?.apiUrl+"/listahoteles")
     .pipe(
       map(responseData=>{
         return responseData
@@ -30,7 +32,7 @@ export class HabitacionesService {
 
   getHabitacionesbyTipo(id:string) : Observable<IHabitaciones[]> {
 
-    return  (this.http.get<IHabitaciones[]>(environment.apiUrl+"/reportes/habitaciones/"+id)
+    return  (this.http.get<IHabitaciones[]>(this._hotelConfig.current?.apiUrl+"/reportes/habitaciones/"+id)
       .pipe(
         map(responseData=>{
           return responseData
@@ -39,7 +41,7 @@ export class HabitacionesService {
   }
 
   getHabitacionbyNumero(numero:string) : Observable<IHabitaciones[]> {
-    return  (this.http.get<IHabitaciones[]>(environment.apiUrl+"/reportes/habitacion/"+numero)
+    return  (this.http.get<IHabitaciones[]>(this._hotelConfig.current?.apiUrl+"/reportes/habitacion/"+numero)
         .pipe(
           map(responseData=>{
             return responseData
@@ -48,7 +50,7 @@ export class HabitacionesService {
     }
 
   getHabitaciones() :Observable<IHabitaciones[]> {
-    return this.http.get<IHabitaciones[]>(environment.apiUrl + '/habitaciones')
+    return this.http.get<IHabitaciones[]>(this._hotelConfig.current?.apiUrl + '/habitaciones')
           .pipe(tap(habs => this._habitaciones$.next(habs)));
   }
 
@@ -58,7 +60,7 @@ export class HabitacionesService {
     .set('tipo', tipo)
 
     return this.http
-     .get<IHabitaciones[]>(environment.apiUrl + '/info/habitaciones', {params:params})
+     .get<IHabitaciones[]>(this._hotelConfig.current?.apiUrl + '/info/habitaciones', {params:params})
      .pipe(
        map(responseData=>{
        return responseData
@@ -70,7 +72,7 @@ export class HabitacionesService {
    getCodigohabitaciones() :Observable<IHabitaciones[]> {
 
     return this.http
-     .get<IHabitaciones[]>(environment.apiUrl + '/reportes/tipo')
+     .get<IHabitaciones[]>(this._hotelConfig.current?.apiUrl + '/reportes/tipo')
      .pipe(
        map(responseData=>{
        return responseData
@@ -79,5 +81,5 @@ export class HabitacionesService {
 
    }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private _hotelConfig: HotelConfigService) { }
 }

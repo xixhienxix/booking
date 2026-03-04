@@ -1,23 +1,372 @@
-<!-- Search summary banner -->
-<div class="search-summary">
-  <div class="summary-item">
-    <span class="summary-label">Llegada</span>
-    <span class="summary-value">{{ intialDate | date:'dd MMM yyyy' }}</span>
-  </div>
-  <div class="summary-divider"></div>
-  <div class="summary-item">
-    <span class="summary-label">Salida</span>
-    <span class="summary-value">{{ endDate | date:'dd MMM yyyy' }}</span>
-  </div>
-  <div class="summary-divider"></div>
-  <div class="summary-item">
-    <span class="summary-label">Noches</span>
-    <span class="summary-value">{{ totalNights }}</span>
-  </div>
-  <div class="summary-rooms-found">
-    <strong>{{ habitaciones.length }}</strong> habitaciones disponibles
-  </div>
+<!-- Search summary banner — EDITABLE -->
+<div class="search-summary" [class.is-editing]="isEditingSearch">
+
+  <!-- ── View mode ── -->
+  <ng-container *ngIf="!isEditingSearch">
+    <div class="summary-item">
+      <span class="summary-label">Llegada</span>
+      <span class="summary-value">{{ intialDate | date:'dd MMM yyyy' }}</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Salida</span>
+      <span class="summary-value">{{ endDate | date:'dd MMM yyyy' }}</span>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <span class="summary-label">Noches</span>
+      <span class="summary-value">{{ totalNights }}</span>
+    </div>
+
+    <!-- Promo badge (shown when active) -->
+    <div *ngIf="validatedPromo" class="promo-badge-summary">
+      <mat-icon>local_offer</mat-icon>
+      <span>{{ validatedPromo.nombre }}</span>
+    </div>
+
+    <div class="summary-rooms-found">
+      <strong>{{ habitaciones.length }}</strong>
+      habitaciones disponibles
+    </div>
+
+    <button class="edit-search-btn" type="button" (click)="startEditSearch()" matTooltip="Modificar búsqueda">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </ng-container>
+
+  <!-- ── Edit mode ── -->
+  <ng-container *ngIf="isEditingSearch">
+    <div class="edit-search-grid">
+
+      <div class="edit-field edit-date-field">
+        <label class="edit-label">Fechas</label>
+        <mat-form-field appearance="outline" class="edit-date-picker">
+          <mat-date-range-input [rangePicker]="editPicker" [min]="minDateEdit">
+            <input matStartDate
+                   placeholder="Llegada"
+                   [(ngModel)]="editLlegadaDate"
+                   [ngModelOptions]="{standalone: true}"
+                   (dateChange)="onEditStartDate($event)" />
+            <input matEndDate
+                   placeholder="Salida"
+                   [(ngModel)]="editSalidaDate"
+                   [ngModelOptions]="{standalone: true}"
+                   (dateChange)="onEditEndDate($event)" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="editPicker"></mat-datepicker-toggle>
+          <mat-date-range-picker #editPicker></mat-date-range-picker>
+        </mat-form-field>
+      </div>
+
+      <div class="edit-field guests-field">
+        <label class="edit-label">Adultos</label>
+        <div class="guest-counter-edit">
+          <button type="button" class="counter-btn" (click)="editAdultos = editAdultos > 1 ? editAdultos - 1 : 1">−</button>
+          <span class="counter-val">{{ editAdultos }}</span>
+          <button type="button" class="counter-btn" (click)="editAdultos = editAdultos + 1">+</button>
+        </div>
+      </div>
+
+      <div class="edit-field guests-field">
+        <label class="edit-label">Niños</label>
+        <div class="guest-counter-edit">
+          <button type="button" class="counter-btn" (click)="editNinos = editNinos > 0 ? editNinos - 1 : 0">−</button>
+          <span class="counter-val">{{ editNinos }}</span>
+          <button type="button" class="counter-btn" (click)="editNinos = editNinos + 1">+</button>
+        </div>
+      </div>
+
+      <div class="edit-field promo-field">
+        <label class="edit-label">Promo</label>
+        <div class="promo-edit-wrapper">
+          <input type="text"
+                 class="edit-input promo-input"
+                 [(ngModel)]="editPromoCode"
+                 placeholder="Código opcional"
+                 (input)="onEditPromoInput()" />
+          <mat-icon *ngIf="editPromoStatus === 'valid'" class="promo-status-icon valid">check_circle</mat-icon>
+          <mat-icon *ngIf="editPromoStatus === 'invalid'" class="promo-status-icon invalid">cancel</mat-icon>
+        </div>
+        <span *ngIf="editPromoStatus === 'invalid'" class="promo-error-msg">{{ editPromoMessage }}</span>
+      </div>
+
+      <div class="edit-actions">
+        <button class="btn-apply" type="button" (click)="applySearchChanges()">
+          <mat-icon>search</mat-icon> Buscar
+        </button>
+        <button class="btn-cancel" type="button" (click)="cancelEditSearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+    </div>
+  </ng-container>
+
 </div>
+
+<div class="tax-notice">
+  <mat-icon>info</mat-icon>
+  Todos los precios son en MXN e incluyen IVA (16%) + ISH (3%)
+</div>
+
+<ng-container *ngFor="let dispo of habitaciones; let x = index">
+  <div class="habitacion-card">
+
+    <!-- Room top: image + details -->
+    <div class="room-info">
+      <div class="room-image" [ngStyle]="{ 'background-image': 'url(' + dispo.URL + ')' }"></div>
+
+      <div class="room-details">
+        <h2 class="room-code">{{ dispo.Codigo.replace('_', ' ') }}</h2>
+        <p class="room-desc">{{ dispo.Descripcion }}</p>
+
+        <div class="max-ocupacion">
+          <span><strong>Máx. Adultos:</strong> {{ dispo.Adultos }}</span>
+          <span class="separator">|</span>
+          <span><strong>Máx. Niños:</strong> {{ dispo.Ninos }}</span>
+        </div>
+
+        <div class="amenidades">
+          <ng-container *ngFor="let amenidad of dispo.Amenidades">
+            <div class="amenidad-item">
+              <img src="../../../../../assets/media/icons/custom/{{ amenidad }}.png" [alt]="amenidad" />
+              <span>{{ amenidad }}</span>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarifas -->
+    <div class="tarifas-container">
+      <h4 class="tarifas-title">Tarifas Disponibles</h4>
+
+      <ng-container *ngFor="let tarifas of tarifasArray">
+        <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
+            <div class="tarifa-row">
+
+            <!-- Col 1: Tarifa name only -->
+            <div class="tarifa-info">
+                <div class="tarifa-nombre">{{ tarifas.Tarifa }}</div>
+            </div>
+
+            <!-- Col 2: Selects + button — fills middle space -->
+            <div class="select-group">
+                <div class="selects-row">
+
+                <div class="select-item">
+                    <label [ngStyle]="{ color: qty > getMaxFromAdultos(dispo.Codigo) ? '#dc3545' : '' }">
+                    Adultos: {{ qty }}
+                    <mat-icon *ngIf="qty > getMaxFromAdultos(dispo.Codigo)"
+                        matTooltip="⚠ Excede el máximo para este cuarto"
+                        matTooltipPosition="right"
+                        class="warn-icon">warning</mat-icon>
+                    </label>
+                    <select [(ngModel)]="qty"
+                    [ngModel]="getValidQty(dispo.Codigo, qty)"
+                    (ngModelChange)="onQtyChange(dispo.Codigo)">
+                    <option *ngFor="let n of generateAdultosArray(dispo.Codigo)" [value]="n">{{ n }}</option>
+                    </select>
+                </div>
+
+                <div class="select-item">
+                    <label [ngStyle]="{ color: qtyNin > getMaxFromNinos(dispo.Codigo) ? '#dc3545' : '' }">
+                    Niños: {{ qtyNin }}
+                    <mat-icon *ngIf="qtyNin > getMaxFromNinos(dispo.Codigo)"
+                        matTooltip="⚠ Excede el máximo para este cuarto"
+                        matTooltipPosition="right"
+                        class="warn-icon">warning</mat-icon>
+                    </label>
+                    <select [(ngModel)]="qtyNin"
+                    [ngModel]="getValidNinQty(dispo.Codigo, qtyNin)"
+                    (ngModelChange)="onQtyChange(dispo.Codigo)">
+                    <option *ngFor="let n of generateNinosArray(dispo.Codigo)" [value]="n">{{ n }}</option>
+                    </select>
+                </div>
+
+                <div class="select-item">
+                    <label>Quedan: <span class="quedan-badge">{{ getMaxValue(dispo.Codigo) }}</span></label>
+                    <select [(ngModel)]="numeroHabs"
+                    (ngModelChange)="onQtyHabsChange(dispo.Codigo, $event)">
+                    <option *ngFor="let num of generateInventarioArray(dispo.Codigo)" [value]="num">{{ num }}</option>
+                    </select>
+                </div>
+
+                </div>
+
+                <div class="btn-group">
+                <button type="button"
+                    [disabled]="(+qtyNin > getMaxFromNinos(dispo.Codigo)) || (+qty > getMaxFromAdultos(dispo.Codigo))"
+                    (click)="agregaHab(tarifas, dispo.Codigo, numeroHabs)">
+                    + Agregar Habitación
+                </button>
+                </div>
+            </div>
+
+            <!-- Col 3: Price — rightmost -->
+            <div class="precio-wrapper">
+                <ng-container *ngIf="!validatedPromo">
+                <span class="total-amount">
+                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights | currency:'':'symbol':'1.0-0' }}
+                </span>
+                <small class="total-label">
+                    Total {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}
+                </small>
+                </ng-container>
+
+                <ng-container *ngIf="validatedPromo">
+                <span class="total-amount tachado gris">
+                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights | currency:'':'symbol':'1.0-0' }}
+                </span>
+                <span class="total-amount verde">
+                    {{ calcPromoTotal(tarifas, dispo.Codigo) | currency:'':'symbol':'1.0-0' }}
+                </span>
+                <small class="promo-tag">🎟 {{ validatedPromo.nombre }}</small>
+                <small class="ahorro-tag">
+                    Ahorras {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights - calcPromoTotal(tarifas, dispo.Codigo) | currency:'':'symbol':'1.0-0' }}
+                </small>
+                </ng-container>
+            </div>
+
+            </div>
+        </ng-container>
+      </ng-container>
+    </div>
+
+  </div>
+</ng-container>
+
+<div class="tax-notice">
+  <mat-icon>info</mat-icon>
+  Todos los precios son en MXN e incluyen IVA (16%) + ISH (3%)
+</div>
+
+<ng-container *ngFor="let dispo of habitaciones; let x = index">
+  <div class="habitacion-card">
+
+    <!-- Room top: image + details -->
+    <div class="room-info">
+      <div class="room-image" [ngStyle]="{ 'background-image': 'url(' + dispo.URL + ')' }"></div>
+
+      <div class="room-details">
+        <h2 class="room-code">{{ dispo.Codigo.replace('_', ' ') }}</h2>
+        <p class="room-desc">{{ dispo.Descripcion }}</p>
+
+        <div class="max-ocupacion">
+          <span><strong>Máx. Adultos:</strong> {{ dispo.Adultos }}</span>
+          <span class="separator">|</span>
+          <span><strong>Máx. Niños:</strong> {{ dispo.Ninos }}</span>
+        </div>
+
+        <div class="amenidades">
+          <ng-container *ngFor="let amenidad of dispo.Amenidades">
+            <div class="amenidad-item">
+              <img src="../../../../../assets/media/icons/custom/{{ amenidad }}.png" [alt]="amenidad" />
+              <span>{{ amenidad }}</span>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarifas -->
+    <div class="tarifas-container">
+      <h4 class="tarifas-title">Tarifas Disponibles</h4>
+
+      <ng-container *ngFor="let tarifas of tarifasArray">
+        <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
+            <div class="tarifa-row">
+
+            <!-- Col 1: Tarifa name only -->
+            <div class="tarifa-info">
+                <div class="tarifa-nombre">{{ tarifas.Tarifa }}</div>
+            </div>
+
+            <!-- Col 2: Selects + button — fills middle space -->
+            <div class="select-group">
+                <div class="selects-row">
+
+                <div class="select-item">
+                    <label [ngStyle]="{ color: qty > getMaxFromAdultos(dispo.Codigo) ? '#dc3545' : '' }">
+                    Adultos: {{ qty }}
+                    <mat-icon *ngIf="qty > getMaxFromAdultos(dispo.Codigo)"
+                        matTooltip="⚠ Excede el máximo para este cuarto"
+                        matTooltipPosition="right"
+                        class="warn-icon">warning</mat-icon>
+                    </label>
+                    <select [(ngModel)]="qty"
+                    [ngModel]="getValidQty(dispo.Codigo, qty)"
+                    (ngModelChange)="onQtyChange(dispo.Codigo)">
+                    <option *ngFor="let n of generateAdultosArray(dispo.Codigo)" [value]="n">{{ n }}</option>
+                    </select>
+                </div>
+
+                <div class="select-item">
+                    <label [ngStyle]="{ color: qtyNin > getMaxFromNinos(dispo.Codigo) ? '#dc3545' : '' }">
+                    Niños: {{ qtyNin }}
+                    <mat-icon *ngIf="qtyNin > getMaxFromNinos(dispo.Codigo)"
+                        matTooltip="⚠ Excede el máximo para este cuarto"
+                        matTooltipPosition="right"
+                        class="warn-icon">warning</mat-icon>
+                    </label>
+                    <select [(ngModel)]="qtyNin"
+                    [ngModel]="getValidNinQty(dispo.Codigo, qtyNin)"
+                    (ngModelChange)="onQtyChange(dispo.Codigo)">
+                    <option *ngFor="let n of generateNinosArray(dispo.Codigo)" [value]="n">{{ n }}</option>
+                    </select>
+                </div>
+
+                <div class="select-item">
+                    <label>Quedan: <span class="quedan-badge">{{ getMaxValue(dispo.Codigo) }}</span></label>
+                    <select [(ngModel)]="numeroHabs"
+                    (ngModelChange)="onQtyHabsChange(dispo.Codigo, $event)">
+                    <option *ngFor="let num of generateInventarioArray(dispo.Codigo)" [value]="num">{{ num }}</option>
+                    </select>
+                </div>
+
+                </div>
+
+                <div class="btn-group">
+                <button type="button"
+                    [disabled]="(+qtyNin > getMaxFromNinos(dispo.Codigo)) || (+qty > getMaxFromAdultos(dispo.Codigo))"
+                    (click)="agregaHab(tarifas, dispo.Codigo, numeroHabs)">
+                    + Agregar Habitación
+                </button>
+                </div>
+            </div>
+
+            <!-- Col 3: Price — rightmost -->
+            <div class="precio-wrapper">
+                <ng-container *ngIf="!validatedPromo">
+                <span class="total-amount">
+                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights | currency:'':'symbol':'1.0-0' }}
+                </span>
+                <small class="total-label">
+                    Total {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}
+                </small>
+                </ng-container>
+
+                <ng-container *ngIf="validatedPromo">
+                <span class="total-amount tachado gris">
+                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights | currency:'':'symbol':'1.0-0' }}
+                </span>
+                <span class="total-amount verde">
+                    {{ calcPromoTotal(tarifas, dispo.Codigo) | currency:'':'symbol':'1.0-0' }}
+                </span>
+                <small class="promo-tag">🎟 {{ validatedPromo.nombre }}</small>
+                <small class="ahorro-tag">
+                    Ahorras {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights - calcPromoTotal(tarifas, dispo.Codigo) | currency:'':'symbol':'1.0-0' }}
+                </small>
+                </ng-container>
+            </div>
+
+            </div>
+        </ng-container>
+      </ng-container>
+    </div>
+
+  </div>
+</ng-container>
 
 <div class="tax-notice">
   <mat-icon>info</mat-icon>

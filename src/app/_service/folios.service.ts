@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { HotelConfigService } from './hotel-config.service';
 
 export interface Foliador {
   _id: string;
@@ -14,10 +15,10 @@ export interface Foliador {
 @Injectable({ providedIn: 'root' })
 export class FolioService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private _hotelConfig: HotelConfigService) {}
 
   getAll(): Observable<Foliador[]> {
-    return this.http.get<Foliador[]>(environment.apiUrl + '/folios/all').pipe(
+    return this.http.get<Foliador[]>(this._hotelConfig.current?.apiUrl + '/folios/all').pipe(
       map(responseData => responseData)
     );
   }

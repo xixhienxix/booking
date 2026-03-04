@@ -5,6 +5,7 @@ import { Observable, forkJoin, firstValueFrom, of, catchError } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { DateTime } from 'luxon';
+import { HotelConfigService } from './hotel-config.service';
 
 export interface BookingHuesped {
   folio: string;
@@ -58,24 +59,24 @@ export interface EmailPayload {
 @Injectable({ providedIn: 'root' })
 export class BookingReservaService {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private _hotelConfig: HotelConfigService ) {}
 
   saveHuespedes(huespedArray: BookingHuesped[]): Observable<any> {
     return this.http.post<any>(
-      environment.apiUrl + '/huesped/save',
+      this._hotelConfig.current?.apiUrl + '/huesped/save',
       { huespedInfo: huespedArray }
     );
   }
 
   saveEstadoCuenta(edoCuenta: any[]): Observable<any> {
     return this.http.post<any>(
-      environment.apiUrl + '/edo_cuenta/hospedaje',
+      this._hotelConfig.current?.apiUrl + '/edo_cuenta/hospedaje',
       { edoCuenta }
     );
   }
 
   sendConfirmationEmail(payload: EmailPayload): Observable<any> {
-    return this.http.post(environment.apiUrl + '/mail/send', payload).pipe(
+    return this.http.post(this._hotelConfig.current?.apiUrl + '/mail/send', payload).pipe(
       catchError(err => {
         console.error('Email error:', err);
         return of(null); // don't block reservation if email fails

@@ -5,13 +5,14 @@ import { ITarifas } from "../_models/tarifas.model";
 import { environment } from "src/environments/environment";
 import { tarifarioTabla, Tarifas } from "../_models/tarifario.model";
 import { DateTime } from "luxon"
+import { HotelConfigService } from "./hotel-config.service";
 @Injectable({
   providedIn: 'root'
 })
 
 export class TarifasService {
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private _hotelConfig: HotelConfigService) {
   }
 
   private tarifas$: BehaviorSubject<Tarifas[]> = new BehaviorSubject<Tarifas[]>([])
@@ -24,7 +25,7 @@ export class TarifasService {
 
   getTarifas(): Observable<ITarifas[]> {
     return this.http
-      .get<ITarifas[]>(environment.apiUrl + '/tarifario/tarifas')
+      .get<ITarifas[]>(this._hotelConfig.current?.apiUrl + '/tarifario/tarifas')
       .pipe(
         map(responseData => {
           return responseData
@@ -35,7 +36,7 @@ export class TarifasService {
 
   getAll() :Observable<Tarifas[]> {
     return this.http
-     .get<any[]>(environment.apiUrl + '/tarifario/tarifas')
+     .get<any[]>(this._hotelConfig.current?.apiUrl + '/tarifario/tarifas')
      .pipe(
        map(responseData=>{
         return responseData

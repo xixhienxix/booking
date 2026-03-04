@@ -10,6 +10,7 @@ import { ICalendario } from '../_models/calendario.model';
 import { Bloqueo } from '../_models/bloqueos.model';
 import { Habitacion } from '../_models/habitacion.model';
 import { Promos } from '../_models/promos.model';
+import { HotelConfigService } from './hotel-config.service';
 @Injectable({
   providedIn: 'root'
 })
@@ -47,7 +48,8 @@ export class DisponibilidadService {
   }
 
   constructor(
-    private http:HttpClient
+    private http:HttpClient,
+    private _hotelConfig: HotelConfigService
   ) { }
 
   set setCuartosNoDisponibles (val:string[]){
@@ -116,7 +118,7 @@ changeValidatedPromo(promo: Promos | null): void {
       codigo:currentSearch.codigoPromo
     }
 
-    return this.http.post<any>(environment.apiUrl + '/disponibilidad/reservas', {params})
+    return this.http.post<any>(this._hotelConfig.current?.apiUrl + '/disponibilidad/reservas', {params})
     .pipe(
         map(responseData=>{
          return responseData
@@ -206,7 +208,7 @@ changeValidatedPromo(promo: Promos | null): void {
 
     getAllBloqueos():Observable<Bloqueo[]>{
       return this.http
-       .get<Bloqueo[]>(environment.apiUrl + '/bloqueos/getAll')
+       .get<Bloqueo[]>(this._hotelConfig.current?.apiUrl + '/bloqueos/getAll')
        .pipe(
          map(responseData=>{
           const postArray = []
@@ -221,7 +223,7 @@ changeValidatedPromo(promo: Promos | null): void {
 
   getAllHabitaciones() :Observable<Habitacion[]> {
     return this.http
-     .get<Habitacion[]>(environment.apiUrl + '/habitaciones')
+     .get<Habitacion[]>(this._hotelConfig.current?.apiUrl + '/habitaciones')
      .pipe(
        map(responseData=>{
         const postArray = []
@@ -239,7 +241,7 @@ changeValidatedPromo(promo: Promos | null): void {
     const body = {
       fechaInicial, fechaFinal, dias, hotel
     } 
-    return this.http.post(environment.apiUrl+"/disponibilidad/booking",body)
+    return this.http.post(this._hotelConfig.current?.apiUrl+"/disponibilidad/booking",body)
 
    }
 

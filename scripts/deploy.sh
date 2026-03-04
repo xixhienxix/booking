@@ -12,19 +12,21 @@ fi
 case $HOTEL in
   "hotel-pokemon")
     HOTEL_ID="Hotel Pokemon"
-    API_URL="https://api.milobify.com"
+    API_URL="https://milobify.com"
     COLOR="#00506a"
     LOGO="https://storage.googleapis.com/hotel-pokemon/logo.png"
     BUILD_CONFIG="hotel-pokemon"
     FIREBASE_SITE="hotel-pokemon-booking"
+    INTERNAL_SECRET="y3RB@5gX#Q6mv4eVZ2Lcz8!upG*M7daFqK\$P1sRjHT9NnDbGx^Yf%WAoeLiXU0Ct"
     ;;
   "hotel-bingo")
     HOTEL_ID="Hotel Bingo"
-    API_URL="https://api.milobify.com"
+    API_URL="https://milobify.com"
     COLOR="#8b1a1a"
     LOGO="https://storage.googleapis.com/hotel-bingo/logo.png"
     BUILD_CONFIG="hotel-bingo"
     FIREBASE_SITE="hotel-bingo-booking"
+    INTERNAL_SECRET="y3RB@5gX#Q6mv4eVZ2Lcz8!upG*M7daFqK\$P1sRjHT9NnDbGx^Yf%WAoeLiXU0Ct"
     ;;
   *)
     echo "❌ Unknown hotel: $HOTEL"
@@ -43,19 +45,44 @@ echo ""
 
 # ── Step 1: Inject hotel-config.json ───────────────────────
 echo "📝 Injecting hotel-config.json..."
-cat > src/assets/hotel-config.json << EOF
+
+cat > src/assets/hotel-config.json << 'EOF'
 {
-  "hotelID": "$HOTEL_ID",
-  "hotelNombre": "$HOTEL_ID",
-  "hotelLogo": "$LOGO",
-  "hotelColor": "$COLOR",
-  "apiUrl": "$API_URL"
+  "hotelID": "HOTEL_ID_PLACEHOLDER",
+  "hotelNombre": "HOTEL_ID_PLACEHOLDER",
+  "hotelLogo": "LOGO_PLACEHOLDER",
+  "hotelColor": "COLOR_PLACEHOLDER",
+  "apiUrl": "API_URL_PLACEHOLDER",
+  "internalSecret": "INTERNAL_SECRET_PLACEHOLDER"
 }
 EOF
+
+# ── Substitute placeholders (avoids bash variable expansion issues) ──
+sed -i '' \
+  -e "s|HOTEL_ID_PLACEHOLDER|$HOTEL_ID|g" \
+  -e "s|LOGO_PLACEHOLDER|$LOGO|g" \
+  -e "s|COLOR_PLACEHOLDER|$COLOR|g" \
+  -e "s|API_URL_PLACEHOLDER|$API_URL|g" \
+  -e "s|INTERNAL_SECRET_PLACEHOLDER|$INTERNAL_SECRET|g" \
+  src/assets/hotel-config.json
+
+if [ $? -ne 0 ]; then
+  echo "❌ Failed to write hotel-config.json"
+  exit 1
+fi
+
 echo "✅ hotel-config.json ready"
+echo "   hotelID:  $HOTEL_ID"
+echo "   apiUrl:   $API_URL"
+echo "   site:     $FIREBASE_SITE"
+
+# ── Verify the generated file ───────────────────────────────
+echo ""
+echo "📄 Generated hotel-config.json:"
+cat src/assets/hotel-config.json
+echo ""
 
 # ── Step 2: Build ───────────────────────────────────────────
-echo ""
 echo "🔨 Building $HOTEL_ID..."
 ng build --configuration=$BUILD_CONFIG
 

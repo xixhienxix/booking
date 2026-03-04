@@ -14,6 +14,7 @@ import { dateRangeValidator } from 'src/app/_helpers/custom-validators/date-rang
 import { Promos } from 'src/app/_models/promos.model';
 import { PromosBookingService } from 'src/app/_service/promos.service';
 import { PromoValidatorService } from 'src/app/_service/promo.validation.service';
+import { HotelConfigService } from 'src/app/_service/hotel-config.service';
 
 const today = new Date();
 const month = today.getMonth();
@@ -51,7 +52,7 @@ export class Step1Component implements OnInit, OnDestroy {
 
   quantityNin: number = 0;
   quantity: number = 1;
-  hotelId: string = environment.hotelID;
+  hotelId: string ;
 
   /** Dates */
   intialDateFC = new FormControl(null);
@@ -79,7 +80,8 @@ export class Step1Component implements OnInit, OnDestroy {
     private spinnerLoading: SpinnerService,
     private _disponibilidadService: DisponibilidadService,
     private _promoBookingService: PromosBookingService,
-    private _promoValidationService: PromoValidatorService
+    private _promoValidationService: PromoValidatorService,
+    private _hotelConfig: HotelConfigService
   ) {
     this.formGroup = this.fb.group({
       adultos: [1, Validators.required],
@@ -98,6 +100,7 @@ export class Step1Component implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.hotelId = this._hotelConfig.current!.hotelID;
     this._disponibilidadService.changeMiReserva([])
     this.formGroup.controls["hotel"].patchValue(this.hotelId);
 

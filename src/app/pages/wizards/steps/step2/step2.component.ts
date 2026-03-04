@@ -55,6 +55,16 @@ export class Step2Component implements OnInit, OnDestroy {
 habitacionesArray: number[] = [];
 selectedHabitaciones: number = 1;
 
+isEditingSearch = false;
+editLlegadaDate: Date | null = null;   
+editSalidaDate:  Date | null = null;
+editPromoCode: string = '';
+editPromoStatus: 'idle' | 'valid' | 'invalid' = 'idle';
+editPromoMessage: string = '';
+editAdultos: number = 1;
+editNinos: number = 0;
+
+
   @Input() intialDate: Date = new Date();
   @Input() endDate: Date = new Date();
   @Input() qtyNin:number=0
@@ -88,6 +98,7 @@ selectedHabitaciones: number = 1;
     private _tarifasServices: TarifasService,
     private fb: FormBuilder,
     private _promoValidatorService: PromoValidatorService,
+    private _promoBookingService: PromosBookingService,
   ) {
     this.reservaForm = this.fb.group({
   codigoCuarto: ['', Validators.required],
@@ -97,6 +108,13 @@ selectedHabitaciones: number = 1;
 });
 
    }
+
+   get minDateEdit(): Date { return new Date(); }
+
+
+get todayStr(): string {
+  return new Date().toISOString().split('T')[0];
+}
 
   async ngOnInit() {
 
@@ -357,6 +375,95 @@ calcPromoTotal(tarifas: any, codigo: string): number {
   return result.pendiente;
 }
 
+startEditSearch(): void {
+  this.editLlegadaDate = new Date(this.intialDate);
+  this.editSalidaDate  = new Date(this.endDate);
+  this.editPromoCode   = this.validatedPromo?.codigo ?? '';
+  this.editPromoStatus = this.validatedPromo ? 'valid' : 'idle';
+  this.editPromoMessage = '';
+  this.editAdultos     = this.qty;
+  this.editNinos       = this.qtyNin;
+  this.isEditingSearch = true;
+}
+
+cancelEditSearch(): void {
+  this.isEditingSearch = false;
+}
+
+/** Called when the user types in the promo field during edit mode */
+onEditPromoInput(): void {
+  this.editPromoStatus = 'idle';
+}
+
+/** Fired when the start date changes in the range picker */
+onEditStartDate(event: any): void {
+  this.editLlegadaDate = event.value ? new Date(event.value) : null;
+}
+
+/** Fired when the end date changes in the range picker */
+onEditEndDate(event: any): void {
+  this.editSalidaDate = event.value ? new Date(event.value) : null;
+}
+
+/** Apply button: validate dates + promo, then trigger availability reload */
+applySearchChanges(): void {
+  const newStart = this.editLlegadaDate;
+  const newEnd   = this.editSalidaDate;
+
+  if (!newStart || !newEnd || newEnd <= newStart) {
+    return;
+  }
+
+  // 1. Update dates
+  this.intialDate  = newStart;
+  this.endDate     = newEnd;
+  const oneDay     = 1000 * 60 * 60 * 24;
+  this.totalNights = Math.round((newEnd.getTime() - newStart.getTime()) / oneDay);
+
+  // 1b. Update guests
+  this.qty    = this.editAdultos;
+  this.qtyNin = this.editNinos;
+
+  // Propagate to the availability service so the room list reloads
+  this._disponibilidadService.changeFechaIni(newStart);
+  this._disponibilidadService.changeFechaFinal(newEnd);
+
+  // 2. Validate promo
+  const code = this.editPromoCode.trim().toUpperCase();
+  if (code) {
+    const result = this._promoValidatorService.validatePromo(
+      code,
+      this._promoBookingService.currentPromos,
+      newStart,
+      newEnd,
+      this.totalNights,
+      [],
+      [],
+      true,
+    );
+
+    if (result.valid && result.promo) {
+      this.editPromoStatus = 'valid';
+      this.validatedPromo  = result.promo;
+      this._disponibilidadService.changeValidatedPromo(result.promo);
+    } else {
+      this.editPromoStatus  = 'invalid';
+      this.editPromoMessage = result.reason ?? 'Código no válido.';
+      this.validatedPromo   = null;
+      this._disponibilidadService.changeValidatedPromo(null);
+      return;
+    }
+  } else {
+    this.validatedPromo = null;
+    this._disponibilidadService.changeValidatedPromo(null);
+  }
+
+  // 3. Notify parent stepper
+  this.updateParentModel({}, true);
+
+  // 4. Close edit panel
+  this.isEditingSearch = false;
+}
 
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());

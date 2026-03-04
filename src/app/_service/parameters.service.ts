@@ -3,6 +3,7 @@ import { DEFAULT_PARAMETERS, PARAMETERS } from "../_models/parameters.model";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "src/environments/environment";
 import { BehaviorSubject, Observable, tap } from "rxjs";
+import { HotelConfigService } from "./hotel-config.service";
 
 @Injectable({
     providedIn: 'root'
@@ -11,7 +12,7 @@ export class ParametersService {
     private _parameters$ = new BehaviorSubject<PARAMETERS>(DEFAULT_PARAMETERS);
     readonly parameters$ = this._parameters$.asObservable();
 
-    constructor(private http: HttpClient) {
+    constructor(private http: HttpClient, private _hotelConfig: HotelConfigService) {
     }
 
     get currentParameters(){
@@ -19,7 +20,7 @@ export class ParametersService {
     }
 
     getAll(): Observable<PARAMETERS> {
-        return this.http.get<PARAMETERS>(`${environment.apiUrl}/booking/parameters`).pipe(
+        return this.http.get<PARAMETERS>(`${this._hotelConfig.current?.apiUrl}/booking/parameters`).pipe(
             tap((parameters: PARAMETERS) => this._parameters$.next(parameters)
         ));
     }

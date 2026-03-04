@@ -47,7 +47,7 @@ $radius-lg:   24px;
     .summary-value {
       font-size: 1.2rem;
       font-weight: 700;
-      font-family: 'Georgia', serif;
+      font-family: 'Times New Roman', serif;
     }
   }
 
@@ -71,7 +71,7 @@ $radius-lg:   24px;
     strong {
       display: block;
       font-size: 1.3rem;
-      font-family: 'Georgia', serif;
+      font-family: 'Times New Roman', serif;
       line-height: 1;
     }
   }
@@ -163,7 +163,7 @@ $radius-lg:   24px;
     font-weight: 700;
     font-size: 1.35rem;
     margin-bottom: 0.35rem;
-    font-family: 'Georgia', serif;
+    font-family: 'Times New Roman', serif;
   }
 
   .room-desc {
@@ -277,7 +277,7 @@ $radius-lg:   24px;
   font-size: 1.05rem;
   font-weight: 700;
   color: $brand;
-  font-family: 'Georgia', serif;
+  font-family: 'Times New Roman', serif;
 }
 
 .precio-regular-row {
@@ -326,7 +326,7 @@ $radius-lg:   24px;
     font-weight: 900;
     font-size: 1.4rem;
     color: $text-dark;
-    font-family: 'Georgia', serif;
+    font-family: 'Times New Roman', serif;
     line-height: 1.1;
 
     &.tachado { font-size: 0.95rem; font-weight: 400; }
@@ -472,4 +472,354 @@ $radius-lg:   24px;
   .tarifa-info   { flex: 1 1 100%; }
   .select-group  { flex: 1 1 100%; }
   .precio-wrapper { flex: 1 1 100%; }
+}
+
+// ── ADD THESE RULES to your existing step2.component.scss ──────────────────
+// Place them right after the existing .search-summary block
+
+// Edit toggle button
+.edit-search-btn {
+  margin-left: auto;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+  &:hover {
+    background: rgba(255,255,255,0.28);
+    transform: scale(1.1);
+  }
+}
+
+// Promo badge shown in view mode
+.promo-badge-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  color: #fff;
+
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
+}
+
+// Edit mode layout
+.search-summary.is-editing {
+  flex-wrap: wrap;
+  padding: 1.25rem 1.5rem;
+}
+
+.edit-search-grid {
+  display: grid;
+  grid-template-columns: 1fr 120px 120px;
+  grid-template-rows: auto auto;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  position: relative;
+}
+
+.edit-date-field {
+  grid-column: 1;
+  grid-row: 1;
+
+  ::ng-deep input.mat-date-range-input-inner {
+    min-width: 70px !important;
+  }
+}
+
+.guests-field {
+  grid-row: 1;
+  align-items: center;
+
+  .edit-label {
+    text-align: center;
+    width: 100%;
+  }
+}
+
+.promo-field {
+  grid-column: 1 / 3;
+  grid-row: 2;
+}
+
+.edit-actions {
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;  
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.edit-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  font-family: Arial, sans-serif;
+  color: #fff;
+}
+
+.edit-input {
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 0.88rem;
+  font-family: 'Times New Roman', serif;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+
+  // date input calendar icon color
+  color-scheme: dark;
+
+  &::placeholder { color: rgba(255,255,255,0.5); font-family: Arial, sans-serif; font-weight: 400; }
+
+  &:focus {
+    border-color: rgba(255,255,255,0.75);
+    background: rgba(255,255,255,0.2);
+  }
+}
+
+.promo-edit-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .promo-input { padding-right: 28px; }
+
+  .promo-status-icon {
+    position: absolute;
+    right: 8px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+
+    &.valid  { color: #6edc8f; }
+    &.invalid { color: #f87171; }
+  }
+}
+
+.promo-error-msg {
+  font-size: 0.65rem;
+  color: #fca5a5;
+  font-family: Arial, sans-serif;
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  white-space: nowrap;
+}
+
+.btn-apply {
+  display: inline-flex;
+  align-items: center;
+  //gap: 5px;
+  padding: 8px 18px;
+  background: #fff;
+  color: #00506a;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+
+  &:hover { background: #e8f4f7; transform: translateY(-1px); }
+}
+
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+  &:hover { background: rgba(255,255,255,0.22); }
+}
+
+// ── Date range picker inside the teal banner ────────────────
+.edit-date-field {
+  flex: 0 0 65%;
+  min-width: 0;
+
+  // Prevent the date text from being cut off
+  ::ng-deep .mat-date-range-input-container {
+    overflow: visible !important;
+  }
+
+  ::ng-deep input.mat-date-range-input-inner {
+    min-width: 90px !important;
+  }
+}
+
+.edit-date-picker {
+  width: 100%;
+
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      background: rgba(255,255,255,0.12) !important;
+      border-radius: 8px !important;
+      padding-bottom: 0 !important;
+      // Match the 36px height of the guest counters
+      min-height: 36px !important;
+      height: 36px !important;
+    }
+
+    .mat-mdc-form-field-flex {
+      height: 36px !important;
+      align-items: center !important;
+      padding: 0 8px !important;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      min-height: unset !important;
+      height: 36px !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: rgba(255,255,255,0.35) !important;
+    }
+
+    &:hover .mdc-notched-outline__leading,
+    &:hover .mdc-notched-outline__notch,
+    &:hover .mdc-notched-outline__trailing {
+      border-color: rgba(255,255,255,0.75) !important;
+    }
+
+    .mat-mdc-input-element,
+    input {
+      color: #fff !important;
+      font-family: 'Times New Roman', serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,0.5) !important;
+      font-family: Arial, sans-serif;
+      font-weight: 400;
+    }
+
+    .mat-date-range-input-separator {
+      color: rgba(255,255,255,0.6) !important;
+    }
+
+    .mat-mdc-floating-label,
+    .mat-mdc-form-field-label {
+      display: none !important;   // hide label since we have our own .edit-label above
+    }
+
+    .mat-datepicker-toggle,
+    .mat-datepicker-toggle .mat-mdc-icon-button {
+      color: rgba(255,255,255,0.75) !important;
+      width: 32px !important;
+      height: 32px !important;
+      padding: 0 !important;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+}
+
+.guest-counter-edit {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 36px;
+  width: 100%;
+}
+
+.counter-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 300;
+  width: 36px;
+  height: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+
+  &:hover { background: rgba(255,255,255,0.18); }
+  &:active { background: rgba(255,255,255,0.28); }
+}
+
+.counter-val {
+  flex: 1;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: 'Times New Roman', serif;
+  color: #fff;
+  border-left: 1px solid rgba(255,255,255,0.25);
+  border-right: 1px solid rgba(255,255,255,0.25);
+  line-height: 36px;
+}
+
+// ── Responsive ──────────────────────────────────────────────
+@media (max-width: 600px) {
+  .edit-search-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .edit-date-field  { grid-column: 1 / -1; grid-row: 1; }
+  .guests-field:nth-child(2) { grid-column: 1; grid-row: 2; }
+  .guests-field:nth-child(3) { grid-column: 2; grid-row: 2; }
+  .promo-field      { grid-column: 1 / -1; grid-row: 3; }
+  .edit-actions     { grid-column: 1 / -1; grid-row: 4; justify-content: flex-end; }
 }

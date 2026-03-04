@@ -434,7 +434,7 @@ luhnCheck(num: string): boolean {
           tarifa: fullTarifa,                
           porPagar: finalPendiente,
           pendiente: finalPendiente,
-          origen: 'WEB',
+          origen: 'Página Web',
           habitacion: reserva.codigoCuarto,
           telefono: formData.telefono,
           email: formData.email,
