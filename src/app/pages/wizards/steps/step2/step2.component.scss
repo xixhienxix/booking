@@ -569,10 +569,11 @@ $radius-lg:   24px;
   grid-row: 2;
   display: flex;
   gap: 0.5rem;
-  align-items: flex-end;  
+  align-items: flex-end;   // align to bottom so buttons sit on same baseline as input
   justify-content: flex-end;
   flex-shrink: 0;
 }
+
 
 .edit-label {
   font-size: 0.62rem;
@@ -582,6 +583,7 @@ $radius-lg:   24px;
   font-family: Arial, sans-serif;
   color: #fff;
 }
+
 
 .edit-input {
   padding: 7px 10px;
@@ -822,4 +824,63 @@ $radius-lg:   24px;
   .guests-field:nth-child(3) { grid-column: 2; grid-row: 2; }
   .promo-field      { grid-column: 1 / -1; grid-row: 3; }
   .edit-actions     { grid-column: 1 / -1; grid-row: 4; justify-content: flex-end; }
+}
+
+// ── Empty search state ──────────────────────────────────────
+.empty-search-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #4a5568;
+
+  .empty-icon {
+    font-size: 3.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    color: #00506a;
+    opacity: 0.25;
+    margin-bottom: 1.25rem;
+  }
+
+  h3 {
+    font-family: 'Times New Roman', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a2332;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: #8a9bb0;
+    font-family: Arial, sans-serif;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.btn-start-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #00506a, #1a7a9a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 80, 106, 0.3);
+  transition: opacity 0.2s, transform 0.2s;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
 }

@@ -22,6 +22,7 @@ export class TarifasService {
   updateTarifario(data: any) {
     this.tarifas$.next(data)
   }
+  
 
   getTarifas(): Observable<ITarifas[]> {
     return this.http

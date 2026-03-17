@@ -3,6 +3,6 @@
   "hotelNombre": "Hotel Pokemon",
   "hotelLogo": "https://storage.googleapis.com/hotel-pokemon/logo.png",
   "hotelColor": "#00506a",
-  "apiUrl": "https://milobify.com",
+  "apiUrl": "http://localhost:3500",
   "internalSecret": "y3RB@5gX#Q6mv4eVZ2Lcz8!upG*M7daFqK$P1sRjHT9NnDbGx^Yf%WAoeLiXU0Ct"
 }
