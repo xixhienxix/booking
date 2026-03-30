@@ -82,9 +82,9 @@ export class TarifasService {
           default:
             rate = item.Tarifa_3;
         }
-        tarifaTotal += rate * adultos;
+        tarifaTotal += rate;
         if (ninos !== 0) {
-          tarifaTotal += item.Tarifa_N * ninos;
+          tarifaTotal += item.Tarifa_N;
         }
       });
     } else {
@@ -142,9 +142,9 @@ export class TarifasService {
           default:
             rate = item.Tarifa_3;
         }
-        tarifaTotal += rate * adultos;
+        tarifaTotal += rate ;
         if (ninos !== 0) {
-          tarifaTotal += item.Tarifa_N * ninos;
+          tarifaTotal += item.Tarifa_N ;
         }
       });
       return Math.ceil(tarifaTotal);
@@ -299,9 +299,9 @@ export class TarifasService {
 
     const applyRate = (item: any, date: DateTime) => {
         let rate = adultos <= 3 ? item[`Tarifa_${adultos}`] : item.Tarifa_3;
-        let total = rate * adultos;
+        let total = rate;
         if (ninos !== 0) {
-            total += item.Tarifa_N * ninos;
+            total += item.Tarifa_N;
         }
 
         if (returnArray) {

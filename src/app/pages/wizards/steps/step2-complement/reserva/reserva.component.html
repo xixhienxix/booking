@@ -8,18 +8,23 @@
 
     <!-- Date / nights summary -->
     <div class="stay-summary">
-      <div class="stay-item">
-        <span class="stay-label">Llegada</span>
-        <span class="stay-value">{{ fechaIniDateTime.toFormat('dd MMM yyyy') }}</span>
-      </div>
-      <div class="stay-arrow">→</div>
-      <div class="stay-item">
-        <span class="stay-label">Salida</span>
-        <span class="stay-value">{{ FechaFinDateTime.toFormat('dd MMM yyyy') }}</span>
-      </div>
+      <!-- Top row: nights pill -->
       <div class="stay-nights">
         <span class="stay-nights-num">{{ diff }}</span>
         <span class="stay-nights-label">{{ diff === 1 ? 'noche' : 'noches' }}</span>
+      </div>
+
+      <!-- Bottom row: llegada → salida -->
+      <div class="stay-dates">
+        <div class="stay-item">
+          <span class="stay-label">Llegada</span>
+          <span class="stay-value">{{ fechaIniDateTime.toFormat('dd MMM yyyy') }}</span>
+        </div>
+        <div class="stay-arrow">→</div>
+        <div class="stay-item">
+          <span class="stay-label">Salida</span>
+          <span class="stay-value">{{ FechaFinDateTime.toFormat('dd MMM yyyy') }}</span>
+        </div>
       </div>
     </div>
 

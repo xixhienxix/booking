@@ -166,9 +166,19 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   }
 
   generateInventarioArray(codigo: string): number[] {
-    const inventario = this.roomCodesComplete.filter(room => room.Codigo === codigo).length;
+    const disponibles = this._disponibilidadService.currentPreAsignadas
+      .filter(room => room.codigo === codigo);
+
+    // Subtract rooms already added to miReserva
+    const yaAgregadas = this._disponibilidadService.getMiReserva()
+      .filter(r => r.codigoCuarto === codigo)
+      .reduce((sum, r) => sum + r.cantidadHabitaciones, 0);
+
+    const inventario = Math.max(0, disponibles.length - yaAgregadas);
+
     return Array.from({ length: inventario }, (_, i) => i + 1);
   }
+  
 
   generateAdultosArray(codigo: string) {
     const adultosQty = this.roomCodesComplete.filter(room => room.Codigo === codigo)[0].Adultos;
@@ -298,7 +308,7 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
 
   getMaxValue(codigo: string): number {
     const arr = this.generateInventarioArray(codigo);
-    return arr.length ? Math.max(...arr) : 1;
+    return arr.length ? Math.max(...arr) : 0;
   }
 
   calcPromoTotal(tarifas: any, codigo: string): number {

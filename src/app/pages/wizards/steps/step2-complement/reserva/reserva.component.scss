@@ -68,55 +68,24 @@ $radius-lg:   20px;
 // ── Stay summary ────────────────────────────────────────────
 .stay-summary {
   display: flex;
-  align-items: center;
+  flex-direction: column;  // ← stack rows vertically
   gap: 0.5rem;
-  flex-wrap: nowrap;        // ← force single row always
   background: $white;
   border: 1px solid $border;
   border-radius: $radius-md;
   padding: 0.75rem 1rem;
   margin-bottom: 0.875rem;
 
-  .stay-item {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    flex: 1 1 0;            // ← equal share of space, no overflow
-    min-width: 0;           // ← allows text to shrink below content size
-
-    .stay-label {
-      font-size: 0.78rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: $text-soft;
-      font-family: Arial, sans-serif;
-      white-space: nowrap;  // ← label never wraps
-    }
-
-    .stay-value {
-      font-size: 0.82rem;
-      font-weight: 700;
-      color: $text-dark;
-      font-family: 'Times New Roman', serif;
-      white-space: nowrap;  // ← "01 Mar 2026" stays on one line
-    }
-  }
-
-  .stay-arrow {
-    color: $text-soft;
-    font-size: 0.9rem;
-    flex-shrink: 0;         // ← arrow never compresses
-  }
-
   .stay-nights {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
     background: linear-gradient(135deg, $brand, $brand-mid);
     color: $white;
     border-radius: $radius-sm;
     padding: 0.3rem 0.6rem;
-    flex-shrink: 0;         // ← nights pill never compresses
 
     .stay-nights-num {
       font-size: 1.2rem;
@@ -126,7 +95,7 @@ $radius-lg:   20px;
     }
 
     .stay-nights-label {
-      font-size: 0.55rem;
+      font-size: 1rem;
       font-weight: bold;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -134,7 +103,46 @@ $radius-lg:   20px;
       font-family: Arial, sans-serif;
     }
   }
+
+  .stay-dates {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .stay-item {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      flex: 1 1 0;
+      min-width: 0;
+
+      .stay-label {
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: $text-soft;
+        font-family: Arial, sans-serif;
+        white-space: nowrap;
+      }
+
+      .stay-value {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: $text-dark;
+        font-family: 'Times New Roman', serif;
+        white-space: nowrap;
+      }
+    }
+
+    .stay-arrow {
+      color: $text-soft;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+  }
 }
+
+
 
 // ── Promo block ─────────────────────────────────────────────
 .promo-block {
@@ -390,4 +398,8 @@ $radius-lg:   20px;
 @media (max-width: 576px) {
   .mi-reserva-card { max-width: 100%; }
   .stay-summary { flex-wrap: wrap; }
+}
+// ── Responsive ──────────────────────────────────────────────
+@media (max-width: 576px) {
+  .mi-reserva-card { max-width: 100%; }
 }

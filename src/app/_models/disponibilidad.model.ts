@@ -24,7 +24,7 @@ export let defaultDispo: IDisponibilidad = {
   Folio: ''
 };
 
-export interface preAsignadas {
+export interface  preAsignadas {
 checked: boolean
 codigo: string
 disabled: boolean

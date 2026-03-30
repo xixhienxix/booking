@@ -861,6 +861,13 @@ $radius-lg:   24px;
   }
 }
 
+.quedan-badge {
+  &.agotado {
+    color: $danger;
+    font-weight: 700;
+  }
+}
+
 .btn-start-search {
   display: inline-flex;
   align-items: center;

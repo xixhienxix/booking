@@ -22,6 +22,9 @@ export class DisponibilidadService {
   private disponibilidad$: BehaviorSubject<IHabitaciones[]> = new BehaviorSubject<IHabitaciones[]>([]);
   currentData = this.disponibilidad$.asObservable();
 
+  private disponibilidadCompleta$: BehaviorSubject<IHabitaciones[]> = new BehaviorSubject<IHabitaciones[]>([]);
+  currentDisponibilidadCompleta = this.disponibilidad$.asObservable();
+
   private fechaInicial$: BehaviorSubject<Date> = new BehaviorSubject<Date>(new Date())
   currentFechaIni = this.fechaInicial$.asObservable();
 
