@@ -49,6 +49,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     private _parametrosService: ParametersService,
     private _hotelConfig: HotelConfigService,
   ) {
+      console.log('✅ HorizontalComponent constructor called');
     this.spinnerService.isLoading$.subscribe(val => this.isLoading = val);
   }
 

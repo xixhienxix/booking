@@ -1,6 +1,4 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { firstValueFrom } from "rxjs";
 
 export interface HotelConfig {
   hotelID:        string;
@@ -8,27 +6,39 @@ export interface HotelConfig {
   hotelLogo:      string;
   hotelColor:     string;
   apiUrl:         string;
-  internalSecret: string;   
+  internalSecret: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class HotelConfigService {
   private config: HotelConfig | null = null;
 
-  constructor() {}
+  async load(): Promise<void> {
+    console.log('🔄 [HotelConfig] load() started');
+    try {
+      const response = await fetch('assets/hotel-config.json');
+      console.log('🌐 [HotelConfig] fetch response status:', response.status, response.ok);
 
-    async load(): Promise<void> {
-    const response = await fetch('/assets/hotel-config.json');
-    this.config = await response.json();
-    console.log('✅ Full config:', this.config); // ← check exact keys
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+
+      this.config = await response.json();
+      console.log('✅ [HotelConfig] config set:', this.config);
+      console.log('✅ [HotelConfig] isLoaded:', this.isLoaded);
+
+    } catch (err) {
+      console.error('❌ [HotelConfig] load() threw — this causes NG0403:', err);
+      // swallow the error so APP_INITIALIZER resolves
     }
 
-  // ── Safe getter — returns null if not loaded yet ─────────
+    console.log('🏁 [HotelConfig] load() finished, config is:', this.config);
+  }
+
   get current(): HotelConfig | null { return this.config; }
 
-
-  // ── Use this when you NEED the value and expect it loaded ─
   get currentOrThrow(): HotelConfig {
+    console.log('⚠️ [HotelConfig] currentOrThrow called, isLoaded:', this.isLoaded);
     if (!this.config) throw new Error('HotelConfig not loaded yet');
     return this.config;
   }

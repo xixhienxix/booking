@@ -7,5 +7,7 @@ import { Component, OnInit } from '@angular/core';
 export class WizardsComponent implements OnInit {
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+        console.log('✅ WizardsComponent initialized');
+  }
 }

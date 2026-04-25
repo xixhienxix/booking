@@ -12,9 +12,7 @@ const routes: Routes = [
         path: 'horizontal',
         component: HorizontalComponent,
       },
-
-      { path: '', redirectTo: 'horizontal', pathMatch: 'full' },
-      { path: '**', redirectTo: 'horizontal', pathMatch: 'full' },
+      { path: '', redirectTo: 'horizontal', pathMatch: 'full' }, 
     ],
   },
 ];

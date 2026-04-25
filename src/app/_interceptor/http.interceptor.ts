@@ -1,45 +1,48 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { Injectable, Injector } from "@angular/core"; // 1. Added Injector
 import { Observable } from "rxjs";
 import { HotelConfigService } from "../_service/hotel-config.service";
 
 @Injectable()
 export class HotelInterceptor implements HttpInterceptor {
-  constructor(private _hotelConfig: HotelConfigService) {}
+  
+  // 2. Inject the Injector instead of the service directly
+  constructor(private injector: Injector) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    
+    // 3. Manually get the service instance here
+    const _hotelConfig = this.injector.get(HotelConfigService);
+    console.log('🔁 [Interceptor] fired for:', req.url);
+    console.log('🔁 [Interceptor] isLoaded:', _hotelConfig.isLoaded);
+    console.log('🔁 [Interceptor] current:', _hotelConfig.current);
 
-    // ── Skip if config not loaded yet (e.g. the hotel-config.json fetch itself)
-    if (!this._hotelConfig.isLoaded || !this._hotelConfig.current) {
+    // 4. Update references from this._hotelConfig to _hotelConfig
+    if (!_hotelConfig.isLoaded || !_hotelConfig.current) {
       return next.handle(req);
     }
 
-    const { hotelID, internalSecret, apiUrl } = this._hotelConfig.current;
+    const { hotelID, internalSecret, apiUrl } = _hotelConfig.current;
 
-    // ── Rewrite relative URLs to use apiUrl from hotel-config.json ──
     let url = req.url;
     if (!url.startsWith('http')) {
       url = `${apiUrl}${url.startsWith('/') ? '' : '/'}${url}`;
     }
 
-    // ── Build headers ────────────────────────────────────────────────
     const headers: Record<string, string> = {
       'Accept':            'application/json',
-      'hotel':             hotelID,   // ← what backend reads from headers
-      'x-hotel-id':        hotelID,   // ← keep for guards
+      'hotel':             hotelID,
+      'x-hotel-id':        hotelID,
     };
 
     if (internalSecret) {
       headers['x-internal-access'] = internalSecret;
     }
 
-    // ── Don't force Content-Type on FormData requests ────────────────
     if (!(req.body instanceof FormData)) {
       headers['Content-Type'] = 'application/json; charset=utf-8';
     }
 
-    // ── Inject hotel into body for POST/PUT/PATCH ────────────────────
-    // Skip if body uses nested { params: {} } shape (e.g. disponibilidad calls)
     let body = req.body;
     if (
       body &&

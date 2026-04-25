@@ -1,4 +1,5 @@
-import { NgModule,  APP_INITIALIZER } from '@angular/core';
+import { NgModule,  APP_INITIALIZER, Injector } from '@angular/core';
+import { createCustomElement } from '@angular/elements'
 import { BrowserModule } from '@angular/platform-browser';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -11,14 +12,15 @@ import { AppRoutingModule } from './app-routing.module';
 import { HotelInterceptor } from './_interceptor/http.interceptor';
 import {MatCardModule} from '@angular/material/card';
 import { HotelConfigService } from './_service/hotel-config.service';
+import { InlineSVGModule } from 'ng-inline-svg-2';
+
 function initHotelConfig(configService: HotelConfigService) {
   return () => configService.load();
 }
 @NgModule({
-  declarations: [
-    AppComponent,
-  ],
+  declarations: [AppComponent],
   imports: [
+    InlineSVGModule.forRoot(),
     HttpClientModule,
     MatCardModule,
     AppRoutingModule,
@@ -27,21 +29,23 @@ function initHotelConfig(configService: HotelConfigService) {
     MatFormFieldModule,
     MatDatepickerModule,
     BrowserModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [
-    {    
+    HotelConfigService,
+    {
       provide: HTTP_INTERCEPTORS,
       useClass: HotelInterceptor,
-      multi:true
+      multi: true
     },
     {
       provide: APP_INITIALIZER,
-      useFactory:initHotelConfig,
+      useFactory: initHotelConfig,
       deps: [HotelConfigService],
-      multi:true
+      multi: true
     }
   ],
-  bootstrap: [AppComponent]
+    bootstrap: [AppComponent] 
 })
-export class AppModule { }
+export class AppModule {
+}

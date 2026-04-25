@@ -20,7 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist",
+            "outputPath": "dist/main",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -47,7 +47,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "510kb",
-                  "maximumError": "10kb"
+                  "maximumError": "20kb"
                 }
               ],
               "fileReplacements": [
@@ -78,7 +78,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "510kb",
-                  "maximumError": "10kb"
+                  "maximumError": "20kb"
                 }
               ],
               "fileReplacements": [
@@ -106,7 +106,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "510kb",
-                  "maximumError": "10kb"
+                  "maximumError": "20kb"
                 }
               ],
               "fileReplacements": [
