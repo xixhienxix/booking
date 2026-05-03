@@ -403,3 +403,73 @@ $radius-lg:   20px;
 @media (max-width: 576px) {
   .mi-reserva-card { max-width: 100%; }
 }
+// ── ADD THESE to your existing reserva.component.scss ──────
+// Place after the .room-card-header block
+
+// Per-room date range row (Bug 4)
+.room-dates-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  background: linear-gradient(135deg, rgba(0,80,106,0.04), rgba(26,122,154,0.04));
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.room-date-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.room-date-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a9bb0;
+  font-family: Arial, sans-serif;
+}
+
+.room-date-value {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1a2332;
+  font-family: 'Times New Roman', serif;
+  white-space: nowrap;
+}
+
+.room-date-arrow {
+  color: #8a9bb0;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.room-nights-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #00506a, #1a7a9a);
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  flex-shrink: 0;
+  min-width: 40px;
+  text-align: center;
+}
+
+.room-nights-num {
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1;
+  font-family: 'Times New Roman', serif;
+}
+
+.room-nights-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  font-family: Arial, sans-serif;
+}

@@ -483,3 +483,86 @@ $radius-lg:   24px;
     mat-radio-button { padding: 0.75rem; }
   }
 }
+// ── ADD THESE to your existing step3.component.scss ────────
+// Place after the .package-action block
+
+// Hint showing which room types the extra is valid for
+.package-rooms-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  color: #8a9bb0;
+  font-family: Arial, sans-serif;
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+    color: #00506a;
+    opacity: 0.6;
+  }
+}
+
+// Container for per-room add buttons (Bug 3)
+.package-room-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.4rem 0 1.25rem;
+  padding: 0 0.25rem;
+}
+
+.add-to-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a9bb0;
+  font-family: Arial, sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+// Per-room add button
+.btn-add-to-room {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #00506a, #1a7a9a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 3px 8px rgba(0, 80, 106, 0.2);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    opacity: 0.88;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Small date range shown inside the button
+.room-dates-hint {
+  font-size: 0.68rem;
+  opacity: 0.8;
+  font-weight: 400;
+  margin-left: 2px;
+}

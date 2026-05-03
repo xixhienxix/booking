@@ -6,28 +6,6 @@
 
   <div class="modal-body">
 
-    <!-- Date / nights summary -->
-    <div class="stay-summary">
-      <!-- Top row: nights pill -->
-      <div class="stay-nights">
-        <span class="stay-nights-num">{{ diff }}</span>
-        <span class="stay-nights-label">{{ diff === 1 ? 'noche' : 'noches' }}</span>
-      </div>
-
-      <!-- Bottom row: llegada → salida -->
-      <div class="stay-dates">
-        <div class="stay-item">
-          <span class="stay-label">Llegada</span>
-          <span class="stay-value">{{ fechaIniDateTime.toFormat('dd MMM yyyy') }}</span>
-        </div>
-        <div class="stay-arrow">→</div>
-        <div class="stay-item">
-          <span class="stay-label">Salida</span>
-          <span class="stay-value">{{ FechaFinDateTime.toFormat('dd MMM yyyy') }}</span>
-        </div>
-      </div>
-    </div>
-
     <!-- Promo badge -->
     <ng-container *ngIf="validatedPromo">
       <div class="promo-block">
@@ -66,6 +44,23 @@
               <button class="btn-remove" (click)="pop(i)" aria-label="Eliminar habitación">
                 <mat-icon>close</mat-icon>
               </button>
+            </div>
+
+            <!-- Per-room date range (Bug 4 fix) -->
+            <div class="room-dates-row" *ngIf="reservas.fechaInicial && reservas.fechaFinal">
+              <div class="room-date-item">
+                <span class="room-date-label">Llegada</span>
+                <span class="room-date-value">{{ reservas.fechaInicial | date:'dd MMM yyyy' }}</span>
+              </div>
+              <div class="room-date-arrow">→</div>
+              <div class="room-date-item">
+                <span class="room-date-label">Salida</span>
+                <span class="room-date-value">{{ reservas.fechaFinal | date:'dd MMM yyyy' }}</span>
+              </div>
+              <div class="room-nights-pill">
+                <span class="room-nights-num">{{ calcNights(reservas.fechaInicial, reservas.fechaFinal) }}</span>
+                <span class="room-nights-label">{{ calcNights(reservas.fechaInicial, reservas.fechaFinal) === 1 ? 'noche' : 'noches' }}</span>
+              </div>
             </div>
 
             <!-- Room detail chips -->

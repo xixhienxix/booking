@@ -1,180 +1,303 @@
-/* ── Mobile-first base ─────────────────────────────────── */
-.step-content {
+// ── Design tokens ───────────────────────────────────────────
+$brand:      #00506a;
+$brand-mid:  #1a7a9a;
+$brand-light:#e8f4f7;
+$accent:     #c8963e;
+$border:     #e2e8f0;
+$text-soft:  #8a9bb0;
+$white:      #ffffff;
+$radius-sm:  8px;
+$radius-md:  12px;
+
+// ── Widget root — no outer card, no shadow ──────────────────
+.booking-widget {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  padding: 0 1rem;
-  margin-top: 1rem;
+  min-height: 100vh;
+  background: #f4f6f8;
+  font-family: Arial, sans-serif;
+}
+
+// ── Slim stepper ────────────────────────────────────────────
+.stepper-wrap {
+  background: $white;
+  border-bottom: 1px solid $border;
+  padding: 0.875rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.stepper-track {
+  display: flex;
+  align-items: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid $border;
+  background: $white;
+  color: $text-soft;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.stepper-step.active .step-dot {
+  background: $brand;
+  border-color: $brand;
+  color: $white;
+  box-shadow: 0 0 0 3px rgba(0, 80, 106, 0.15);
+}
+
+.stepper-step.done .step-dot {
+  background: $brand-light;
+  border-color: $brand;
+  color: $brand;
+}
+
+.step-label {
+  font-size: 10px;
+  color: $text-soft;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+.stepper-step.active .step-label {
+  color: $brand;
+  font-weight: 600;
+}
+
+.stepper-step.done .step-label {
+  color: $brand;
+}
+
+.stepper-line {
+  flex: 1;
+  height: 1.5px;
+  background: $border;
+  margin: 0 6px 18px;
+  transition: background 0.25s ease;
+
+  &.done {
+    background: $brand;
+  }
+}
+
+// ── Widget body ─────────────────────────────────────────────
+.widget-body {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  // centers children horizontally
+}
+
+// ── Step content row ────────────────────────────────────────
+.step-content {
   display: flex;
   gap: 1rem;
   align-items: flex-start;
-}
-
-.step-section {
+  padding: 1rem 1.5rem;
   width: 100%;
-}
-
-.wrap {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-/* ── Kill Metronic's massive padding ───────────────────── */
-.stepper.stepper-links {
-  padding-top: 0 !important;
-}
-
-form#kt_create_account_form {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-  padding-bottom: 1rem !important;
-}
-
-.stepper-nav {
-  margin-bottom: 0.5rem !important;
-}
-
-.d-flex.flex-stack {
-  padding-top: 1rem !important;
-}
-
-/* ── Step 2 & 3 layout ─────────────────────────────────── */
-.step2-section {
-  flex: 0 1 600px;
-  min-width: 0;
-  max-width: 600px;
-  overflow-y: auto;
-  max-height: 80vh;
-}
-
-.step3-section {
-  flex: 0 1 500px;
-  min-width: 0;
-  max-width: 500px;
-  overflow-y: auto;
-  max-height: 80vh;
-}
-
-.fixed-reserva-wrapper {
-  flex: 1 1 200px;
-  max-width: 300px;
-  overflow-y: auto;
+  max-width: 1000px;    // cap total width so it aligns with stepper
   box-sizing: border-box;
-  border-radius: 8px;
+}
+
+// ── Step 2 main column ──────────────────────────────────────
+.step2-section {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 620px;
+}
+
+// ── Step 3 main column ──────────────────────────────────────
+.step3-section {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 540px;
+}
+
+// ── Reserva sidebar ─────────────────────────────────────────
+.fixed-reserva-wrapper {
+  flex: 0 0 280px;
+  max-width: 280px;
   position: sticky;
-  top: 1rem;
+  top: 68px; // below the stepper
+  align-self: flex-start;
+  border-radius: $radius-md;
+  overflow: hidden;
 }
 
 .reserva-section {
-  height: 100%;
-  width: 100%;
   display: block;
-}
-
-/* ── Buttons ───────────────────────────────────────────── */
-button {
   width: 100%;
-  margin-bottom: 1rem;
 }
 
-.btn-group button {
-  padding: 6px 12px;
-  background-color: #00506a;
-  color: white;
-  border: none;
-  border-radius: 6px;
+// ── Nav bar ─────────────────────────────────────────────────
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;  // center the inner row
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  background: $white;
+  border-top: 1px solid $border;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// Inner row constrained to same max-width as content
+.nav-inner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 1000px;
+}
+
+.nav-spacer {
+  flex: 1;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  background: transparent;
+  color: $brand;
+  border: 1.5px solid $border;
+  border-radius: $radius-sm;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9rem;
-  transition: background-color 0.3s;
+  font-family: Arial, sans-serif;
+  transition: background 0.2s, border-color 0.2s;
+  margin-bottom: 0; // override global button margin
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
 
   &:hover {
-    background-color: #007ba7;
+    background: $brand-light;
+    border-color: $brand;
+  }
+}
+
+.btn-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 24px;
+  background: $brand;
+  color: $white;
+  border: none;
+  border-radius: $radius-sm;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.02em;
+  transition: background 0.2s, transform 0.15s, opacity 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 80, 106, 0.25);
+  margin-bottom: 0; // override global button margin
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
   }
 
-  &:disabled,
-  &[disabled] {
-    background-color: #b9b9b9;
+  &:hover:not(:disabled) {
+    background: $brand-mid;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 80, 106, 0.35);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: #c8d0d8;
+    box-shadow: none;
     cursor: not-allowed;
-    opacity: 0.6;
-  }
-
-  &:disabled:hover,
-  &[disabled]:hover {
-    background-color: #b9b9b9;
+    opacity: 0.7;
   }
 }
 
-/* ── Tablet ────────────────────────────────────────────── */
-@media (min-width: 768px) {
-  .step-section {
-    width: 100%;
-  }
-
-  .step-content {
-    padding: 0 2rem;
-    margin-top: 1rem;
-  }
-
-  button {
-    width: auto;
-  }
+// ── Override global button rule from horizontal ─────────────
+// (the global `button { width: 100% }` must not hit our nav buttons)
+.nav-bar button {
+  width: auto !important;
+  margin-bottom: 0 !important;
 }
 
-/* ── Desktop ───────────────────────────────────────────── */
-@media (min-width: 1024px) {
-  .step-content {
-    width: 100%;
-    padding: 0 3rem;
-    margin-top: 1rem;
-  }
-
-  .step-section {
-    width: 100%;
-  }
-
-  .wrap {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-
-  button {
-    width: auto;
-  }
-}
-
-/* ── Extra-large ───────────────────────────────────────── */
-@media (min-width: 1440px) {
-  .step-content {
-    max-width: 100%;
-    margin: 0 auto;
-    margin-top: 1rem;
-  }
-
-  .step-section {
-    width: 70%;
-  }
-
-  .wrap {
-    justify-content: space-around;
-  }
-}
-
-/* ── Mobile stack ──────────────────────────────────────── */
+// ── Mobile ──────────────────────────────────────────────────
 @media (max-width: 768px) {
   .step-content {
     flex-direction: column;
+    padding: 0.75rem;
   }
 
   .step2-section,
-  .step3-section,
-  .fixed-reserva-wrapper,
-  .reserva-section {
-    max-height: none;
+  .step3-section {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .fixed-reserva-wrapper {
     position: static;
     flex: none;
     max-width: 100%;
-    min-width: 0;
     width: 100%;
+  }
+
+  .stepper-wrap {
+    padding: 0.75rem 1rem;
+  }
+
+  .step-label {
+    display: none; // hide labels on mobile, show only dots
+  }
+
+  .nav-bar {
+    padding: 0.75rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-next,
+  .btn-back {
+    padding: 9px 14px;
+    font-size: 0.8rem;
   }
 }

@@ -7,7 +7,7 @@
     </div>
     <h1 class="success-title">¡Reservación Confirmada!</h1>
     <p class="success-subtitle">
-      Gracias por elegir <strong>Hotel Pokemon</strong>.<br>
+      Gracias por elegir <strong>{{ hotelNombre }}</strong>.<br>
       Los detalles de tu reservación han sido enviados a tu correo electrónico.
     </p>
   </div>
@@ -22,83 +22,103 @@
     <p class="confirmation-hint">Guarda este número para cualquier consulta futura.</p>
   </mat-card>
 
-  <!-- Stay details -->
-  <mat-card class="detail-card">
-    <h3 class="detail-title">
-      <mat-icon>hotel</mat-icon> Detalles de tu Estancia
-    </h3>
-
-    <div class="detail-grid">
-      <div class="detail-item">
-        <label>Check-in</label>
-        <span>{{ checkInFormatted }}</span>
-      </div>
-      <div class="detail-item">
-        <label>Check-out</label>
-        <span>{{ checkOutFormatted }}</span>
-      </div>
-      <div class="detail-item">
-        <label>Noches</label>
-        <span>{{ nights }}</span>
-      </div>
-      <div class="detail-item">
-        <label>Huéspedes</label>
-        <span>{{ adultos }} adulto(s) · {{ ninos }} niño(s)</span>
-      </div>
+  <!-- Promo badge if applied -->
+  <ng-container *ngIf="validatedPromo">
+    <div class="promo-applied-badge">
+      <mat-icon>local_offer</mat-icon>
+      <span>
+        Promoción <strong>{{ validatedPromo.nombre }}</strong> aplicada —
+        <span *ngIf="validatedPromo.discountType">{{ validatedPromo.qtyPrecio }}% de descuento</span>
+        <span *ngIf="!validatedPromo.discountType">${{ validatedPromo.qtyPrecio }} por noche</span>
+      </span>
     </div>
+  </ng-container>
 
-    <!-- Promo badge if applied -->
-    <ng-container *ngIf="validatedPromo">
-      <div class="promo-applied-badge">
-        <mat-icon>local_offer</mat-icon>
-        <span>
-          Promoción <strong>{{ validatedPromo.nombre }}</strong> aplicada —
-          <span *ngIf="validatedPromo.discountType">{{ validatedPromo.qtyPrecio }}% de descuento</span>
-          <span *ngIf="!validatedPromo.discountType">${{ validatedPromo.qtyPrecio }} por noche</span>
-        </span>
-      </div>
-    </ng-container>
+  <!-- Rooms — one card per reservation with its own dates -->
+  <ng-container *ngFor="let reserva of miReserva; let i = index">
+    <mat-card class="detail-card">
 
-    <!-- Rooms -->
-    <div class="rooms-summary">
-      <h4>Habitaciones Reservadas</h4>
+      <h3 class="detail-title">
+        <mat-icon style="font-size:1.2rem;width:1.2rem;height:1.2rem;">bed</mat-icon>
+        <span>{{ reserva.codigoCuarto }}</span>
+        <span class="room-index-badge" *ngIf="miReserva.length > 1">Reserva {{ i + 1 }}</span>
+      </h3>
 
-      <ng-container *ngFor="let reserva of miReserva">
-        <div class="room-summary-row">
-          <div class="room-summary-info">
-            <mat-icon>bed</mat-icon>
-            <div>
-              <strong>{{ reserva.codigoCuarto }}</strong>
-              <small>{{ reserva.nombreTarifa }} · {{ reserva.cantidadHabitaciones }} hab. · {{ reserva.cantidadAdultos }} adulto(s) · {{ reserva.cantidadNinos }} niño(s)</small>
-            </div>
-          </div>
-          <div class="room-summary-price">
-            <ng-container *ngIf="reserva.descuentoAplicado && reserva.descuentoAplicado > 0">
-              <span class="original-price">{{ reserva.precioOriginal | currency }}</span>
-              <span class="promo-tag">- {{ reserva.descuentoAplicado | currency }}</span>
-            </ng-container>
-            <strong>{{ reserva.precioTarifa | currency }}</strong>
-          </div>
+      <!-- Per-room date grid -->
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Check-in</label>
+          <span>{{ formatDate(reserva.fechaInicial) }}</span>
         </div>
+        <div class="detail-item">
+          <label>Check-out</label>
+          <span>{{ formatDate(reserva.fechaFinal) }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Noches</label>
+          <span>{{ calcNights(reserva.fechaInicial, reserva.fechaFinal) }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Huéspedes</label>
+          <span>
+            {{ reserva.cantidadAdultos }} adulto(s)
+            <ng-container *ngIf="reserva.cantidadNinos > 0"> · {{ reserva.cantidadNinos }} niño(s)</ng-container>
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Habitaciones</label>
+          <span>{{ reserva.cantidadHabitaciones }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Tarifa</label>
+          <span>{{ reserva.nombreTarifa }}</span>
+        </div>
+      </div>
 
-        <!-- Packages -->
-        <ng-container *ngIf="(reserva.packageList?.length ?? 0) > 0">
+      <!-- Packages for this room -->
+      <ng-container *ngIf="(reserva.packageList?.length ?? 0) > 0">
+        <div class="rooms-summary">
+          <h4>Extras incluidos</h4>
           <div *ngFor="let pkg of reserva.packageList ?? []" class="package-summary-row">
             <div>
-              <mat-icon style="font-size: 1rem; vertical-align: middle;">room_service</mat-icon>
+              <mat-icon style="font-size:1rem;vertical-align:middle;">room_service</mat-icon>
               {{ pkg.Nombre }} x{{ pkg.Cantidad }}
             </div>
             <span>{{ pkg.Precio * pkg.Cantidad | currency }}</span>
           </div>
-        </ng-container>
-
+        </div>
       </ng-container>
-    </div>
 
-    <!-- Totals — mirrors app-reserva exactly -->
+      <!-- Room price -->
+      <div class="room-price-footer">
+        <ng-container *ngIf="reserva.descuentoAplicado && reserva.descuentoAplicado > 0">
+          <div class="total-row muted">
+            <span>Precio original</span>
+            <span class="line-through">{{ reserva.precioOriginal | currency }}</span>
+          </div>
+          <div class="total-row promo-row">
+            <span>🎟 {{ reserva.promoNombre }}</span>
+            <span>- {{ reserva.descuentoAplicado | currency }}</span>
+          </div>
+        </ng-container>
+        <div class="total-row room-total">
+          <span>Total habitación</span>
+          <span>{{ reserva.precioTarifa | currency }}</span>
+        </div>
+      </div>
+
+    </mat-card>
+  </ng-container>
+
+  <!-- Grand total summary -->
+  <mat-card class="detail-card">
+    <h3 class="detail-title">
+      <mat-icon style="font-size:1.2rem;width:1.2rem;height:1.2rem;">receipt</mat-icon>
+      <span>Resumen de Pago</span>
+    </h3>
     <div class="totals-section">
-      <div class="total-row" *ngIf="totalDescuento > 0" style="color: #198754;">
-        <span>🎟 Descuento promoción</span>
+      <div class="total-row" *ngIf="totalDescuento > 0" style="color:#198754;">
+        <span>🎟 Descuento total</span>
         <span>- {{ totalDescuento | currency }}</span>
       </div>
       <div class="total-row">
@@ -136,7 +156,8 @@
   <!-- Next steps -->
   <mat-card class="detail-card">
     <h3 class="detail-title">
-      <mat-icon>info</mat-icon> ¿Qué sigue?
+      <mat-icon style="font-size:1.2rem;width:1.2rem;height:1.2rem;">info</mat-icon>
+      <span>¿Qué sigue?</span>
     </h3>
     <div class="next-steps">
       <div class="next-step-item">
@@ -165,11 +186,11 @@
 
   <!-- Actions -->
   <div class="actions-row">
-    <button mat-raised-button color="warm" (click)="printConfirmation()">
+    <button mat-raised-button (click)="printConfirmation()">
       <mat-icon>print</mat-icon> Imprimir confirmación
     </button>
-    <button mat-raised-button color="primary" routerLink="/" (click)="backToHome()">
-      <mat-icon>home</mat-icon> Volver al inicio
+    <button mat-raised-button color="primary" (click)="backToHome()">
+      <mat-icon>home</mat-icon> Nueva reservación
     </button>
   </div>
 

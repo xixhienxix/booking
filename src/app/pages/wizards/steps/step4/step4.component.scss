@@ -262,3 +262,63 @@
 
   mat-icon { font-size: 1rem; width: 1rem; height: 1rem; }
 }
+// ── ADD THESE to your existing step4.component.scss (step5) ──
+
+// Badge when showing multiple reservations
+.room-index-badge {
+  margin-left: auto;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(0, 80, 106, 0.1);
+  color: #00506a;
+  border-radius: 20px;
+  padding: 0.15rem 0.6rem;
+  font-family: Arial, sans-serif;
+}
+
+// Room price footer inside each room card
+.room-price-footer {
+  border-top: 1px solid #eee;
+  padding: 0.75rem 0 0;
+  margin-top: 0.75rem;
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #555;
+    padding: 2px 0;
+
+    &.muted { color: #aaa; }
+    &.promo-row { color: #198754; font-weight: 600; }
+
+    &.room-total {
+      font-weight: 700;
+      color: #1a2332;
+      font-size: 0.95rem;
+      margin-top: 4px;
+      border-top: 1px solid #eee;
+      padding-top: 6px;
+    }
+
+    .line-through { text-decoration: line-through; }
+  }
+}
+
+// Promo badge at top of page
+.promo-applied-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e6f4ea;
+  border: 1px solid #b7dfbf;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  color: #198754;
+  margin-bottom: 0.5rem;
+
+  mat-icon { font-size: 1rem; width: 1rem; height: 1rem; flex-shrink: 0; }
+}

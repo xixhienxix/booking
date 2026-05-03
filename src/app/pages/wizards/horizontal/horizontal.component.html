@@ -1,109 +1,112 @@
-<div class="card">
-  <div class="card-body">
-    <div class="stepper stepper-links d-flex flex-column" id="kt_create_account_stepper">
+<div class="booking-widget">
 
-      <div class="stepper-nav mb-2">
-        <div class="stepper-item" [ngClass]="{
-            current:   currentStep$.value === 2,
-            completed: currentStep$.value > 2
-          }">
-          <h3 class="stepper-title">Disponibilidad</h3>
-        </div>
+  <!-- ── Slim dot stepper ── -->
+  <div class="stepper-wrap">
+    <div class="stepper-track">
 
-        <div class="stepper-item" [ngClass]="{
-            current:   currentStep$.value === 3,
-            completed: currentStep$.value > 3
-          }">
-          <h3 class="stepper-title">Confirmar Reservación</h3>
+      <div class="stepper-step" [class.active]="currentStep$.value === 2" [class.done]="currentStep$.value > 2">
+        <div class="step-dot">
+          <span *ngIf="currentStep$.value <= 2">1</span>
+          <mat-icon *ngIf="currentStep$.value > 2">check</mat-icon>
         </div>
-
-        <div class="stepper-item" [ngClass]="{ current: currentStep$.value === 4 }">
-          <h3 class="stepper-title">Completado</h3>
-        </div>
+        <span class="step-label">Disponibilidad</span>
       </div>
 
-      <form class="mx-auto pb-10" noValidate id="kt_create_account_form">
-        <div class="current">
+      <div class="stepper-line" [class.done]="currentStep$.value > 2"></div>
 
-          <!-- Step 2: Availability -->
-          <ng-container *ngIf="currentStep$.value === 2">
-            <div class="step-content">
-              <app-step2
-                [qtyNin]="qtyNin"
-                [qty]="qty"
-                [updateParentModel]="updateAccount"
-                [accountsCurrentData]="account$.value"
-                [intialDate]="intialDate"
-                [endDate]="endDate"
-                [hasSearched]="hasSearched"
-                class="step-section step2-section"
-                (onQtyHabsUpdate)="honQtyHabsUpdate($event)"
-                (searchChanged)="onStep2SearchChanged($event)">
-              </app-step2>
-
-              <div class="fixed-reserva-wrapper">
-                <app-reserva class="step-section reserva-section"></app-reserva>
-              </div>
-            </div>
-          </ng-container>
-
-          <!-- Step 3: Confirm -->
-          <ng-container *ngIf="currentStep$.value === 3">
-            <div class="step-content">
-              <app-step3
-                (formValid)="updateStep3Validity($event)"
-                class="step-section step3-section">
-              </app-step3>
-              <div class="fixed-reserva-wrapper">
-                <app-reserva class="step-section reserva-section"></app-reserva>
-              </div>
-            </div>
-          </ng-container>
-
-          <!-- Step 4: Done -->
-          <ng-container *ngIf="currentStep$.value === 4">
-            <app-step5 (honHomeButton)="resetStepper()" class="w-100"></app-step5>
-          </ng-container>
-
+      <div class="stepper-step" [class.active]="currentStep$.value === 3" [class.done]="currentStep$.value > 3">
+        <div class="step-dot">
+          <span *ngIf="currentStep$.value <= 3">2</span>
+          <mat-icon *ngIf="currentStep$.value > 3">check</mat-icon>
         </div>
+        <span class="step-label">Confirmar</span>
+      </div>
 
-        <!-- Navigation -->
-        <div class="d-flex flex-stack pt-15">
-          <div class="btn-group mr-2">
-            <ng-container *ngIf="currentStep$.value === 3">
-              <button type="button" (click)="prevStep()">
-                <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr063.svg'"
-                  class="svg-icon svg-icon-4 me-1"></span>
-                Back
-              </button>
-            </ng-container>
-          </div>
+      <div class="stepper-line" [class.done]="currentStep$.value > 3"></div>
 
-          <ng-container *ngIf="currentStep$.value !== 4">
-            <div class="btn-group">
-              <button type="button"
-                [disabled]="!isCurrentFormValid$.value"
-                (click)="nextStep()">
-                <span class="indicator-label">
-                  <ng-container *ngIf="currentStep$.value === 2">
-                    Continue
-                    <span [inlineSVG]="'./assets/media/icons/duotune/arrows/arr064.svg'"
-                      class="svg-icon svg-icon-3 ms-2 me-0"></span>
-                  </ng-container>
-                  <ng-container *ngIf="currentStep$.value === 3">
-                    Submit
-                  </ng-container>
-                </span>
-              </button>
-            </div>
-          </ng-container>
-        </div>
+      <div class="stepper-step" [class.active]="currentStep$.value === 4">
+        <div class="step-dot">3</div>
+        <span class="step-label">Listo</span>
+      </div>
 
-      </form>
     </div>
   </div>
+
+  <!-- ── Step content ── -->
+  <div class="widget-body">
+
+    <!-- Step 2: Availability -->
+    <ng-container *ngIf="currentStep$.value === 2">
+      <div class="step-content">
+        <app-step2
+          [qtyNin]="qtyNin"
+          [qty]="qty"
+          [updateParentModel]="updateAccount"
+          [accountsCurrentData]="account$.value"
+          [intialDate]="intialDate"
+          [endDate]="endDate"
+          [hasSearched]="hasSearched"
+          class="step-section step2-section"
+          (onQtyHabsUpdate)="honQtyHabsUpdate($event)"
+          (searchChanged)="onStep2SearchChanged($event)">
+        </app-step2>
+        <div class="fixed-reserva-wrapper">
+          <app-reserva class="reserva-section"></app-reserva>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Step 3: Confirm -->
+    <ng-container *ngIf="currentStep$.value === 3">
+      <div class="step-content">
+        <app-step3
+          (formValid)="updateStep3Validity($event)"
+          class="step-section step3-section">
+        </app-step3>
+        <div class="fixed-reserva-wrapper">
+          <app-reserva class="reserva-section"></app-reserva>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Step 4: Done -->
+    <ng-container *ngIf="currentStep$.value === 4">
+      <app-step5 (honHomeButton)="resetStepper()" class="w-100"></app-step5>
+    </ng-container>
+
+  </div>
+
+  <!-- ── Navigation buttons ── -->
+  <div class="nav-bar" *ngIf="currentStep$.value !== 4">
+    <div class="nav-inner">
+
+      <button class="btn-back"
+        *ngIf="currentStep$.value === 3"
+        type="button"
+        (click)="prevStep()">
+        <mat-icon>arrow_back</mat-icon> Regresar
+      </button>
+
+      <div class="nav-spacer"></div>
+
+      <button class="btn-next"
+        type="button"
+        [disabled]="!isCurrentFormValid$.value"
+        (click)="nextStep()">
+        <ng-container *ngIf="currentStep$.value === 2">
+          Continuar <mat-icon>arrow_forward</mat-icon>
+        </ng-container>
+        <ng-container *ngIf="currentStep$.value === 3">
+          <mat-icon>check</mat-icon> Confirmar Reservación
+        </ng-container>
+      </button>
+
+    </div>
+  </div>
+
 </div>
 
+<!-- Loading overlay -->
 <ng-container *ngIf="isLoading">
   <app-loadding-spinner></app-loadding-spinner>
 </ng-container>

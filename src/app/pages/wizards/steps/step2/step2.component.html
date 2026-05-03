@@ -93,9 +93,6 @@
         <button class="btn-apply" type="button" (click)="applySearchChanges()">
           <mat-icon>search</mat-icon> Buscar
         </button>
-        <button class="btn-cancel" type="button" (click)="cancelEditSearch()">
-          <mat-icon>close</mat-icon>
-        </button>
       </div>
 
     </div>
@@ -109,9 +106,6 @@
     <mat-icon class="empty-icon">search</mat-icon>
     <h3>Selecciona tus fechas para ver disponibilidad</h3>
     <p>Usa el panel de búsqueda para elegir tus fechas de llegada y salida.</p>
-    <button type="button" class="btn-start-search" (click)="startEditSearch()">
-      <mat-icon>calendar_today</mat-icon> Buscar habitaciones
-    </button>
   </div>
 </ng-container>
 
@@ -194,10 +188,18 @@
                     </select>
                   </div>
 
+                  <!-- BUG 2 FIX: use per-room key for numeroHabs -->
                   <div class="select-item">
-                    <label>Quedan: <span class="quedan-badge">{{ getMaxValue(dispo.Codigo) }}</span></label>
-                    <select [(ngModel)]="numeroHabs"
-                            (ngModelChange)="onQtyHabsChange(dispo.Codigo, $event)">
+                    <label>
+                      Quedan:
+                      <span class="quedan-badge"
+                        [class.agotado]="getMaxValue(dispo.Codigo) === 0">
+                        {{ getMaxValue(dispo.Codigo) }}
+                      </span>
+                    </label>
+                    <select
+                      [ngModel]="getRoomHabs(dispo.Codigo, tarifas.Tarifa)"
+                      (ngModelChange)="setRoomHabs(dispo.Codigo, tarifas.Tarifa, $event)">
                       <option *ngFor="let num of generateInventarioArray(dispo.Codigo)" [value]="num">{{ num }}</option>
                     </select>
                   </div>
@@ -205,34 +207,36 @@
                 </div>
 
                 <div class="btn-group">
+                  <!-- BUG 2 FIX: show price × selected habs quantity -->
                   <button type="button"
-                      [disabled]="(+qtyNin > getMaxFromNinos(dispo.Codigo)) || (+qty > getMaxFromAdultos(dispo.Codigo))"
-                      (click)="agregaHab(tarifas, dispo.Codigo, numeroHabs)">
+                      [disabled]="(+qtyNin > getMaxFromNinos(dispo.Codigo)) || (+qty > getMaxFromAdultos(dispo.Codigo)) || getMaxValue(dispo.Codigo) === 0"
+                      (click)="agregaHab(tarifas, dispo.Codigo, getRoomHabs(dispo.Codigo, tarifas.Tarifa))">
                     + Agregar Habitación
                   </button>
                 </div>
               </div>
 
+              <!-- BUG 2 FIX: price multiplied by selected habs quantity -->
               <div class="precio-wrapper">
                 <ng-container *ngIf="!validatedPromo">
                   <span class="total-amount">
-                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights | currency:'':'symbol':'1.0-0' }}
+                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
                   </span>
                   <small class="total-label">
-                    Total {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}
+                    {{ getRoomHabs(dispo.Codigo, tarifas.Tarifa) }} hab. × {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}
                   </small>
                 </ng-container>
 
                 <ng-container *ngIf="validatedPromo">
                   <span class="total-amount tachado gris">
-                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights | currency:'':'symbol':'1.0-0' }}
+                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
                   </span>
                   <span class="total-amount verde">
-                    {{ calcPromoTotal(tarifas, dispo.Codigo) | currency:'':'symbol':'1.0-0' }}
+                    {{ calcPromoTotal(tarifas, dispo.Codigo) * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
                   </span>
                   <small class="promo-tag">🎟 {{ validatedPromo.nombre }}</small>
                   <small class="ahorro-tag">
-                    Ahorras {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights - calcPromoTotal(tarifas, dispo.Codigo) | currency:'':'symbol':'1.0-0' }}
+                    Ahorras {{ (roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights - calcPromoTotal(tarifas, dispo.Codigo)) * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
                   </small>
                 </ng-container>
               </div>

@@ -81,7 +81,10 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   numPplOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
   quedanOptions: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
   selectedQty: { [key: string]: number } = {};
-  numeroHabs: number = 1;
+
+  // BUG 2 FIX: per-room+tarifa map for selected habs quantity
+  // key: `${codigoCuarto}__${tarifaNombre}`
+  private roomHabsMap: { [key: string]: number } = {};
 
   validatedPromo: Promos | null = null;
 
@@ -106,14 +109,28 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     return new Date().toISOString().split('T')[0];
   }
 
+  // BUG 2 FIX: get selected habs for a specific room+tarifa combo
+  getRoomHabs(codigo: string, tarifa: string): number {
+    const key = `${codigo}__${tarifa}`;
+    if (this.roomHabsMap[key] === undefined) {
+      // default to 1 if inventory exists, 0 otherwise
+      this.roomHabsMap[key] = this.getMaxValue(codigo) > 0 ? 1 : 0;
+    }
+    return this.roomHabsMap[key];
+  }
+
+  // BUG 2 FIX: set selected habs for a specific room+tarifa combo
+  setRoomHabs(codigo: string, tarifa: string, value: number): void {
+    const key = `${codigo}__${tarifa}`;
+    this.roomHabsMap[key] = Number(value);
+    this.onQtyHabsUpdate.emit(Number(value));
+  }
+
   async ngOnInit() {
     console.log('%c[Step2] ngOnInit — intialDate:', 'color: yellow', this.intialDate, '| endDate:', this.endDate, '| hasSearched:', this.hasSearched);
 
     this.tarifas = await firstValueFrom(this._tarifasServices.getAll());
     this.roomCodesComplete = await firstValueFrom(this._disponibilidadService.getAllHabitaciones());
-
-    console.log('[Step2] roomCodesComplete loaded:', this.roomCodesComplete.length, 'rooms');
-    console.log('[Step2] tarifas loaded:', this.tarifas.length, 'tarifas');
 
     this.tarifasStandard = this.tarifas.filter(item => item.Tarifa === 'Tarifa Base');
     this.tarifasTemporales = this.tarifas.filter(item => item.Tarifa === 'Tarifa De Temporada');
@@ -125,21 +142,21 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
       this.validatedPromo = promo;
     });
 
+    // BUG 1 FIX: validity is ONLY true when at least one room has been added
     this._disponibilidadService.currentReserva.subscribe(reservas => {
       const hasReserva = reservas.length > 0;
       this.updateParentModel({}, hasReserva);
     });
 
     this.totalNights = this.calcNights(this.intialDate, this.endDate);
-    console.log('[Step2] totalNights on init:', this.totalNights);
 
     this._disponibilidadService.currentData.subscribe(res => {
-      console.log('%c[Step2] habitaciones updated from service:', 'color: yellow', res.length, 'rooms', res);
       this.habitaciones = [...res];
+      // Reset per-room habs map when availability changes
+      this.roomHabsMap = {};
     });
 
     this._tarifasServices.currentData.subscribe(res => {
-      console.log('[Step2] tarifasArray updated from service:', res.length, 'tarifas');
       this.tarifasArray = [...res];
     });
 
@@ -169,16 +186,13 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     const disponibles = this._disponibilidadService.currentPreAsignadas
       .filter(room => room.codigo === codigo);
 
-    // Subtract rooms already added to miReserva
     const yaAgregadas = this._disponibilidadService.getMiReserva()
       .filter(r => r.codigoCuarto === codigo)
       .reduce((sum, r) => sum + r.cantidadHabitaciones, 0);
 
     const inventario = Math.max(0, disponibles.length - yaAgregadas);
-
     return Array.from({ length: inventario }, (_, i) => i + 1);
   }
-  
 
   generateAdultosArray(codigo: string) {
     const adultosQty = this.roomCodesComplete.filter(room => room.Codigo === codigo)[0].Adultos;
@@ -269,8 +283,11 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     return Math.ceil(value);
   }
 
+  // BUG 2 + BUG 4 FIX: agregaHab now uses per-room habs qty and tags dates
   agregaHab(tarifas: any, codigo: string, quedan: number) {
-    const basePrice = this.roundUp(this.ratesToCalc(tarifas, false, codigo)) * this.totalNights;
+    const habsToAdd = Number(quedan);
+    const nightlyRate = this.roundUp(this.ratesToCalc(tarifas, false, codigo));
+    const basePrice = nightlyRate * this.totalNights * habsToAdd;  // BUG 2: multiply by habsToAdd
     let finalPrice = basePrice;
     let discountAmount = 0;
 
@@ -278,19 +295,21 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
       const desglose = Array.from({ length: this.totalNights }, (_, i) => ({
         tarifa: tarifas.Tarifa,
         fecha: `night_${i}`,
-        tarifaTotal: this.roundUp(this.ratesToCalc(tarifas, false, codigo)),
+        tarifaTotal: nightlyRate,
       }));
       const result = this._promoValidatorService.applyPromo(
-        this.validatedPromo, desglose, basePrice, this.totalNights,
+        this.validatedPromo, desglose, nightlyRate * this.totalNights, this.totalNights,
       );
-      finalPrice = result.pendiente;
-      discountAmount = result.discountAmount;
+      // BUG 2: multiply promo price by habs quantity too
+      finalPrice = result.pendiente * habsToAdd;
+      discountAmount = result.discountAmount * habsToAdd;
     }
 
+    // BUG 4 FIX: store the search dates with each reservation entry
     const obj: miReserva[] = [{
       codigoCuarto: codigo,
       numeroCuarto: '',
-      cantidadHabitaciones: Number(quedan),
+      cantidadHabitaciones: habsToAdd,
       nombreTarifa: tarifas.Tarifa,
       precioTarifa: finalPrice,
       precioOriginal: basePrice,
@@ -299,11 +318,17 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
       detallesTarifa: this.plan,
       cantidadAdultos: this.qty,
       cantidadNinos: this.qtyNin,
+      // BUG 4: tag with search dates so changing dates later doesn't invalidate them
+      fechaInicial: new Date(this.intialDate),
+      fechaFinal: new Date(this.endDate),
     }];
 
     this._disponibilidadService.addMiReserva(obj);
     const hasReserva = (this._disponibilidadService.getMiReserva()?.length ?? 0) > 0;
     this.updateParentModel({}, hasReserva);
+
+    // Reset the habs selector for this room back to 1 after adding
+    this.setRoomHabs(codigo, tarifas.Tarifa, 1);
   }
 
   getMaxValue(codigo: string): number {
@@ -324,7 +349,7 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     const result = this._promoValidatorService.applyPromo(
       this.validatedPromo, desglose, nightlyRate * this.totalNights, this.totalNights,
     );
-    return result.pendiente;
+    return result.pendiente; // caller multiplies by getRoomHabs in template
   }
 
   startEditSearch(): void {
@@ -336,12 +361,6 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     this.editAdultos      = this.qty;
     this.editNinos        = this.qtyNin;
     this.isEditingSearch  = true;
-    console.log('[Step2] startEditSearch — pre-filled with:', {
-      editLlegadaDate: this.editLlegadaDate,
-      editSalidaDate: this.editSalidaDate,
-      editAdultos: this.editAdultos,
-      editNinos: this.editNinos,
-    });
   }
 
   cancelEditSearch(): void {
@@ -354,40 +373,33 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
 
   onEditStartDate(event: any): void {
     this.editLlegadaDate = event.value ? new Date(event.value) : null;
-    console.log('[Step2] onEditStartDate:', this.editLlegadaDate);
   }
 
   onEditEndDate(event: any): void {
     this.editSalidaDate = event.value ? new Date(event.value) : null;
-    console.log('[Step2] onEditEndDate:', this.editSalidaDate);
   }
 
-  /** Apply button: validate dates + promo, then trigger availability reload */
   applySearchChanges(): void {
     const newStart = this.editLlegadaDate;
     const newEnd   = this.editSalidaDate;
 
-    console.log('%c[Step2] applySearchChanges fired', 'color: magenta; font-weight: bold', { newStart, newEnd });
+    if (!newStart || !newEnd || newEnd <= newStart) return;
 
-    if (!newStart || !newEnd || newEnd <= newStart) {
-      console.warn('[Step2] applySearchChanges — invalid dates, aborting', { newStart, newEnd });
-      return;
-    }
-
-    // 1. Update dates
     this.intialDate  = newStart;
     this.endDate     = newEnd;
     this.totalNights = this.calcNights(newStart, newEnd);
-    console.log('[Step2] totalNights after apply:', this.totalNights);
-
-    // 1b. Update guests
     this.qty    = this.editAdultos;
     this.qtyNin = this.editNinos;
 
     this._disponibilidadService.changeFechaIni(newStart);
     this._disponibilidadService.changeFechaFinal(newEnd);
 
-    // 2. Validate promo
+    // BUG 1 FIX: clear validity — user must add a room for the NEW search
+    // (existing rooms from other date ranges are kept, but new search = not valid yet)
+    const existingReservas = this._disponibilidadService.getMiReserva();
+    this.updateParentModel({}, existingReservas.length > 0);
+
+    // Validate promo
     const code = this.editPromoCode.trim().toUpperCase();
     if (code) {
       const result = this._promoValidatorService.validatePromo(
@@ -396,11 +408,8 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
         newStart,
         newEnd,
         this.totalNights,
-        [],
-        [],
-        true,
+        [], [], true,
       );
-
       if (result.valid && result.promo) {
         this.editPromoStatus = 'valid';
         this.validatedPromo  = result.promo;
@@ -410,7 +419,6 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
         this.editPromoMessage = result.reason ?? 'Código no válido.';
         this.validatedPromo   = null;
         this._disponibilidadService.changeValidatedPromo(null);
-        console.warn('[Step2] promo invalid, aborting emit', result);
         return;
       }
     } else {
@@ -418,15 +426,11 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
       this._disponibilidadService.changeValidatedPromo(null);
     }
 
-    // 3. Notify parent stepper
-    this.updateParentModel({}, true);
+    // Reset per-room habs map for the new search
+    this.roomHabsMap = {};
 
-    // 4. Emit so horizontal re-runs the availability query
     const payload = { intialDate: newStart, endDate: newEnd, qty: this.qty, qtyNin: this.qtyNin };
-    console.log('%c[Step2] emitting searchChanged', 'color: magenta', payload);
     this.searchChanged.emit(payload);
-
-    // 5. Close edit panel
     this.isEditingSearch = false;
   }
 

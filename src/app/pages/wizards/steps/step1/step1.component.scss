@@ -149,7 +149,7 @@ legend {
   font-size: 1.8rem;
   font-weight: 900;
   line-height: 1;
-  font-family: 'Times New Roman', serif;
+  font-family: Arial, sans-serif;
 }
 
 // ── Guest counters ─────────────────────────────────────────
@@ -227,7 +227,7 @@ legend {
   height: 40px;
   background: $white;
   color: $text-dark;
-  font-family: 'Times New Roman', serif;
+  font-family: Arial, sans-serif;
 
   &:focus {
     outline: none;

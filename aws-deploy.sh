@@ -28,4 +28,11 @@ aws s3 cp $DIST_PATH/assets/hotel-config.json s3://$BUCKET_NAME/assets/hotel-con
   --cache-control "no-cache,no-store,must-revalidate" \
   --content-type "application/json"
 
+echo "🔄 Invalidating CloudFront cache..."
+aws cloudfront create-invalidation \
+  --distribution-id E2ZG7WVPSOS5HW \
+  --paths "/*"
+
+echo "✅ Deploy complete! https://d3lkfchxk2jil4.cloudfront.net"
+
 echo "✅ Deploy complete! http://$BUCKET_NAME.s3-website-$REGION.amazonaws.com"
