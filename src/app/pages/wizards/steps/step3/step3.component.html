@@ -2,19 +2,18 @@
 
   <!-- Hero header -->
   <div class="title-container">
-    <h1 class="confirm-title">CONFIRMA RESERVACIÓN</h1>
+    <h1 class="confirm-title">COMPLETA TU RESERVA</h1>
   </div>
 
-  <!-- SERVICIOS EXTRAS -->
+  <!-- 1. SERVICIOS EXTRAS -->
   <mat-card class="section">
-    <h2>Servicios Extras</h2>
+    <h2>1. HAZLO ESPECIAL: COMPLEMENTOS PARA TU VIAJE <span class="optional-badge">(Opcional)</span></h2>
     <p>Suma experiencias y servicios adicionales a tu estancia.</p>
 
     <div class="extras-section">
       <p class="extras-subtitle">Disponibles para tu habitación</p>
 
       <ng-container *ngFor="let package of packagesList">
-        <!-- BUG 3 FIX: show which rooms this extra is valid for -->
         <mat-card class="extras-grid package-row">
 
           <!-- Package info -->
@@ -23,7 +22,6 @@
             <ul>
               <li>{{ package.Descripcion }}</li>
             </ul>
-            <!-- Show which room types this extra applies to -->
             <div class="package-rooms-hint">
               <mat-icon>bed</mat-icon>
               <span>Válido para: {{ package.habitacionesMatch.join(', ') }}</span>
@@ -48,11 +46,10 @@
 
         </mat-card>
 
-        <!-- BUG 3 FIX: one "Agregar" button per valid room instead of one global button -->
+        <!-- Per-room add buttons -->
         <div class="package-room-actions">
           <span class="add-to-label">Agregar a:</span>
           <ng-container *ngFor="let reserva of getMiReserva()">
-            <!-- Only show rooms that are valid for this extra -->
             <ng-container *ngIf="package.habitacionesMatch.includes(reserva.codigoCuarto)">
               <button
                 type="button"
@@ -72,9 +69,9 @@
     </div>
   </mat-card>
 
-  <!-- DATOS DEL HUÉSPED -->
+  <!-- 2. DATOS DEL HUÉSPED -->
   <mat-card class="section">
-    <h2>Datos del Huésped</h2>
+    <h2>2. TUS DATOS DE CONTACTO</h2>
     <p>Necesitamos tus datos para completar la reservación.</p>
 
     <form class="guest-form" *ngIf="guestForm" [formGroup]="guestForm">
@@ -130,106 +127,80 @@
     </form>
   </mat-card>
 
-  <!-- FORMA DE PAGO -->
+  <!-- 3. CÓMO GARANTIZAR TU RESERVA -->
   <mat-card class="section">
-    <h2>Forma de Pago</h2>
-    <p>Selecciona cómo deseas pagar tu reservación.</p>
+    <h2>3. CÓMO GARANTIZAR TU RESERVA</h2>
+    <p>Tu reserva está a un paso de confirmarse. Sigue estas sencillas instrucciones:</p>
 
-    <form [formGroup]="guestForm">
-
-      <mat-radio-group formControlName="paymentType" class="radio-group">
-        <mat-radio-button value="total">
-          Pago Total &nbsp; <strong>{{ totalPayment | currency }}</strong>
-        </mat-radio-button>
-        <mat-radio-button value="deposito">
-          Depósito del 50% &nbsp; <strong>{{ partialPayment | currency }}</strong>
-        </mat-radio-button>
-      </mat-radio-group>
-
-      <div class="field-error"
-        *ngIf="guestForm.get('paymentType')?.invalid && guestForm.get('paymentType')?.touched">
-        ⚠ Selecciona una forma de pago
+    <!-- Bloque 1: Matemáticas claras -->
+    <div class="spei-block total-block">
+      <div class="total-block-header">
+        <div class="total-block-icon">
+          <mat-icon>lock</mat-icon>
+        </div>
+        <div class="total-block-content">
+          <span class="total-block-label">Total de tu reservación:</span>
+          <span class="total-block-amount">{{ totalPayment | currency }}</span>
+          <span class="total-block-sub">Para bloquear tus fechas, requerimos un anticipo del 50%.</span>
+        </div>
       </div>
 
-      <mat-divider class="section-divider"></mat-divider>
-
-      <div class="payment-methods">
-
-        <div class="payment-method-card disabled">
-          <div class="payment-method-header">
-            <mat-icon>account_balance</mat-icon>
-            <span>Transferencia Bancaria</span>
-            <span class="coming-soon-badge">Próximamente</span>
-          </div>
-          <p class="note">Una vez efectuada la reserva, te indicaremos la cuenta donde realizar el pago.</p>
-        </div>
-
-        <div class="payment-method-card"
-          [class.selected]="guestForm.get('hotelDirect')?.value"
-          [class.error]="guestForm.get('hotelDirect')?.invalid && guestForm.get('hotelDirect')?.touched">
-          <div class="payment-method-header">
-            <mat-icon>hotel</mat-icon>
-            <span>Directo en el Hotel</span>
-            <mat-checkbox formControlName="hotelDirect" class="payment-checkbox"></mat-checkbox>
-          </div>
-          <p class="note">Necesitamos la tarjeta de crédito o débito solo como garantía — no se cobrará nada ahora.</p>
-          <div class="field-error"
-            *ngIf="guestForm.get('hotelDirect')?.invalid && guestForm.get('hotelDirect')?.touched">
-            ⚠ Debes seleccionar esta opción para continuar
+      <div class="total-block-breakdown">
+        <div class="breakdown-row deadline-row">
+          <mat-icon>calendar_today</mat-icon>
+          <div>
+            <span class="breakdown-label">Fecha límite de pago:</span>
+            <strong class="breakdown-value">{{ todayLabel }}</strong>
           </div>
         </div>
-
+        <div class="breakdown-divider"></div>
+        <div class="breakdown-row deposit-row">
+          <div class="deposit-label">Monto a depositar:</div>
+          <div class="deposit-amount">{{ partialPayment | currency }}</div>
+        </div>
       </div>
 
-    </form>
-
-    <form [formGroup]="cardForm" novalidate>
-      <div class="card-form-title">
-        <mat-icon>credit_card</mat-icon>
-        <span>Datos de Tarjeta (Garantía)</span>
+      <div class="total-block-note">
+        <mat-icon>info</mat-icon>
+        <span>
+          El saldo restante ({{ partialPayment | currency }}) lo pagarás directamente en
+          recepción el día de tu llegada (Check-in).
+        </span>
       </div>
+    </div>
 
-      <div class="credit-card">
-
-        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card-number-field">
-          <mat-label>Número de tarjeta</mat-label>
-          <input matInput formControlName="cardNumber" maxlength="19"
-            placeholder="0000-0000-0000-0000" autocomplete="cc-number" inputmode="numeric"
-            (input)="formatCardNumber($event)" />
-          <span matSuffix class="card-type-badge"
-            [style.color]="cardType === 'unknown' ? '#aaa' : '#00506a'">
-            <ng-container [ngSwitch]="cardType">
-              <span *ngSwitchCase="'visa'">VISA</span>
-              <span *ngSwitchCase="'mastercard'">MC</span>
-              <span *ngSwitchCase="'amex'">AMEX</span>
-              <span *ngSwitchCase="'discover'">DISC</span>
-              <span *ngSwitchDefault>💳</span>
-            </ng-container>
-          </span>
-          <mat-error *ngIf="cardForm.get('cardNumber')?.hasError('required')">Requerido</mat-error>
-          <mat-error *ngIf="cardForm.get('cardNumber')?.hasError('invalidLength')">Entre 13 y 16 dígitos</mat-error>
-          <mat-error *ngIf="cardForm.get('cardNumber')?.hasError('invalidCard')">Número inválido</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>Expiración</mat-label>
-          <input matInput formControlName="expiryDate" placeholder="MM/YY" maxlength="5"
-            autocomplete="cc-exp" inputmode="numeric" (input)="formatExpiryDate($event)" />
-          <mat-error *ngIf="cardForm.get('expiryDate')?.hasError('required')">Requerido</mat-error>
-          <mat-error *ngIf="cardForm.get('expiryDate')?.hasError('invalidExpiryDate')">Formato MM/YY</mat-error>
-          <mat-error *ngIf="cardForm.get('expiryDate')?.hasError('expired')">Tarjeta expirada</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-          <mat-label>CVV</mat-label>
-          <input matInput formControlName="cvv" maxlength="4"
-            autocomplete="cc-csc" inputmode="numeric" />
-          <mat-error *ngIf="cardForm.get('cvv')?.hasError('required')">Requerido</mat-error>
-          <mat-error *ngIf="cardForm.get('cvv')?.hasError('pattern')">CVV inválido</mat-error>
-        </mat-form-field>
-
+    <!-- Bloque 2: Datos bancarios -->
+    <div class="spei-block bank-block">
+      <div class="bank-block-header">
+        <div class="bank-block-icon">
+          <mat-icon>account_balance</mat-icon>
+        </div>
+        <div>
+          <span class="bank-block-title">Datos para Transferencia (SPEI)</span>
+        </div>
       </div>
-    </form>
+      <ul class="bank-details-list">
+        <li><span class="bank-detail-key">Titular:</span> <span class="bank-detail-val">{{ currentParametrosFront.nombre_cuenta  }}</span></li>
+        <li><span class="bank-detail-key">Banco:</span> <span class="bank-detail-val">{{ 'BBVA' }}</span></li>
+        <li><span class="bank-detail-key">Cuenta CLABE:</span> <span class="bank-detail-val clabe">{{ currentParametrosFront.clabe  }}</span></li>
+      </ul>
+    </div>
+
+    <!-- Bloque 3: Siguientes pasos / WhatsApp -->
+    <div class="spei-block whatsapp-block">
+      <div class="whatsapp-block-header">
+        <div class="whatsapp-icon-circle">
+          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+        </div>
+        <span class="whatsapp-block-title">Siguientes Pasos</span>
+      </div>
+      <p class="whatsapp-block-text">
+        Al hacer clic en <strong>"Completar Reserva"</strong>, te enviaremos de inmediato un WhatsApp con estos mismos datos.<br>
+        Una vez que nos envíes tu comprobante por ese medio, te responderemos con tu <strong>Confirmación Oficial</strong>.
+      </p>
+    </div>
 
   </mat-card>
 

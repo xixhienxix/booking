@@ -24,19 +24,28 @@ export class ReservaComponent implements OnInit {
     this._disponibilidadService.currentValidatedPromo.subscribe(promo => {
       this.validatedPromo = promo;
     });
- 
-    // Bug 4 fix: totals no longer depend on global diff — each room has its own dates
+
     this._disponibilidadService.currentReserva.subscribe(val => {
       this.miReserva = val;
       this.recalcTotals(val);
     });
   }
 
-  // Helper exposed to template to show nights per room
+  // Nights per room
   calcNights(fechaInicial: Date | undefined, fechaFinal: Date | undefined): number {
     if (!fechaInicial || !fechaFinal) return 0;
     const ms = new Date(fechaFinal).getTime() - new Date(fechaInicial).getTime();
     return Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)));
+  }
+
+  /** Sum of all packages for a single room */
+  calcExtrasTotal(reserva: miReserva): number {
+    return reserva.packageList?.reduce((s, p) => s + (p.Precio || 0) * (p.Cantidad || 1), 0) ?? 0;
+  }
+
+  /** Total per room = hospedaje + extras */
+  calcRoomTotal(reserva: miReserva): number {
+    return (reserva.precioTarifa || 0) + this.calcExtrasTotal(reserva);
   }
 
   private recalcTotals(val: miReserva[]) {
@@ -45,17 +54,17 @@ export class ReservaComponent implements OnInit {
     this.iva = 0;
     this.ish = 0;
     this.total = 0;
- 
+
     for (const reserva of val) {
       // Room price already includes IVA 16% + ISH 3% = factor 1.19
       const totalRoomWithTaxes = reserva.precioTarifa || 0;
       const netRoomPrice = totalRoomWithTaxes / 1.19;
- 
+
       this.subtotal += netRoomPrice;
       this.iva += netRoomPrice * 0.16;
       this.ish += netRoomPrice * 0.03;
       this.total += totalRoomWithTaxes;
- 
+
       // Packages — IVA 16% only
       for (const pkg of reserva.packageList ?? []) {
         const pkgTotal = (pkg.Precio || 0) * (pkg.Cantidad || 1);
@@ -65,7 +74,7 @@ export class ReservaComponent implements OnInit {
         this.total += pkgTotal;
       }
     }
- 
+
     this.impuestos = this.iva + this.ish;
   }
 

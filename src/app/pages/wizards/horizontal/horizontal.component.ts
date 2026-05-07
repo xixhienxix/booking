@@ -63,6 +63,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
         this._promosBookingService.fetchPromos(),
         this._habitacionService.getHabitaciones(),
         this._parametrosService.getAll(),
+        this._parametrosService.getFrontParameters(),
       ]));
     } finally {
       this.spinnerService.loadingState = false;
@@ -201,10 +202,10 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     const currentStep = this.currentStep$.value;
 
     if (currentStep === 3) {
+      // Only guestForm is required — cardForm was removed from the UX
       this.step3.guestForm.markAllAsTouched();
-      this.step3.cardForm.markAllAsTouched();
-      if (!this.step3.guestForm.valid || !this.step3.cardForm.valid) return;
-
+      if (!this.step3.guestForm.valid) return;
+ 
       const saved = await this.step3.submitBooking();
       if (!saved) {
         console.error('Reservation could not be saved');

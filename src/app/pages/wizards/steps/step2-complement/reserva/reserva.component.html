@@ -46,7 +46,7 @@
               </button>
             </div>
 
-            <!-- Per-room date range (Bug 4 fix) -->
+            <!-- Per-room date range -->
             <div class="room-dates-row" *ngIf="reservas.fechaInicial && reservas.fechaFinal">
               <div class="room-date-item">
                 <span class="room-date-label">Llegada</span>
@@ -90,8 +90,10 @@
               </div>
             </ng-container>
 
-            <!-- Room price footer -->
+            <!-- Room price footer — desglosado -->
             <div class="room-card-footer">
+
+              <!-- Promo: tachado + promo row -->
               <ng-container *ngIf="reservas.descuentoAplicado && reservas.descuentoAplicado > 0">
                 <div class="price-row muted">
                   <span>Precio original</span>
@@ -103,10 +105,30 @@
                 </div>
                 <div class="price-divider"></div>
               </ng-container>
-              <div class="price-row total">
-                <span>Total estancia</span>
-                <span class="price-total">{{ reservas.precioTarifa | currency }}</span>
+
+              <!-- ── NEW: Desglose hospedaje + extras ── -->
+              <div class="price-row breakdown-hospedaje">
+                <span>
+                  Hospedaje ({{ calcNights(reservas.fechaInicial, reservas.fechaFinal) }}
+                  {{ calcNights(reservas.fechaInicial, reservas.fechaFinal) === 1 ? 'Noche' : 'Noches' }})
+                </span>
+                <span>{{ reservas.precioTarifa | currency }}</span>
               </div>
+
+              <ng-container *ngIf="(reservas.packageList?.length ?? 0) > 0">
+                <div class="price-row breakdown-extras">
+                  <span>Servicios Extra</span>
+                  <span>{{ calcExtrasTotal(reservas) | currency }}</span>
+                </div>
+              </ng-container>
+
+              <div class="price-divider"></div>
+
+              <div class="price-row total">
+                <span>Total de esta Habitación</span>
+                <span class="price-total">{{ calcRoomTotal(reservas) | currency }}</span>
+              </div>
+
             </div>
 
           </div>

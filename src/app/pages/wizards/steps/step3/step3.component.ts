@@ -14,7 +14,7 @@ import { TarifasService } from 'src/app/_service/tarifas.service';
 import { PromoValidatorService } from 'src/app/_service/promo.validation.service';
 import { SpinnerService } from 'src/app/_service/spinner.service';
 import { ParametersService } from 'src/app/_service/parameters.service';
-import { PARAMETERS } from 'src/app/_models/parameters.model';
+import { PARAMETERS, Parametros_Front } from 'src/app/_models/parameters.model';
 
 export interface PackagesSimplex extends Packages {
   habitacionesMatch: string[];
@@ -27,8 +27,10 @@ export interface PackagesSimplex extends Packages {
   styleUrls: ['./step3.component.scss']
 })
 export class Step3Component implements OnInit {
+  // Card form kept for backward-compat but no longer required for step validity
   cardForm: FormGroup;
   currentParametros: PARAMETERS;
+  currentParametrosFront: Parametros_Front
 
   @Input('updateParentModel') updateParentModel: (part: Partial<ICalendario>, isFormValid: boolean) => void;
   @Output() formValid = new EventEmitter<boolean>();
@@ -45,6 +47,13 @@ export class Step3Component implements OnInit {
   checkOut: Date;
   stayNights: number = 1;
 
+  /** Human-readable "today" date label for the payment deadline */
+  todayLabel: string = '';
+
+  private readonly DAYS_ES   = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  private readonly MONTHS_ES = ['enero','febrero','marzo','abril','mayo','junio',
+                                'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
   constructor(
     private _packagesServices: PackagesService,
     private _disponibilidadService: DisponibilidadService,
@@ -56,14 +65,14 @@ export class Step3Component implements OnInit {
     private _parametrosService: ParametersService,
     private fb: FormBuilder
   ) {
+    // Card form still constructed (used by submitBooking internally if needed)
     this.cardForm = this.fb.group({
-      cardNumber: ['', [Validators.required, Validators.pattern(/^\d{13,19}$/)]],
-      expiryDate: ['', [Validators.required, this.expiryDateValidator]],
-      cvv: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]],
+      cardNumber: [''],
+      expiryDate: [''],
+      cvv: [''],
     });
   }
 
-  // BUG 3 FIX: expose reservas to template so we can show per-room add buttons
   getMiReserva(): miReserva[] {
     return this._disponibilidadService.getMiReserva();
   }
@@ -71,7 +80,13 @@ export class Step3Component implements OnInit {
   async ngOnInit() {
     this.initForm();
     this._parametrosService.getAll().subscribe();
+    this._parametrosService.getFrontParameters().subscribe();
     this.currentParametros = this._parametrosService.currentParameters;
+    this.currentParametrosFront = this._parametrosService.currentFrontParameters;
+
+    // Build today label: "Miércoles 6 de Mayo del 2026"
+    const now = new Date();
+    this.todayLabel = `${this.DAYS_ES[now.getDay()]} ${now.getDate()} de ${this.MONTHS_ES[now.getMonth()].charAt(0).toUpperCase() + this.MONTHS_ES[now.getMonth()].slice(1)} del ${now.getFullYear()}`;
 
     this._disponibilidadService.currentValidatedPromo.subscribe(p => this.validatedPromo = p);
     this._disponibilidadService.currentFechaIni.subscribe(d => this.checkIn = d);
@@ -99,18 +114,16 @@ export class Step3Component implements OnInit {
     this.totalPayment = this._disponibilidadService.getMiReserva().reduce((sum, obj) => sum + obj.precioTarifa, 0);
     this.partialPayment = this.totalPayment * 0.5;
 
+    // Step validity: only guestForm required (no card form)
     const updateStep3Validity = () => {
-      const isValid = this.guestForm.valid && this.cardForm.valid;
+      const isValid = this.guestForm.valid;
       this.formValid.emit(isValid);
     };
 
     this.guestForm.valueChanges.subscribe(updateStep3Validity);
     this.guestForm.statusChanges.subscribe(updateStep3Validity);
-    this.cardForm.valueChanges.subscribe(updateStep3Validity);
-    this.cardForm.statusChanges.subscribe(updateStep3Validity);
     updateStep3Validity();
 
-    // BUG 3 FIX: load packages and filter per matched rooms — unchanged logic
     this._disponibilidadService.currentReserva.pipe(
       switchMap(rsv => {
         const codigosCuarto = rsv.map(t => t.codigoCuarto);
@@ -131,7 +144,6 @@ export class Step3Component implements OnInit {
     });
   }
 
-  // BUG 3 FIX: new method — add extra to ONE specific reserva, not all matching rooms
   agregarExtraAHabitacion(packages: PackagesSimplex, reserva: miReserva) {
     const currentReserva = this._disponibilidadService.getMiReserva().map(r => ({
       ...r,
@@ -141,28 +153,17 @@ export class Step3Component implements OnInit {
     const { habitacionesMatch, selectedCantidad, ...packageToAdd } = packages;
     packageToAdd.Cantidad = selectedCantidad ?? 1;
 
-    // Find the exact reserva by matching codigoCuarto AND dates (Bug 4 compatibility)
     const target = currentReserva.find(r =>
       r.codigoCuarto === reserva.codigoCuarto &&
       r.fechaInicial?.toISOString() === reserva.fechaInicial?.toISOString()
     );
 
-    if (!target) {
-      console.warn('[Step3] agregarExtraAHabitacion — target room not found:', reserva);
-      return;
-    }
-
-    // Validate room is in habitacionesMatch
-    if (!habitacionesMatch.includes(target.codigoCuarto)) {
-      console.warn('[Step3] extra not valid for room:', target.codigoCuarto);
-      return;
-    }
+    if (!target) return;
+    if (!habitacionesMatch.includes(target.codigoCuarto)) return;
 
     target.packageList.push({ ...packageToAdd });
-
     this._disponibilidadService.changeMiReserva(currentReserva);
 
-    // Recalc totals
     this.totalPayment = currentReserva.reduce((sum, r) => {
       const roomTotal = r.precioTarifa || 0;
       const pkgTotal = r.packageList?.reduce((s, p) => s + (p.Precio * p.Cantidad), 0) ?? 0;
@@ -171,7 +172,6 @@ export class Step3Component implements OnInit {
     this.partialPayment = this.totalPayment * 0.5;
   }
 
-  // Keep original agregarExtra for backward compat (now unused in template)
   agregarExtra(packages: PackagesSimplex) {
     const currentReserva = this._disponibilidadService.getMiReserva().map(r => ({
       ...r,
@@ -211,13 +211,20 @@ export class Step3Component implements OnInit {
       confirmaEmail: ['', [Validators.required, Validators.email]],
       pais:          ['', Validators.required],
       requerimiento: [''],
-      paymentType:   ['', Validators.required],
-      hotelDirect:   [false, Validators.requiredTrue],
     }, {
       validators: this.emailMatchValidator('email', 'confirmaEmail'),
     });
   }
 
+  emailMatchValidator(emailKey: string, confirmEmailKey: string): ValidatorFn {
+    return (group: AbstractControl) => {
+      const email = group.get(emailKey)?.value;
+      const confirmEmail = group.get(confirmEmailKey)?.value;
+      return email === confirmEmail ? null : { emailsMismatch: true };
+    };
+  }
+
+  // Kept for backward compat (formatCardNumber, detectCardType, etc.) — unused in new template
   luhnCheck(num: string): boolean {
     let sum = 0;
     let shouldDouble = false;
@@ -230,25 +237,12 @@ export class Step3Component implements OnInit {
     return sum % 10 === 0;
   }
 
-  emitValidity(): void {
-    const isValid = this.guestForm.valid && this.cardForm.valid;
-    this.formValid.emit(isValid);
-  }
-
   formatExpiryDate(event: Event): void {
     const input = event.target as HTMLInputElement;
     let value = input.value.replace(/\D/g, '');
     if (value.length >= 2) value = value.substring(0, 2) + '/' + value.substring(2, 4);
     input.value = value;
     this.cardForm.get('expiryDate')?.setValue(value, { emitEvent: true });
-  }
-
-  emailMatchValidator(emailKey: string, confirmEmailKey: string): ValidatorFn {
-    return (group: AbstractControl) => {
-      const email = group.get(emailKey)?.value;
-      const confirmEmail = group.get(confirmEmailKey)?.value;
-      return email === confirmEmail ? null : { emailsMismatch: true };
-    };
   }
 
   formatCardNumber(event: Event): void {
@@ -277,7 +271,7 @@ export class Step3Component implements OnInit {
 
   expiryDateValidator(control: AbstractControl) {
     if (!control.value) return null;
-    const regex = /^(0[1-9]|1[0-2])\/(\d{2}|\d{4})$/;
+    const regex = /^(0[1-9]|1[0-2])\/(\\d{2}|\\d{4})$/;
     if (!regex.test(control.value)) return { invalidExpiryDate: true };
     const [month, year] = control.value.split('/');
     let expYear = parseInt(year, 10);
@@ -307,10 +301,6 @@ export class Step3Component implements OnInit {
       for (const reserva of miReserva) {
         const folioStr = folio.Letra + currentFolioValue;
 
-
-
-        // CRITICAL: always use dates stored on the reserva, never global checkIn/checkOut
-        // fechaInicial/fechaFinal were set in agregaHab when the user added the room.
         if (!reserva.fechaInicial || !reserva.fechaFinal) {
           console.error('[Step3] submitBooking — reserva missing dates', reserva);
           this._spinnerService.loadingState = false;

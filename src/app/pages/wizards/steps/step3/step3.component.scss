@@ -1,4 +1,4 @@
-// step3.component.scss — full redesign matching design system
+// step3.component.scss
 
 $brand:       #00506a;
 $brand-light: #e8f4f7;
@@ -84,22 +84,34 @@ $radius-lg:   24px;
   &:nth-child(3) { animation-delay: 0.10s; }
   &:nth-child(4) { animation-delay: 0.15s; }
 
+  // ── Updated: larger, bolder numbered gold titles ──
   h2 {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: $accent;
-    margin: 0 0 0.25rem;
+    margin: 0 0 0.35rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    line-height: 1.3;
 
     &::after {
       content: '';
       flex: 1;
       height: 1px;
       background: $border;
+    }
+
+    .optional-badge {
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      text-transform: none;
+      color: $text-soft;
+      font-family: Arial, sans-serif;
+      margin-left: -0.25rem;
     }
   }
 
@@ -234,40 +246,65 @@ $radius-lg:   24px;
 }
 
 // ── Add extra button ────────────────────────────────────────
-.package-action {
-  .btn-group button { white-space: nowrap; }
+.package-room-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0.4rem 0 1.25rem;
+  padding: 0 0.25rem;
 }
 
-.btn-group button {
-  padding: 8px 18px;
+.add-to-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $text-soft;
+  font-family: Arial, sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-add-to-room {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
   background: linear-gradient(135deg, $brand, $brand-mid);
   color: $white;
   border: none;
   border-radius: $radius-sm;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.82rem;
-  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+  font-weight: 600;
   font-family: Arial, sans-serif;
-  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(0, 80, 106, 0.25);
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 3px 8px rgba(0, 80, 106, 0.2);
 
-  &:hover:not(:disabled) {
-    opacity: 0.9;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(0, 80, 106, 0.35);
-  }
+  mat-icon { font-size: 14px; width: 14px; height: 14px; }
 
-  &:active:not(:disabled) { transform: translateY(0); }
+  &:hover { opacity: 0.88; transform: translateY(-1px); }
+  &:active { transform: translateY(0); }
+}
 
-  &:disabled,
-  &[disabled] {
-    background: #c8d0d8;
-    box-shadow: none;
-    cursor: not-allowed;
-    opacity: 0.7;
-    transform: none;
-  }
+.room-dates-hint {
+  font-size: 0.68rem;
+  opacity: 0.8;
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+.package-rooms-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  color: $text-soft;
+  font-family: Arial, sans-serif;
+
+  mat-icon { font-size: 13px; width: 13px; height: 13px; color: $brand; opacity: 0.6; }
 }
 
 // ── Guest form ──────────────────────────────────────────────
@@ -278,15 +315,14 @@ $radius-lg:   24px;
   .grid-form {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 0.25rem 1rem;      // ← minimal row gap — subscriptSizing="dynamic" handles error space
+    gap: 0.25rem 1rem;
 
     mat-form-field { width: 100%; }
-
     .full-span { grid-column: 1 / -1; }
   }
 }
 
-// ── Field error — used outside mat-form-field ───────────────
+// ── Field error ─────────────────────────────────────────────
 .field-error {
   font-size: 0.75rem;
   color: $danger;
@@ -297,166 +333,295 @@ $radius-lg:   24px;
   gap: 0.25rem;
 }
 
-// ── Section divider ─────────────────────────────────────────
-.section-divider {
-  margin: 1rem 0 !important;
+// ═══════════════════════════════════════════════════════════
+// ── SPEI Payment Blocks ─────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+
+.spei-block {
+  border-radius: $radius-md;
+  margin-bottom: 1rem;
+  overflow: hidden;
+
+  &:last-child { margin-bottom: 0; }
 }
 
-// ── Payment method cards ────────────────────────────────────
-.payment-methods {
+// Block 1 — Total + breakdown (blue-light)
+.total-block {
+  background: #eef6fb;
+  border: 1.5px solid #b8d8e8;
+
+  .total-block-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.125rem 1.25rem 0.875rem;
+  }
+
+  .total-block-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba($brand, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      color: $brand;
+    }
+  }
+
+  .total-block-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+
+    .total-block-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: $text-mid;
+      font-family: Arial, sans-serif;
+    }
+
+    .total-block-amount {
+      font-size: 1.75rem;
+      font-weight: 900;
+      color: $text-dark;
+      font-family: 'Times New Roman', serif;
+      line-height: 1.1;
+    }
+
+    .total-block-sub {
+      font-size: 0.75rem;
+      color: $text-soft;
+      font-family: Arial, sans-serif;
+      margin-top: 0.15rem;
+    }
+  }
+
+  .total-block-breakdown {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 0;
+    background: $white;
+    border-top: 1px solid #b8d8e8;
+    border-bottom: 1px solid #b8d8e8;
+    padding: 0.875rem 1.25rem;
+  }
+
+  .breakdown-divider {
+    width: 1px;
+    height: 100%;
+    background: #b8d8e8;
+    margin: 0 1rem;
+    min-height: 40px;
+  }
+
+  .breakdown-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    mat-icon {
+      font-size: 1.1rem;
+      width: 1.1rem;
+      height: 1.1rem;
+      color: $brand;
+      flex-shrink: 0;
+    }
+
+    .breakdown-label {
+      font-size: 0.72rem;
+      color: $text-soft;
+      font-family: Arial, sans-serif;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .breakdown-value {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: $text-dark;
+      font-family: Arial, sans-serif;
+    }
+  }
+
+  .deposit-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+
+    .deposit-label {
+      font-size: 0.72rem;
+      color: $text-soft;
+      font-family: Arial, sans-serif;
+    }
+
+    .deposit-amount {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: $brand;
+      font-family: 'Times New Roman', serif;
+      line-height: 1;
+    }
+  }
+
+  .total-block-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+
+    mat-icon {
+      font-size: 1rem;
+      width: 1rem;
+      height: 1rem;
+      color: $brand-mid;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    span {
+      font-size: 0.76rem;
+      color: $text-mid;
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+    }
+  }
+}
+
+// Block 2 — Bank data
+.bank-block {
+  background: $surface;
+  border: 1.5px solid $border;
+  padding: 1.125rem 1.25rem;
+
+  .bank-block-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .bank-block-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba($accent, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 1.3rem;
+      width: 1.3rem;
+      height: 1.3rem;
+      color: darken($accent, 10%);
+    }
+  }
+
+  .bank-block-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $text-dark;
+    font-family: Arial, sans-serif;
+  }
+}
+
+.bank-details-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
+  gap: 0.35rem;
 
-.payment-method-card {
-  border: 1.5px solid $border;
-  border-radius: $radius-md;
-  padding: 0.875rem 1rem;
-  background: $surface;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-family: Arial, sans-serif;
+    font-size: 0.85rem;
 
-  &.selected {
-    border-color: $brand;
-    background: $brand-light;
-    box-shadow: 0 0 0 3px rgba(0, 80, 106, 0.06);
+    &::before {
+      content: '●';
+      color: $accent;
+      font-size: 0.5rem;
+      flex-shrink: 0;
+      position: relative;
+      top: -1px;
+    }
   }
 
-  &.error {
-    border-color: $danger;
-    background: rgba($danger, 0.03);
-  }
-
-  &.disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-}
-
-.payment-method-header {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-bottom: 0.4rem;
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: $text-dark;
-  font-family: Arial, sans-serif;
-
-  mat-icon {
-    font-size: 1.1rem;
-    width: 1.1rem;
-    height: 1.1rem;
-    color: $brand;
+  .bank-detail-key {
+    font-weight: 700;
+    color: $accent;
     flex-shrink: 0;
   }
 
-  .payment-checkbox {
-    margin-left: auto;
+  .bank-detail-val {
+    color: $text-dark;
+
+    &.clabe {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
   }
 }
 
-.coming-soon-badge {
-  margin-left: auto;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: rgba($accent, 0.15);
-  color: darken($accent, 10%);
-  border-radius: 20px;
-  padding: 0.15rem 0.5rem;
-  font-family: Arial, sans-serif;
-}
+// Block 3 — WhatsApp next steps
+.whatsapp-block {
+  background: #f0faf2;
+  border: 1.5px solid #a8d8b0;
+  padding: 1.125rem 1.25rem;
 
-// ── Payment radio group ─────────────────────────────────────
-.radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin: 0.75rem 0 1rem;
-
-  mat-radio-button {
+  .whatsapp-block-header {
     display: flex;
     align-items: center;
-    background: $surface;
-    border: 1.5px solid $border;
-    border-radius: $radius-sm;
-    padding: 0.875rem 1rem;
-    transition: border-color 0.2s, background 0.2s;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .whatsapp-icon-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #25d366;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: $white;
+    padding: 10px;
+
+    svg { width: 22px; height: 22px; }
+  }
+
+  .whatsapp-block-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a5c35;
     font-family: Arial, sans-serif;
-    font-size: 0.875rem;
-
-    &.mat-radio-checked {
-      border-color: $brand;
-      background: $brand-light;
-    }
-
-    strong {
-      color: $brand;
-      font-size: 1rem;
-      font-family: 'Times New Roman', serif;
-    }
-  }
-}
-
-// ── Note ────────────────────────────────────────────────────
-.note {
-  font-size: 0.78rem;
-  color: $text-soft;
-  margin: 0.25rem 0 0.5rem;
-  padding-left: 0.5rem;
-  border-left: 2px solid $border;
-  font-family: Arial, sans-serif;
-  line-height: 1.5;
-}
-
-// ── Card form title ─────────────────────────────────────────
-.card-form-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: $accent;
-  margin: 1rem 0 0.75rem;
-  font-family: Arial, sans-serif;
-
-  mat-icon {
-    font-size: 1rem;
-    width: 1rem;
-    height: 1rem;
   }
 
-  &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: $border;
+  .whatsapp-block-text {
+    font-size: 0.82rem;
+    color: #2d6a4f;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding-left: 0;
+
+    strong { color: #1a5c35; }
   }
-}
-
-// ── Credit card form ────────────────────────────────────────
-.credit-card {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 0.25rem 0.75rem;
-  align-items: start;
-
-  .card-number-field { grid-column: 1; }
-
-  mat-form-field { width: 100%; }
-}
-
-.card-type-badge {
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding-right: 4px;
-  letter-spacing: 0.05em;
 }
 
 // ── Animations ──────────────────────────────────────────────
@@ -473,96 +638,17 @@ $radius-lg:   24px;
 
   .package-price { text-align: left; }
 
-  .credit-card {
-    grid-template-columns: 1fr 1fr;
+  .total-block .total-block-breakdown {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
 
-    .card-number-field { grid-column: 1 / -1; }
+    .breakdown-divider {
+      width: 100%;
+      height: 1px;
+      min-height: unset;
+      margin: 0;
+    }
+
+    .deposit-row { align-items: flex-start; }
   }
-
-  .radio-group {
-    mat-radio-button { padding: 0.75rem; }
-  }
-}
-// ── ADD THESE to your existing step3.component.scss ────────
-// Place after the .package-action block
-
-// Hint showing which room types the extra is valid for
-.package-rooms-hint {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 0.4rem;
-  font-size: 0.72rem;
-  color: #8a9bb0;
-  font-family: Arial, sans-serif;
-
-  mat-icon {
-    font-size: 13px;
-    width: 13px;
-    height: 13px;
-    color: #00506a;
-    opacity: 0.6;
-  }
-}
-
-// Container for per-room add buttons (Bug 3)
-.package-room-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin: 0.4rem 0 1.25rem;
-  padding: 0 0.25rem;
-}
-
-.add-to-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #8a9bb0;
-  font-family: Arial, sans-serif;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-// Per-room add button
-.btn-add-to-room {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
-  background: linear-gradient(135deg, #00506a, #1a7a9a);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  font-family: Arial, sans-serif;
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.15s;
-  box-shadow: 0 3px 8px rgba(0, 80, 106, 0.2);
-
-  mat-icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-  }
-
-  &:hover {
-    opacity: 0.88;
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-// Small date range shown inside the button
-.room-dates-hint {
-  font-size: 0.68rem;
-  opacity: 0.8;
-  font-weight: 400;
-  margin-left: 2px;
 }
