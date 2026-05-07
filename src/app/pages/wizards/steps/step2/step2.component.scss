@@ -1,3 +1,4 @@
+// ── Design tokens ───────────────────────────────────────────
 $brand:       #00506a;
 $brand-light: #e8f4f7;
 $brand-mid:   #1a7a9a;
@@ -16,7 +17,10 @@ $radius-sm:   8px;
 $radius-md:   16px;
 $radius-lg:   24px;
 
-// ── Search summary banner ───────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// SEARCH SUMMARY BANNER
+// ══════════════════════════════════════════════════════════════
+
 .search-summary {
   display: flex;
   align-items: center;
@@ -30,6 +34,11 @@ $radius-lg:   24px;
   color: $white;
   animation: fadeUp 0.35s ease both;
 
+  &.is-editing {
+    flex-wrap: wrap;
+    padding: 1.25rem 1.5rem;
+  }
+
   .summary-item {
     display: flex;
     flex-direction: column;
@@ -37,7 +46,7 @@ $radius-lg:   24px;
     text-align: center;
 
     .summary-label {
-      font-size: 1rem;
+      font-size: 0.7rem;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       opacity: 0.75;
@@ -45,7 +54,7 @@ $radius-lg:   24px;
     }
 
     .summary-value {
-      font-size: 1.2rem;
+      font-size: 1rem;
       font-weight: 700;
       font-family: 'Times New Roman', serif;
     }
@@ -77,7 +86,283 @@ $radius-lg:   24px;
   }
 }
 
-// ── Tax notice ──────────────────────────────────────────────
+.edit-search-btn {
+  margin-left: auto;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+  &:hover {
+    background: rgba(255,255,255,0.28);
+    transform: scale(1.1);
+  }
+}
+
+.promo-badge-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.18);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  color: #fff;
+
+  mat-icon { font-size: 13px; width: 13px; height: 13px; }
+}
+
+// ── Edit mode grid ───────────────────────────────────────────
+.edit-search-grid {
+  display: grid;
+  grid-template-columns: 1fr 120px 120px;
+  grid-template-rows: auto auto;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  position: relative;
+}
+
+.edit-date-field {
+  grid-column: 1;
+  grid-row: 1;
+  flex: 0 0 65%;
+  min-width: 0;
+
+  ::ng-deep .mat-date-range-input-container { overflow: visible !important; }
+  ::ng-deep input.mat-date-range-input-inner { min-width: 90px !important; }
+}
+
+.guests-field {
+  grid-row: 1;
+  align-items: center;
+
+  .edit-label { text-align: center; width: 100%; }
+}
+
+.promo-field {
+  grid-column: 1 / 3;
+  grid-row: 2;
+}
+
+.edit-actions {
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.edit-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  font-family: Arial, sans-serif;
+  color: #fff;
+}
+
+.edit-input {
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 0.88rem;
+  font-family: 'Times New Roman', serif;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  color-scheme: dark;
+
+  &::placeholder { color: rgba(255,255,255,0.5); font-family: Arial, sans-serif; font-weight: 400; }
+  &:focus { border-color: rgba(255,255,255,0.75); background: rgba(255,255,255,0.2); }
+}
+
+.promo-edit-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .promo-input { padding-right: 28px; }
+
+  .promo-status-icon {
+    position: absolute;
+    right: 8px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+
+    &.valid   { color: #6edc8f; }
+    &.invalid { color: #f87171; }
+  }
+}
+
+.promo-error-msg {
+  font-size: 0.65rem;
+  color: #fca5a5;
+  font-family: Arial, sans-serif;
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 0;
+  white-space: nowrap;
+}
+
+.edit-date-picker {
+  width: 100%;
+
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      background: rgba(255,255,255,0.12) !important;
+      border-radius: 8px !important;
+      padding-bottom: 0 !important;
+      min-height: 36px !important;
+      height: 36px !important;
+    }
+    .mat-mdc-form-field-flex {
+      height: 36px !important;
+      align-items: center !important;
+      padding: 0 8px !important;
+    }
+    .mat-mdc-form-field-infix {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      min-height: unset !important;
+      height: 36px !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing { border-color: rgba(255,255,255,0.35) !important; }
+    &:hover .mdc-notched-outline__leading,
+    &:hover .mdc-notched-outline__notch,
+    &:hover .mdc-notched-outline__trailing { border-color: rgba(255,255,255,0.75) !important; }
+    .mat-mdc-input-element, input {
+      color: #fff !important;
+      font-family: 'Times New Roman', serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+    }
+    input::placeholder { color: rgba(255,255,255,0.5) !important; font-family: Arial, sans-serif; font-weight: 400; }
+    .mat-date-range-input-separator { color: rgba(255,255,255,0.6) !important; }
+    .mat-mdc-floating-label, .mat-mdc-form-field-label { display: none !important; }
+    .mat-datepicker-toggle, .mat-datepicker-toggle .mat-mdc-icon-button {
+      color: rgba(255,255,255,0.75) !important;
+      width: 32px !important;
+      height: 32px !important;
+      padding: 0 !important;
+    }
+    .mat-mdc-form-field-subscript-wrapper { display: none; }
+  }
+}
+
+.guest-counter-edit {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.12);
+  border: 1.5px solid rgba(255,255,255,0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 36px;
+  width: 100%;
+}
+
+.counter-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 300;
+  width: 36px;
+  height: 100%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  flex-shrink: 0;
+
+  &:hover  { background: rgba(255,255,255,0.18); }
+  &:active { background: rgba(255,255,255,0.28); }
+}
+
+.counter-val {
+  flex: 1;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: 'Times New Roman', serif;
+  color: #fff;
+  border-left: 1px solid rgba(255,255,255,0.25);
+  border-right: 1px solid rgba(255,255,255,0.25);
+  line-height: 36px;
+}
+
+.btn-apply {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 18px;
+  background: #fff;
+  color: #00506a;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+  mat-icon { font-size: 15px; width: 15px; height: 15px; }
+  &:hover  { background: #e8f4f7; transform: translateY(-1px); }
+}
+
+.btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  &:hover  { background: rgba(255,255,255,0.22); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// TAX NOTICE
+// ══════════════════════════════════════════════════════════════
+
 .tax-notice {
   display: flex;
   align-items: center;
@@ -101,10 +386,12 @@ $radius-lg:   24px;
   }
 }
 
-// ── Habitacion card ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// HABITACION CARD
+// ══════════════════════════════════════════════════════════════
+
 .habitacion-card {
   background: $white;
-  border: none;
   border-radius: $radius-lg;
   margin-bottom: 1.5rem;
   box-shadow: $shadow-sm;
@@ -133,7 +420,6 @@ $radius-lg:   24px;
   &:nth-child(4) { animation-delay: 0.20s; }
 }
 
-// ── Room info ───────────────────────────────────────────────
 .room-info {
   display: flex;
   flex-wrap: nowrap;
@@ -148,10 +434,7 @@ $radius-lg:   24px;
   background-position: center;
   flex-shrink: 0;
 
-  @media (max-width: 580px) {
-    width: 100%;
-    height: 180px;
-  }
+  @media (max-width: 580px) { width: 100%; height: 180px; }
 }
 
 .room-details {
@@ -219,7 +502,10 @@ $radius-lg:   24px;
   }
 }
 
-// ── Tarifas section ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// TARIFAS CONTAINER
+// ══════════════════════════════════════════════════════════════
+
 .tarifas-container {
   border-top: 1px solid $border;
   padding: 1.25rem 1.5rem;
@@ -245,17 +531,18 @@ $radius-lg:   24px;
   }
 }
 
-// ── Tarifa row ──────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// TARIFA ROW — 2-column layout (left: info+selectors, right: price)
+// ══════════════════════════════════════════════════════════════
+
 .tarifa-row {
   display: flex;
   align-items: stretch;
-  gap: 1rem;
-  flex-wrap: nowrap;        // ← prevent wrapping so cols stay in line
-  padding: 1rem 1.25rem;
   border: 1.5px solid $border;
   border-radius: $radius-md;
   background: $white;
   margin-bottom: 0.875rem;
+  overflow: hidden;
   transition: border-color 0.2s, box-shadow 0.2s;
 
   &:hover {
@@ -264,136 +551,82 @@ $radius-lg:   24px;
   }
 }
 
-// ── Tarifa info left ────────────────────────────────────────
-.tarifa-info {
-  flex: 0 0 120px;       
+// ── Left column ──────────────────────────────────────────────
+.tarifa-left {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 1.25rem 1.25rem 1rem;
   display: flex;
-  align-items: center;
-  align-self: stretch;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-
 .tarifa-nombre {
-  font-size: 1.05rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  color: $brand;
+  color: $text-dark;
   font-family: 'Times New Roman', serif;
 }
 
-.precio-regular-row {
-  display: flex;
-  gap: 1.25rem;
-}
-
-.precio-regular {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-
-  small {
-    font-size: 0.62rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: $text-soft;
-    font-family: Arial, sans-serif;
-  }
-
-  .monto {
-    font-weight: 700;
-    font-size: 0.9rem;
-
-    &.tachado { color: $danger; text-decoration: line-through; }
-    &.verde    { color: #6fa819; }
-  }
-}
-
-// ── Price wrapper center ────────────────────────────────────
-.precio-wrapper {
-  flex: 0 0 140px;          // ← fixed width, always rightmost
-  display: flex;
-  flex-direction: column;
+// ── Availability badges ──────────────────────────────────────
+.availability-badge {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 0.75rem;
-  background: $surface;
-  border-radius: $radius-sm;
-  border: 1px solid $border;
-  text-align: center;
-  align-self: stretch;
+  gap: 6px;
+  border-radius: 20px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: Arial, sans-serif;
+  width: fit-content;
 
-  .total-amount {
-    font-weight: 900;
-    font-size: 1.4rem;
-    color: $text-dark;
-    font-family: 'Times New Roman', serif;
-    line-height: 1.1;
+  mat-icon { font-size: 1rem; width: 1rem; height: 1rem; }
 
-    &.tachado { font-size: 0.95rem; font-weight: 400; }
-    &.gris    { color: #aaa; text-decoration: line-through; }
-    &.verde   { color: $success; font-size: 1.4rem; }
+  &.available {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #b7dfbf;
   }
 
-  .total-label {
-    font-size: 0.65rem;
-    color: $text-soft;
-    letter-spacing: 0.05em;
-    font-family: Arial, sans-serif;
-  }
-
-  .promo-tag {
-    font-size: 0.72rem;
-    color: $success;
-    font-weight: 700;
-    font-family: Arial, sans-serif;
-  }
-
-  .ahorro-tag {
-    font-size: 0.7rem;
-    color: $success;
-    font-family: Arial, sans-serif;
+  &.urgency {
+    background: $danger;
+    color: $white;
+    border: none;
+    animation: pulse-urgency 1.8s ease-in-out infinite;
   }
 }
 
-// ── Select group right ──────────────────────────────────────
-.select-group {
-  flex: 1 1 auto;        
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 0.6rem;
-  min-width: 0;
-  align-self: stretch;
+@keyframes pulse-urgency {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(220, 53, 69, 0); }
 }
 
+// ── Selects ──────────────────────────────────────────────────
 .selects-row {
   display: flex;
   gap: 0.75rem;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 .select-item {
-  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   gap: 3px;
   min-width: 0;
 
   label {
-    font-size: 0.65rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     color: $text-soft;
     font-family: Arial, sans-serif;
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    white-space: nowrap;
   }
 
   select {
-    width: 100%;
     padding: 6px 8px;
     border-radius: $radius-sm;
     border: 1.5px solid $border;
@@ -401,6 +634,7 @@ $radius-lg:   24px;
     font-size: 0.875rem;
     color: $text-dark;
     cursor: pointer;
+    min-width: 60px;
     transition: border-color 0.2s;
 
     &:focus {
@@ -418,415 +652,180 @@ $radius-lg:   24px;
   height: 14px !important;
 }
 
-.quedan-badge {
-  color: $danger;
-  font-weight: 700;
-}
-
-// ── Add room button ─────────────────────────────────────────
+// ── Add room button ──────────────────────────────────────────
 .btn-group {
   display: flex;
-  justify-content: stretch;
 
   button {
     width: 100%;
-    padding: 8px 14px;
-    background: linear-gradient(135deg, $brand, $brand-mid);
+    padding: 10px 20px;
+    background: $text-dark;
     color: $white;
     border: none;
     border-radius: $radius-sm;
     cursor: pointer;
     font-weight: 700;
-    font-size: 0.82rem;
-    letter-spacing: 0.04em;
+    font-size: 0.875rem;
     font-family: Arial, sans-serif;
-    transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 12px rgba(0, 80, 106, 0.25);
+    transition: background 0.2s, transform 0.15s;
 
     &:hover:not(:disabled) {
-      opacity: 0.9;
+      background: $brand;
       transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(0, 80, 106, 0.35);
     }
-
-    &:active:not(:disabled) { transform: translateY(0); }
 
     &:disabled {
       background: #c8d0d8;
-      box-shadow: none;
       cursor: not-allowed;
       opacity: 0.7;
     }
   }
 }
 
-// ── Animations ──────────────────────────────────────────────
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+// ══════════════════════════════════════════════════════════════
+// RIGHT COLUMN: PRECIO WRAPPER — all 5 UX scenarios
+// ══════════════════════════════════════════════════════════════
 
-// ── Mobile ──────────────────────────────────────────────────
-@media (max-width: 600px) {
-  .tarifa-row    { flex-wrap: wrap; }
-  .tarifa-info   { flex: 1 1 100%; }
-  .select-group  { flex: 1 1 100%; }
-  .precio-wrapper { flex: 1 1 100%; }
-}
-
-// ── ADD THESE RULES to your existing step2.component.scss ──────────────────
-// Place them right after the existing .search-summary block
-
-// Edit toggle button
-.edit-search-btn {
-  margin-left: auto;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #fff;
-  transition: background 0.2s, transform 0.2s;
-  flex-shrink: 0;
-
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
-
-  &:hover {
-    background: rgba(255,255,255,0.28);
-    transform: scale(1.1);
-  }
-}
-
-// Promo badge shown in view mode
-.promo-badge-summary {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(255,255,255,0.18);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 20px;
-  padding: 0.2rem 0.65rem;
-  font-size: 0.75rem;
-  font-family: Arial, sans-serif;
-  font-weight: 600;
-  color: #fff;
-
-  mat-icon { font-size: 13px; width: 13px; height: 13px; }
-}
-
-// Edit mode layout
-.search-summary.is-editing {
-  flex-wrap: wrap;
-  padding: 1.25rem 1.5rem;
-}
-
-.edit-search-grid {
-  display: grid;
-  grid-template-columns: 1fr 120px 120px;
-  grid-template-rows: auto auto;
-  gap: 0.75rem;
-  width: 100%;
-}
-
-.edit-field {
+.precio-wrapper {
+  flex: 0 0 200px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  position: relative;
-}
-
-.edit-date-field {
-  grid-column: 1;
-  grid-row: 1;
-
-  ::ng-deep input.mat-date-range-input-inner {
-    min-width: 70px !important;
-  }
-}
-
-.guests-field {
-  grid-row: 1;
-  align-items: center;
-
-  .edit-label {
-    text-align: center;
-    width: 100%;
-  }
-}
-
-.promo-field {
-  grid-column: 1 / 3;
-  grid-row: 2;
-}
-
-.edit-actions {
-  grid-column: 3;
-  grid-row: 2;
-  display: flex;
-  gap: 0.5rem;
-  align-items: flex-end;   
-  justify-content: flex-end;
-  flex-shrink: 0;
-}
-
-
-.edit-label {
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: 0.75;
-  font-family: Arial, sans-serif;
-  color: #fff;
-}
-
-
-.edit-input {
-  padding: 7px 10px;
-  border-radius: 8px;
-  border: 1.5px solid rgba(255,255,255,0.35);
-  background: rgba(255,255,255,0.12);
-  color: #fff;
-  font-size: 0.88rem;
-  font-family: 'Times New Roman', serif;
-  font-weight: 600;
-  outline: none;
-  transition: border-color 0.2s, background 0.2s;
-  width: 100%;
-  box-sizing: border-box;
-
-  // date input calendar icon color
-  color-scheme: dark;
-
-  &::placeholder { color: rgba(255,255,255,0.5); font-family: Arial, sans-serif; font-weight: 400; }
-
-  &:focus {
-    border-color: rgba(255,255,255,0.75);
-    background: rgba(255,255,255,0.2);
-  }
-}
-
-.promo-edit-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-
-  .promo-input { padding-right: 28px; }
-
-  .promo-status-icon {
-    position: absolute;
-    right: 8px;
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-
-    &.valid  { color: #6edc8f; }
-    &.invalid { color: #f87171; }
-  }
-}
-
-.promo-error-msg {
-  font-size: 0.65rem;
-  color: #fca5a5;
-  font-family: Arial, sans-serif;
-  position: absolute;
-  top: calc(100% + 3px);
-  left: 0;
-  white-space: nowrap;
-}
-
-.btn-apply {
-  display: inline-flex;
-  align-items: center;
-  //gap: 5px;
-  padding: 8px 18px;
-  background: #fff;
-  color: #00506a;
-  border: none;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.82rem;
-  font-family: Arial, sans-serif;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-  white-space: nowrap;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-
-  mat-icon { font-size: 15px; width: 15px; height: 15px; }
-
-  &:hover { background: #e8f4f7; transform: translateY(-1px); }
-}
-
-.btn-cancel {
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 8px;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.2s;
-
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
-
-  &:hover { background: rgba(255,255,255,0.22); }
-}
-
-// ── Date range picker inside the teal banner ────────────────
-.edit-date-field {
-  flex: 0 0 65%;
-  min-width: 0;
-
-  // Prevent the date text from being cut off
-  ::ng-deep .mat-date-range-input-container {
-    overflow: visible !important;
-  }
-
-  ::ng-deep input.mat-date-range-input-inner {
-    min-width: 90px !important;
-  }
-}
-
-.edit-date-picker {
-  width: 100%;
-
-  ::ng-deep {
-    .mat-mdc-text-field-wrapper {
-      background: rgba(255,255,255,0.12) !important;
-      border-radius: 8px !important;
-      padding-bottom: 0 !important;
-      // Match the 36px height of the guest counters
-      min-height: 36px !important;
-      height: 36px !important;
-    }
-
-    .mat-mdc-form-field-flex {
-      height: 36px !important;
-      align-items: center !important;
-      padding: 0 8px !important;
-    }
-
-    .mat-mdc-form-field-infix {
-      padding-top: 0 !important;
-      padding-bottom: 0 !important;
-      min-height: unset !important;
-      height: 36px !important;
-      display: flex !important;
-      align-items: center !important;
-    }
-
-    .mdc-notched-outline__leading,
-    .mdc-notched-outline__notch,
-    .mdc-notched-outline__trailing {
-      border-color: rgba(255,255,255,0.35) !important;
-    }
-
-    &:hover .mdc-notched-outline__leading,
-    &:hover .mdc-notched-outline__notch,
-    &:hover .mdc-notched-outline__trailing {
-      border-color: rgba(255,255,255,0.75) !important;
-    }
-
-    .mat-mdc-input-element,
-    input {
-      color: #fff !important;
-      font-family: 'Times New Roman', serif;
-      font-weight: 600;
-      font-size: 0.88rem;
-    }
-
-    input::placeholder {
-      color: rgba(255,255,255,0.5) !important;
-      font-family: Arial, sans-serif;
-      font-weight: 400;
-    }
-
-    .mat-date-range-input-separator {
-      color: rgba(255,255,255,0.6) !important;
-    }
-
-    .mat-mdc-floating-label,
-    .mat-mdc-form-field-label {
-      display: none !important;   // hide label since we have our own .edit-label above
-    }
-
-    .mat-datepicker-toggle,
-    .mat-datepicker-toggle .mat-mdc-icon-button {
-      color: rgba(255,255,255,0.75) !important;
-      width: 32px !important;
-      height: 32px !important;
-      padding: 0 !important;
-    }
-
-    .mat-mdc-form-field-subscript-wrapper {
-      display: none;
-    }
-  }
-}
-
-.guest-counter-edit {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  background: rgba(255,255,255,0.12);
-  border: 1.5px solid rgba(255,255,255,0.35);
-  border-radius: 8px;
-  overflow: hidden;
-  height: 36px;
-  width: 100%;
-}
-
-.counter-btn {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: 300;
-  width: 36px;
-  height: 100%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s;
-  flex-shrink: 0;
-
-  &:hover { background: rgba(255,255,255,0.18); }
-  &:active { background: rgba(255,255,255,0.28); }
-}
-
-.counter-val {
-  flex: 1;
+  gap: 6px;
+  background: $surface;
+  border-left: 1px solid $border;
   text-align: center;
-  font-size: 0.95rem;
-  font-weight: 700;
+  min-height: 220px;
+}
+
+// Orange banner (coupon / auto-promo)
+.precio-banner {
+  width: 100%;
+  text-align: center;
+  padding: 0.6rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.06em;
+  color: $white;
+  align-self: flex-start;
+  margin-bottom: 4px;
+
+  &.cupon      { background: #e07b39; }
+  &.auto-promo { background: #e07b39; }
+}
+
+// Crossed-out original price (coupon scenario only)
+.precio-original {
   font-family: 'Times New Roman', serif;
-  color: #fff;
-  border-left: 1px solid rgba(255,255,255,0.25);
-  border-right: 1px solid rgba(255,255,255,0.25);
-  line-height: 36px;
-}
+  font-size: 1.15rem;
 
-// ── Responsive ──────────────────────────────────────────────
-@media (max-width: 600px) {
-  .edit-search-grid {
-    grid-template-columns: 1fr 1fr;
+  &.tachado {
+    color: #999;
+    text-decoration: line-through;
   }
-  .edit-date-field  { grid-column: 1 / -1; grid-row: 1; }
-  .guests-field:nth-child(2) { grid-column: 1; grid-row: 2; }
-  .guests-field:nth-child(3) { grid-column: 2; grid-row: 2; }
-  .promo-field      { grid-column: 1 / -1; grid-row: 3; }
-  .edit-actions     { grid-column: 1 / -1; grid-row: 4; justify-content: flex-end; }
 }
 
-// ── Empty search state ──────────────────────────────────────
+// Big final price
+.precio-final {
+  font-size: 2rem;
+  font-weight: 900;
+  color: $text-dark;
+  font-family: 'Times New Roman', serif;
+  line-height: 1;
+  padding: 0 0.75rem;
+}
+
+// "Total X noches / Impuestos incluidos"
+.precio-nights-label {
+  font-size: 0.75rem;
+  color: $text-soft;
+  font-family: Arial, sans-serif;
+  line-height: 1.5;
+  text-align: center;
+}
+
+// Thin horizontal separator
+.precio-separator {
+  width: 60%;
+  height: 1px;
+  background: $border;
+  margin: 2px 0;
+}
+
+// Savings celebration — coupon scenario
+.precio-savings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 0.75rem;
+
+  .savings-star {
+    font-size: 1.2rem;
+    color: $accent;
+  }
+
+  .savings-text {
+    font-size: 0.78rem;
+    color: $success;
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+
+    strong { color: $success; }
+  }
+}
+
+// Legend text — auto-promo scenario
+.precio-auto-legend {
+  font-size: 0.78rem;
+  color: $success;
+  font-family: Arial, sans-serif;
+  font-weight: 600;
+  padding: 0 0.75rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+// Trust badge — no promo scenario
+.precio-trust {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 0 0.75rem;
+
+  .trust-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e6f4ea;
+    border: 2px solid #b7dfbf;
+    color: $success;
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  span {
+    font-size: 0.75rem;
+    color: $success;
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.4;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// EMPTY STATE
+// ══════════════════════════════════════════════════════════════
+
 .empty-search-state {
   display: flex;
   flex-direction: column;
@@ -834,13 +833,13 @@ $radius-lg:   24px;
   justify-content: center;
   padding: 4rem 2rem;
   text-align: center;
-  color: #4a5568;
+  color: $text-mid;
 
   .empty-icon {
     font-size: 3.5rem;
     width: 3.5rem;
     height: 3.5rem;
-    color: #00506a;
+    color: $brand;
     opacity: 0.25;
     margin-bottom: 1.25rem;
   }
@@ -849,22 +848,15 @@ $radius-lg:   24px;
     font-family: 'Times New Roman', serif;
     font-size: 1.35rem;
     font-weight: 700;
-    color: #1a2332;
+    color: $text-dark;
     margin-bottom: 0.5rem;
   }
 
   p {
     font-size: 0.875rem;
-    color: #8a9bb0;
+    color: $text-soft;
     font-family: Arial, sans-serif;
     margin-bottom: 1.5rem;
-  }
-}
-
-.quedan-badge {
-  &.agotado {
-    color: $danger;
-    font-weight: 700;
   }
 }
 
@@ -873,10 +865,10 @@ $radius-lg:   24px;
   align-items: center;
   gap: 6px;
   padding: 10px 24px;
-  background: linear-gradient(135deg, #00506a, #1a7a9a);
-  color: #fff;
+  background: linear-gradient(135deg, $brand, $brand-mid);
+  color: $white;
   border: none;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   font-weight: 700;
   font-size: 0.875rem;
   font-family: Arial, sans-serif;
@@ -886,8 +878,59 @@ $radius-lg:   24px;
 
   mat-icon { font-size: 16px; width: 16px; height: 16px; }
 
-  &:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+  &:hover { opacity: 0.9; transform: translateY(-1px); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ANIMATIONS
+// ══════════════════════════════════════════════════════════════
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// RESPONSIVE
+// ══════════════════════════════════════════════════════════════
+
+@media (max-width: 600px) {
+  .tarifa-row {
+    flex-direction: column;
   }
+
+  .tarifa-left {
+    padding: 1rem;
+  }
+
+  .precio-wrapper {
+    flex: none;
+    border-left: none;
+    border-top: 1px solid $border;
+    width: 100%;
+    padding: 1rem 0;
+    min-height: auto;
+  }
+
+  .precio-final {
+    font-size: 2.2rem;
+  }
+
+  .btn-group button {
+    padding: 14px 20px;
+    font-size: 1rem;
+  }
+
+  .edit-search-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .edit-date-field           { grid-column: 1 / -1; grid-row: 1; }
+  .guests-field:nth-child(2) { grid-column: 1; grid-row: 2; }
+  .guests-field:nth-child(3) { grid-column: 2; grid-row: 2; }
+  .promo-field               { grid-column: 1 / -1; grid-row: 3; }
+  .edit-actions              { grid-column: 1 / -1; grid-row: 4; justify-content: flex-end; }
+
+  .room-info { flex-wrap: wrap; }
+  .room-image { width: 100%; height: 180px; }
 }

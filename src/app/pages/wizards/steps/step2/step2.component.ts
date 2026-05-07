@@ -437,4 +437,44 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   ngOnDestroy() {
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }
+  // ── Promo type helpers for the 5 UX scenarios ──────────────
+
+  // Auto-promos are those applied automatically by date match (not manual coupon codes).
+  // We detect them by checking if the promo nombre contains known auto-promo keywords.
+  isAutoPromo(promo: Promos | null): boolean {
+    if (!promo) return false;
+    const name = (promo.nombre ?? '').toLowerCase();
+    return (
+      name.includes('anticipad') ||
+      name.includes('último minuto') ||
+      name.includes('ultimo minuto') ||
+      name.includes('noche') && name.includes('gratis') ||
+      name.includes('básic') ||
+      name.includes('basic') ||
+      name.includes('especial')
+    );
+  }
+
+  // Returns the orange banner text for auto-promos
+  getPromoBannerText(promo: Promos | null): string {
+    if (!promo) return '';
+    const name = (promo.nombre ?? '').toLowerCase();
+    if (name.includes('anticipad')) return 'OFERTA RESERVA ANTICIPADA';
+    if (name.includes('último minuto') || name.includes('ultimo minuto')) return 'OFERTA DE ÚLTIMO MINUTO';
+    if (name.includes('noche') && name.includes('gratis')) return '¡PROMOCIÓN NOCHES GRATIS!';
+    return 'TARIFA ESPECIAL APLICADA';
+  }
+
+  // Returns the bottom legend text for auto-promos
+  getPromoLegend(promo: Promos | null): string {
+    if (!promo) return '';
+    const name = (promo.nombre ?? '').toLowerCase();
+    if (name.includes('anticipad')) return '🗓️ ¡Bien hecho! Premiamos tu anticipación con esta súper tarifa.';
+    if (name.includes('último minuto') || name.includes('ultimo minuto')) return '⚡ ¡Qué suerte! Atrapaste nuestra tarifa relámpago.';
+    if (name.includes('noche') && name.includes('gratis')) return '🎁 ¡A disfrutar! Tu tarifa final ya incluye noche(s) de regalo.';
+    return '🌟 Aprovechaste nuestra tarifa preferencial para tus fechas.';
+  }
+ 
 }
+
+  
