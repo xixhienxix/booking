@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
@@ -12,6 +12,7 @@ import { HabitacionesService } from 'src/app/_service/habitacion.service';
 import { PromosBookingService } from 'src/app/_service/promos.service';
 import { PromoValidatorService } from 'src/app/_service/promo.validation.service';
 import { Promos } from 'src/app/_models/promos.model';
+import { BookingRoomImageService, IHabitacionImage } from 'src/app/_service/room-image.service';
 
 @Component({
   selector: 'app-step2',
@@ -94,6 +95,7 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     private fb: FormBuilder,
     private _promoValidatorService: PromoValidatorService,
     private _promoBookingService: PromosBookingService,
+    public roomImageService: BookingRoomImageService,
   ) {
     this.reservaForm = this.fb.group({
       codigoCuarto: ['', Validators.required],
@@ -434,7 +436,95 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     this.isEditingSearch = false;
   }
 
+  // ── Image CDN & carousel ──────────────────────────────────
+
+  /** Base URL of your image CDN / S3 bucket. Update to match your environment. */
+  /** Per-room carousel active-index map. Key = room Codigo */
+  private carouselIndexMap: { [codigo: string]: number } = {};
+
+  /**
+   * Delegates to BookingRoomImageService.getUrl() — uses environment.cdnUrl.
+   * Accepts a raw key string for legacy callers; prefer getImageUrl() when
+   * you already have the full IHabitacionImage object.
+   */
+  getCdnUrl(key: string, size: 'thumb' | 'medium' | 'large' = 'medium'): string {
+    if (!key) return '';
+    if (key.startsWith('http')) return key;
+    // Build a minimal image object so getUrl() can resolve the right variant
+    const fakeImg: IHabitacionImage = {
+      key, thumbKey: key, mediumKey: key, largeKey: key, isCover: false,
+    };
+    return this.roomImageService.getUrl(fakeImg, size);
+  }
+
+  /** Resolves the full CDN URL for a typed image object at the given size. */
+  getImageUrl(image: IHabitacionImage, size: 'thumb' | 'medium' | 'large'): string {
+    return this.roomImageService.getUrl(image, size);
+  }
+
+  getActiveIndex(codigo: string): number {
+    return this.carouselIndexMap[codigo] ?? 0;
+  }
+
+  setActiveIndex(codigo: string, index: number): void {
+    this.carouselIndexMap[codigo] = index;
+  }
+
+  nextImage(codigo: string, total: number, event: Event): void {
+    event.stopPropagation();
+    const current = this.carouselIndexMap[codigo] ?? 0;
+    this.carouselIndexMap[codigo] = (current + 1) % total;
+  }
+
+  prevImage(codigo: string, total: number, event: Event): void {
+    event.stopPropagation();
+    const current = this.carouselIndexMap[codigo] ?? 0;
+    this.carouselIndexMap[codigo] = (current - 1 + total) % total;
+  }
+
+  // ── Lightbox ─────────────────────────────────────────────────
+
+  lightbox: {
+    open: boolean;
+    images: IHabitacionImage[];
+    index: number;
+    codigo: string;
+  } = { open: false, images: [], index: 0, codigo: '' };
+
+  openLightbox(dispo: IHabitaciones, index: number): void {
+    this.lightbox = {
+      open:   true,
+      images: dispo.images ?? [],
+      index,
+      codigo: dispo.Codigo,
+    };
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeLightbox(): void {
+    this.lightbox.open = false;
+    document.body.style.overflow = '';
+  }
+
+  lightboxNext(): void {
+    this.lightbox.index = (this.lightbox.index + 1) % this.lightbox.images.length;
+  }
+
+  lightboxPrev(): void {
+    const len = this.lightbox.images.length;
+    this.lightbox.index = (this.lightbox.index - 1 + len) % len;
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    if (!this.lightbox.open) return;
+    if (event.key === 'Escape')      this.closeLightbox();
+    if (event.key === 'ArrowRight')  this.lightboxNext();
+    if (event.key === 'ArrowLeft')   this.lightboxPrev();
+  }
+
   ngOnDestroy() {
+    document.body.style.overflow = '';
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }
   // ── Promo type helpers for the 5 UX scenarios ──────────────
@@ -476,5 +566,3 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   }
  
 }
-
-  

@@ -114,7 +114,61 @@
     <div class="habitacion-card">
 
       <div class="room-info">
-        <div class="room-image" [ngStyle]="{ 'background-image': 'url(' + dispo.URL + ')' }"></div>
+        <!-- ── Image Carousel ── -->
+        <div class="room-carousel" [class.no-images]="!dispo.images?.length">
+
+          <!-- Slides -->
+          <ng-container *ngIf="dispo.images?.length; else noImage">
+            <div class="carousel-track">
+              <div class="carousel-slide"
+                   *ngFor="let img of dispo.images; let i = index"
+                   [class.active]="getActiveIndex(dispo.Codigo) === i">
+                <img
+                  [src]="getImageUrl(img, 'medium')"
+                  [alt]="dispo.Codigo + ' - foto ' + (i + 1)"
+                  (click)="openLightbox(dispo, i)"
+                  (error)="roomImageService.onImgError($event, img)"
+                  loading="lazy" />
+                <div class="carousel-expand-hint">
+                  <mat-icon>zoom_in</mat-icon>
+                </div>
+              </div>
+            </div>
+
+            <!-- Arrows (only if more than 1 image) -->
+            <ng-container *ngIf="(dispo.images?.length ?? 0) > 1">
+              <button class="carousel-arrow prev" type="button"
+                      (click)="prevImage(dispo.Codigo, dispo.images!.length, $event)"
+                      aria-label="Anterior">
+                <mat-icon>chevron_left</mat-icon>
+              </button>
+              <button class="carousel-arrow next" type="button"
+                      (click)="nextImage(dispo.Codigo, dispo.images!.length, $event)"
+                      aria-label="Siguiente">
+                <mat-icon>chevron_right</mat-icon>
+              </button>
+
+              <!-- Dot indicators -->
+              <div class="carousel-dots">
+                <span class="carousel-dot"
+                      *ngFor="let img of dispo.images; let i = index"
+                      [class.active]="getActiveIndex(dispo.Codigo) === i"
+                      (click)="setActiveIndex(dispo.Codigo, i)">
+                </span>
+              </div>
+            </ng-container>
+
+          </ng-container>
+
+          <!-- Fallback -->
+          <ng-template #noImage>
+            <div class="carousel-no-image">
+              <mat-icon>hotel</mat-icon>
+              <span>Sin imágenes</span>
+            </div>
+          </ng-template>
+        </div>
+        <!-- ── /Image Carousel ── -->
         <div class="room-details">
           <h2 class="room-code">{{ dispo.Codigo.replace('_', ' ') }}</h2>
           <p class="room-desc">{{ dispo.Descripcion }}</p>
@@ -280,3 +334,55 @@
   </ng-container>
 
 </ng-container>
+
+<!-- ══════════════════════════════════════════════════════
+     LIGHTBOX OVERLAY
+     ══════════════════════════════════════════════════════ -->
+<div class="lightbox-overlay" *ngIf="lightbox.open" (click)="closeLightbox()">
+  <div class="lightbox-panel" (click)="$event.stopPropagation()">
+
+    <!-- Close -->
+    <button class="lightbox-close" type="button" (click)="closeLightbox()" aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    <!-- Main image -->
+    <div class="lightbox-img-wrap">
+      <img
+        [src]="getImageUrl(lightbox.images[lightbox.index], 'large')"
+        [alt]="lightbox.codigo + ' - foto ' + (lightbox.index + 1)"
+        (error)="roomImageService.onImgError($event, lightbox.images[lightbox.index])"
+        class="lightbox-img" />
+    </div>
+
+    <!-- Nav arrows -->
+    <ng-container *ngIf="lightbox.images.length > 1">
+      <button class="lightbox-arrow prev" type="button"
+              (click)="lightboxPrev()" aria-label="Anterior">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button class="lightbox-arrow next" type="button"
+              (click)="lightboxNext()" aria-label="Siguiente">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </ng-container>
+
+    <!-- Thumbnail strip -->
+    <div class="lightbox-thumbs" *ngIf="lightbox.images.length > 1">
+      <img
+        *ngFor="let img of lightbox.images; let i = index"
+        [src]="getImageUrl(img, 'thumb')"
+        [class.active]="lightbox.index === i"
+        (click)="lightbox.index = i"
+        (error)="roomImageService.onImgError($event, img)"
+        [alt]="'Miniatura ' + (i + 1)"
+        class="lightbox-thumb" />
+    </div>
+
+    <!-- Counter -->
+    <div class="lightbox-counter">
+      {{ lightbox.index + 1 }} / {{ lightbox.images.length }}
+    </div>
+
+  </div>
+</div>
