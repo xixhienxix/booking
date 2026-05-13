@@ -10,6 +10,7 @@ import { HabitacionesService } from 'src/app/_service/habitacion.service';
 import { Step3Component } from '../steps/step3/step3.component';
 import { ParametersService } from 'src/app/_service/parameters.service';
 import { HotelConfigService } from 'src/app/_service/hotel-config.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-horizontal',
@@ -18,6 +19,7 @@ import { HotelConfigService } from 'src/app/_service/hotel-config.service';
 })
 export class HorizontalComponent implements OnInit, OnDestroy {
 
+  currentVersion = environment.version;
   // Start at step 2 — step 1 is no longer used
   formsCount = 3;  // steps: 2 (availability), 3 (confirm), 4 (done)
   account$: BehaviorSubject<ICalendario> = new BehaviorSubject<ICalendario>(defaultCalendario);

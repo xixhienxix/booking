@@ -87,7 +87,11 @@
         <mat-icon>arrow_back</mat-icon> Regresar
       </button>
 
-      <div class="nav-spacer"></div>
+      <div class="nav-spacer">
+          <div class="version-tag" *ngIf="currentStep$.value !== 3">
+            <small>v{{ currentVersion }}</small>
+          </div>
+      </div>
 
       <button class="btn-next"
         type="button"

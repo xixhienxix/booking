@@ -44,6 +44,7 @@ export class Step1Component implements OnInit, OnDestroy {
   @Output() honSubmit: EventEmitter<any> = new EventEmitter();
   @Output() quantityChanged = new EventEmitter<{ qty: number; qtyNin: number }>();
 
+  currentVersion = environment.version;
 
   fechaInicial: Date;
   fechaFinal: Date;
