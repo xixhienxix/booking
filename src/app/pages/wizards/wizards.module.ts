@@ -29,6 +29,7 @@ import { MatCardModule } from '@angular/material/card';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatGridListModule} from '@angular/material/grid-list';
 import { MatDividerModule } from '@angular/material/divider';
+import { CancellationPolicyComponent } from './steps/step2/cancel-policy/cancelation.policy.component';
 
 export const MY_DATE_FORMATS = {
   parse: {
@@ -44,6 +45,7 @@ export const MY_DATE_FORMATS = {
 @NgModule({
   declarations: [
     HorizontalComponent,
+    CancellationPolicyComponent,
     WizardsComponent,
     Step1Component,
     Step2Component,

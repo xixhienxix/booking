@@ -24,7 +24,7 @@
     </div>
 
     <div class="summary-rooms-found" *ngIf="hasSearched">
-      <strong>{{ habitaciones.length }}</strong>
+      <strong>{{ getHabitacionesConTarifa().length }}</strong>
       habitaciones disponibles
     </div>
 
@@ -110,7 +110,7 @@
     Todos los precios son en MXN e incluyen IVA (16%) + ISH (3%)
   </div>
 
-  <ng-container *ngFor="let dispo of habitaciones; let x = index">
+  <ng-container *ngFor="let dispo of getHabitacionesConTarifa(); let x = index">
     <div class="habitacion-card">
 
       <div class="room-info">
@@ -252,6 +252,15 @@
                     + Agregar Habitación
                   </button>
                 </div>
+
+                <!-- ── Política de cancelación ── -->
+                <app-cancellation-policy
+                  [policyType]="resolvePolicyType(tarifas.Politicas ?? [])"
+                  [freeHours]="48"
+                  [partialDays]="7"
+                  partialPenalty="20% / 1 Noche">
+                </app-cancellation-policy>
+
               </div>
 
               <!-- ── Right: precio-wrapper with all 5 UX scenarios ── -->

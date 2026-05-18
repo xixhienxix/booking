@@ -13,6 +13,8 @@ import { PromosBookingService } from 'src/app/_service/promos.service';
 import { PromoValidatorService } from 'src/app/_service/promo.validation.service';
 import { Promos } from 'src/app/_models/promos.model';
 import { BookingRoomImageService, IHabitacionImage } from 'src/app/_service/room-image.service';
+import { resolvePolicyType } from './cancel-policy/cancelation-policy.helper';
+import { CancellationPolicyType } from './cancel-policy/cancelation.policy.component';
 
 @Component({
   selector: 'app-step2',
@@ -88,6 +90,11 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   private roomHabsMap: { [key: string]: number } = {};
 
   validatedPromo: Promos | null = null;
+
+  // ── Política de cancelación ──────────────────────────────────────────
+  // Expone el helper al template para resolver el tipo de política
+  // a partir del array tarifas.Politicas
+  resolvePolicyType = resolvePolicyType;
 
   constructor(
     private _disponibilidadService: DisponibilidadService,
@@ -336,6 +343,21 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   getMaxValue(codigo: string): number {
     const arr = this.generateInventarioArray(codigo);
     return arr.length ? Math.max(...arr) : 0;
+  }
+
+  /**
+   * Returns only the habitaciones that have at least one tarifa in tarifasArray.
+   * Habitaciones without any matching tarifa are hidden from the UI.
+   * Uses deduplication by Codigo so each room type appears only once.
+   */
+  getHabitacionesConTarifa(): IHabitaciones[] {
+    const seenCodigos = new Set<string>();
+    return this.habitaciones.filter(hab => {
+      if (seenCodigos.has(hab.Codigo)) return false;
+      const tieneTarifa = this.tarifasArray.some(t => t.Habitacion.includes(hab.Codigo));
+      if (tieneTarifa) seenCodigos.add(hab.Codigo);
+      return tieneTarifa;
+    });
   }
 
   calcPromoTotal(tarifas: any, codigo: string): number {

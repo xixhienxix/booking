@@ -40,7 +40,12 @@ export class TarifasService {
      .get<any[]>(this._hotelConfig.current?.apiUrl + '/tarifario/tarifas')
      .pipe(
        map(responseData=>{
-        return responseData
+        const filtered = responseData.filter((rate:Tarifas) =>
+          rate.Visibilidad?.subTask?.some(
+            item => item.name === "Booking" && item.value === true
+          )
+        );
+        return filtered;
      })
      )
   }
