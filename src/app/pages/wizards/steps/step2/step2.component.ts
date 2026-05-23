@@ -215,6 +215,10 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     return arr;
   }
 
+  // ── Toast state ──────────────────────────────────────────────
+  showAddedToast = false;
+  private toastTimer: any;
+
   getTarifasForHabitacion(codigo: string) {
     return this.tarifasArray.filter(t => t.Habitacion.includes(codigo));
   }
@@ -335,6 +339,11 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     this._disponibilidadService.addMiReserva(obj);
     const hasReserva = (this._disponibilidadService.getMiReserva()?.length ?? 0) > 0;
     this.updateParentModel({}, hasReserva);
+
+    // Show toast notification
+    clearTimeout(this.toastTimer);
+    this.showAddedToast = true;
+    this.toastTimer = setTimeout(() => { this.showAddedToast = false; }, 3000);
 
     // Reset the habs selector for this room back to 1 after adding
     this.setRoomHabs(codigo, tarifas.Tarifa, 1);
@@ -546,6 +555,7 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnDestroy() {
+    clearTimeout(this.toastTimer);
     document.body.style.overflow = '';
     this.unsubscribe.forEach((sb) => sb.unsubscribe());
   }

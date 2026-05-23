@@ -3,34 +3,52 @@
 
   <!-- ── View mode ── -->
   <ng-container *ngIf="!isEditingSearch">
-    <div class="summary-item">
-      <span class="summary-label">Llegada</span>
-      <span class="summary-value">{{ intialDate | date:'dd MMM yyyy' }}</span>
-    </div>
-    <div class="summary-divider"></div>
-    <div class="summary-item">
-      <span class="summary-label">Salida</span>
-      <span class="summary-value">{{ endDate | date:'dd MMM yyyy' }}</span>
-    </div>
-    <div class="summary-divider"></div>
-    <div class="summary-item">
-      <span class="summary-label">Noches</span>
-      <span class="summary-value">{{ totalNights }}</span>
+
+    <!-- Row 1: all summary data in one line -->
+    <div class="summary-top-row">
+      <div class="summary-item">
+        <span class="summary-label">Llegada</span>
+        <span class="summary-value">{{ intialDate | date:'dd MMM yyyy' }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Salida</span>
+        <span class="summary-value">{{ endDate | date:'dd MMM yyyy' }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Noches</span>
+        <span class="summary-value">{{ totalNights }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Adultos</span>
+        <span class="summary-value">{{ qty }}</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-item">
+        <span class="summary-label">Niños</span>
+        <span class="summary-value">{{ qtyNin }}</span>
+      </div>
+
+      <div *ngIf="validatedPromo" class="promo-badge-summary">
+        <mat-icon>local_offer</mat-icon>
+        <span>{{ validatedPromo.nombre }}</span>
+      </div>
+
+      <div class="summary-divider" *ngIf="hasSearched"></div>
+      <div class="summary-item" *ngIf="hasSearched">
+        <span class="summary-label">Disponibles</span>
+        <span class="summary-value">{{ getHabitacionesConTarifa().length }}</span>
+      </div>
     </div>
 
-    <div *ngIf="validatedPromo" class="promo-badge-summary">
-      <mat-icon>local_offer</mat-icon>
-      <span>{{ validatedPromo.nombre }}</span>
-    </div>
-
-    <div class="summary-rooms-found" *ngIf="hasSearched">
-      <strong>{{ getHabitacionesConTarifa().length }}</strong>
-      habitaciones disponibles
-    </div>
-
-    <button class="edit-search-btn" type="button" (click)="startEditSearch()" matTooltip="Modificar búsqueda">
-      <mat-icon>edit</mat-icon>
+    <!-- Row 2: Nueva Búsqueda full-width -->
+    <button class="btn-nueva-busqueda" type="button" (click)="startEditSearch()">
+      <mat-icon>search</mat-icon>
+      Nueva Búsqueda
     </button>
+
   </ng-container>
 
   <!-- ── Edit mode ── -->
@@ -173,9 +191,7 @@
           <h2 class="room-code">{{ dispo.Codigo.replace('_', ' ') }}</h2>
           <p class="room-desc">{{ dispo.Descripcion }}</p>
           <div class="max-ocupacion">
-            <span><strong>Máx. Adultos:</strong> {{ dispo.Adultos }}</span>
-            <span class="separator">|</span>
-            <span><strong>Máx. Niños:</strong> {{ dispo.Ninos }}</span>
+            <span><strong>Máx. Personas:</strong> {{ dispo.Personas }}</span>
           </div>
           <div class="amenidades">
             <ng-container *ngFor="let amenidad of dispo.Amenidades">
@@ -212,32 +228,32 @@
                 </div>
 
                 <div class="selects-row">
-                  <div class="select-item">
-                    <label [ngStyle]="{ color: qty > getMaxFromAdultos(dispo.Codigo) ? '#dc3545' : '' }">
-                      Adultos
-                      <mat-icon *ngIf="qty > getMaxFromAdultos(dispo.Codigo)" class="warn-icon"
-                          matTooltip="⚠ Excede el máximo" matTooltipPosition="right">warning</mat-icon>
-                    </label>
-                    <select [(ngModel)]="qty" [ngModel]="getValidQty(dispo.Codigo, qty)"
-                            (ngModelChange)="onQtyChange(dispo.Codigo)">
-                      <option *ngFor="let n of generateAdultosArray(dispo.Codigo)" [value]="n">{{ n }}</option>
-                    </select>
+
+                  <!-- Adultos chip — read-only from search -->
+                  <div class="guest-chip">
+                    <span class="guest-chip__icon">
+                      <mat-icon>person</mat-icon>
+                    </span>
+                    <span class="guest-chip__body">
+                      <span class="guest-chip__label">Adultos</span>
+                      <span class="guest-chip__value">{{ qty }}</span>
+                    </span>
                   </div>
 
-                  <div class="select-item">
-                    <label [ngStyle]="{ color: qtyNin > getMaxFromNinos(dispo.Codigo) ? '#dc3545' : '' }">
-                      Niños
-                      <mat-icon *ngIf="qtyNin > getMaxFromNinos(dispo.Codigo)" class="warn-icon"
-                          matTooltip="⚠ Excede el máximo" matTooltipPosition="right">warning</mat-icon>
-                    </label>
-                    <select [(ngModel)]="qtyNin" [ngModel]="getValidNinQty(dispo.Codigo, qtyNin)"
-                            (ngModelChange)="onQtyChange(dispo.Codigo)">
-                      <option *ngFor="let n of generateNinosArray(dispo.Codigo)" [value]="n">{{ n }}</option>
-                    </select>
+                  <!-- Niños chip — read-only from search -->
+                  <div class="guest-chip">
+                    <span class="guest-chip__icon">
+                      <mat-icon>child_care</mat-icon>
+                    </span>
+                    <span class="guest-chip__body">
+                      <span class="guest-chip__label">Niños</span>
+                      <span class="guest-chip__value">{{ qtyNin }}</span>
+                    </span>
                   </div>
 
-                  <div class="select-item">
-                    <label>Cantidad de Habitaciones a reservar:</label>
+                  <!-- Habs selector — same row on desktop, wraps on mobile -->
+                  <div class="select-item habs-select">
+                    <label>CANTIDAD DE HABITACIONES A RESERVAR:</label>
                     <select [ngModel]="getRoomHabs(dispo.Codigo, tarifas.Tarifa)"
                             (ngModelChange)="setRoomHabs(dispo.Codigo, tarifas.Tarifa, $event)">
                       <option *ngFor="let num of generateInventarioArray(dispo.Codigo)" [value]="num">{{ num }}</option>
@@ -247,10 +263,16 @@
 
                 <div class="btn-group">
                   <button type="button"
-                    [disabled]="(+qtyNin > getMaxFromNinos(dispo.Codigo)) || (+qty > getMaxFromAdultos(dispo.Codigo)) || getMaxValue(dispo.Codigo) === 0"
+                    [disabled]="getMaxValue(dispo.Codigo) === 0"
                     (click)="agregaHab(tarifas, dispo.Codigo, getRoomHabs(dispo.Codigo, tarifas.Tarifa))">
                     + Agregar Habitación
                   </button>
+                </div>
+
+                <!-- Toast -->
+                <div *ngIf="showAddedToast" class="added-toast">
+                  <mat-icon>check_circle</mat-icon>
+                  ¡Habitación correctamente agregada a Mi Reserva!
                 </div>
 
                 <!-- ── Política de cancelación ── -->

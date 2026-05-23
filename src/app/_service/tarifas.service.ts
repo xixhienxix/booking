@@ -42,7 +42,7 @@ export class TarifasService {
        map(responseData=>{
         const filtered = responseData.filter((rate:Tarifas) =>
           rate.Visibilidad?.subTask?.some(
-            item => item.name === "Booking" && item.value === true
+            item => item.name === "Motor de Reservas" && item.value === true
           )
         );
         return filtered;

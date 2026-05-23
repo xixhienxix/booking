@@ -1,121 +1,70 @@
-// ── Cancellation Policy Card ────────────────────────────────────────────
-// Matches the beige/sand design with gold icon, colored badge, and soft border.
+// cancellation-policy.component.scss
 
-$beige-bg:      #f5f0e8;
-$beige-border:  #ddd5bc;
-$gold:          #a08840;
-$gold-light:    #c9aa62;
-$text-dark:     #2d2d2d;
-$text-body:     #4a4a4a;
-
-// Badge colours (pill)
-$green-bg:      #e6f4ec;
-$green-text:    #2e7d4f;
-$green-border:  #b6ddc4;
-
-$blue-bg:       #ddeeff;
-$blue-text:     #2563a8;
-$blue-border:   #b3d4f5;
-
-$gray-bg:       #e8e8e8;
-$gray-text:     #5a5a5a;
-$gray-border:   #c8c8c8;
-
-// ── Card ────────────────────────────────────────────────────────────────
 .cancel-policy-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  background: $beige-bg;
-  border: 1px solid $beige-border;
-  border-radius: 14px;
-  padding: 18px 20px;
-  margin-top: 12px;
-  font-family: 'Georgia', 'Times New Roman', serif; // warm serif to match luxury hotel feel
-}
-
-// ── Icon circle ─────────────────────────────────────────────────────────
-.policy-icon-wrap {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  border: 1.5px solid $gold-light;
-  background: lighten($beige-bg, 3%);
-  margin-top: 2px;
-}
-
-.policy-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $gold;
-
-  svg {
-    width: 24px;
-    height: 24px;
-  }
-}
-
-// ── Content ─────────────────────────────────────────────────────────────
-.policy-content {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  flex: 1;
+  background: #f5f0e8;
+  border: 1px solid #ddd5bc;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-top: 12px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+// ── Content ───────────────────────────────────────────────────
+.policy-content {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
 }
 
 .policy-title {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: $text-dark;
-  letter-spacing: 0.01em;
-  font-family: inherit;
+  color: #2d2d2d;
+  font-family: Georgia, 'Times New Roman', serif;
 }
 
-// ── Badge ───────────────────────────────────────────────────────────────
+// ── Badge ─────────────────────────────────────────────────────
 .policy-badge {
   display: inline-block;
   padding: 3px 12px;
   border-radius: 20px;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  font-family: 'Segoe UI', Arial, sans-serif;
   border: 1px solid transparent;
   width: fit-content;
 
   &.badge-free {
-    background: $green-bg;
-    color: $green-text;
-    border-color: $green-border;
+    background: #e6f4ec;
+    color: #2e7d4f;
+    border-color: #b6ddc4;
   }
 
   &.badge-partial {
-    background: $blue-bg;
-    color: $blue-text;
-    border-color: $blue-border;
+    background: #ddeeff;
+    color: #2563a8;
+    border-color: #b3d4f5;
   }
 
   &.badge-nonrefundable {
-    background: $gray-bg;
-    color: $gray-text;
-    border-color: $gray-border;
+    background: #e8e8e8;
+    color: #5a5a5a;
+    border-color: #c8c8c8;
   }
 }
 
-// ── Description ─────────────────────────────────────────────────────────
+// ── Description ───────────────────────────────────────────────
 .policy-description {
-  margin: 4px 0 0;
-  font-size: 0.875rem;
+  margin: 2px 0 0;
+  font-size: 0.82rem;
   line-height: 1.55;
-  color: $text-body;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #4a4a4a;
 
   strong {
-    color: $text-dark;
+    color: #2d2d2d;
   }
 }
