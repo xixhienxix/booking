@@ -253,7 +253,7 @@
 
                   <!-- Habs selector — same row on desktop, wraps on mobile -->
                   <div class="select-item habs-select">
-                    <label>CANTIDAD DE HABITACIONES A RESERVAR:</label>
+                    <label>Habitaciones:</label>
                     <select [ngModel]="getRoomHabs(dispo.Codigo, tarifas.Tarifa)"
                             (ngModelChange)="setRoomHabs(dispo.Codigo, tarifas.Tarifa, $event)">
                       <option *ngFor="let num of generateInventarioArray(dispo.Codigo)" [value]="num">{{ num }}</option>
@@ -270,7 +270,7 @@
                 </div>
 
                 <!-- Toast -->
-                <div *ngIf="showAddedToast" class="added-toast">
+                <div *ngIf="showAddedToastKey === (dispo.Codigo + '__' + tarifas.Tarifa)" class="added-toast">
                   <mat-icon>check_circle</mat-icon>
                   ¡Habitación correctamente agregada a Mi Reserva!
                 </div>

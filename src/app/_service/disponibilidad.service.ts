@@ -129,7 +129,7 @@ changeValidatedPromo(promo: Promos | null): void {
       )
   }
 
-    async calcHabitacionesDisponibles(response:any,intialDate:Date,endDate:Date, cuarto:string){
+    async calcHabitacionesDisponibles(response:any, intialDate:Date, endDate:Date, cuarto:string, adultos: number = 1, ninos: number = 0){
         const ocupadasSet = new Set(response);
 
         const bloqueosArray = await firstValueFrom(this.getAllBloqueos());
@@ -167,8 +167,12 @@ changeValidatedPromo(promo: Promos | null): void {
           }
         });
         const roomCodesComplete = await firstValueFrom(this.getAllHabitaciones());
-        // Filtrar las habitaciones disponibles
-        const habitacionesDisponibles = roomCodesComplete.filter(habitacion => !ocupadasSet.has(habitacion.Numero));
+        // Filter out rooms where total capacity (Personas) is less than requested guests
+        const totalGuests = adultos + ninos;
+        const habitacionesDisponibles = roomCodesComplete.filter(habitacion =>
+          !ocupadasSet.has(habitacion.Numero) &&
+          (habitacion.Personas ?? 0) >= totalGuests
+        );
         // Paso 1: Crear el array preAsignadasArray
         let preAsignadasArray
 

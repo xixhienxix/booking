@@ -160,7 +160,19 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     this.totalNights = this.calcNights(this.intialDate, this.endDate);
 
     this._disponibilidadService.currentData.subscribe(res => {
-      this.habitaciones = [...res];
+      // 1. Mapeamos el arreglo original para ordenar las imágenes de cada habitación
+      this.habitaciones = res.map(hab => {
+        // Validamos que la habitación tenga un arreglo de imágenes válido con más de 1 elemento
+        if (hab.images && hab.images.length > 1) {
+          return {
+            ...hab,
+            // Ordenamos: las que tengan isCover === true se restan primero y se van al índice 0
+            images: [...hab.images].sort((a, b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0))
+          };
+        }
+        return hab; // Si no tiene imágenes o solo tiene una, se queda intacta
+      });
+
       // Reset per-room habs map when availability changes
       this.roomHabsMap = {};
     });
@@ -216,7 +228,7 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   }
 
   // ── Toast state ──────────────────────────────────────────────
-  showAddedToast = false;
+  showAddedToastKey: string | null = null; 
   private toastTimer: any;
 
   getTarifasForHabitacion(codigo: string) {
@@ -342,8 +354,15 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
 
     // Show toast notification
     clearTimeout(this.toastTimer);
-    this.showAddedToast = true;
-    this.toastTimer = setTimeout(() => { this.showAddedToast = false; }, 3000);
+    const toastKey = `${codigo}__${tarifas.Tarifa}`;
+
+    clearTimeout(this.toastTimer);
+
+    this.showAddedToastKey = toastKey;
+
+    this.toastTimer = setTimeout(() => {
+      this.showAddedToastKey = null;
+    }, 3000);
 
     // Reset the habs selector for this room back to 1 after adding
     this.setRoomHabs(codigo, tarifas.Tarifa, 1);
@@ -595,6 +614,27 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     if (name.includes('último minuto') || name.includes('ultimo minuto')) return '⚡ ¡Qué suerte! Atrapaste nuestra tarifa relámpago.';
     if (name.includes('noche') && name.includes('gratis')) return '🎁 ¡A disfrutar! Tu tarifa final ya incluye noche(s) de regalo.';
     return '🌟 Aprovechaste nuestra tarifa preferencial para tus fechas.';
+  }
+
+  // 1. Agrega este método privado al final de tu clase en step2.component.ts
+  /**
+   * Recorre las habitaciones devueltas por el servicio y asegura que la imagen
+   * marcada con isCover quede en la primera posición (index 0) para el carrusel.
+   */
+  private ordenarImagenesPorPortada(habitaciones: IHabitaciones[]): IHabitaciones[] {
+    if (!habitaciones || habitaciones.length === 0) return habitaciones;
+
+    return habitaciones.map(hab => {
+      if (hab.images && hab.images.length > 1) {
+        // Ordenamos el arreglo mutando o creando una copia donde isCover sea prioritario
+        hab.images = [...hab.images].sort((a, b) => {
+          const aCover = a.isCover ? 1 : 0;
+          const bCover = b.isCover ? 1 : 0;
+          return bCover - aCover; // Si b tiene isCover: true, resta positivo y se mueve al frente
+        });
+      }
+      return hab;
+    });
   }
  
 }

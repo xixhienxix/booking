@@ -170,7 +170,7 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     let dispoResponse: any;
     try {
       dispoResponse = await this._disponibilidadService.calcHabitacionesDisponibles(
-        filteredResult, startDate, endDate, '1'
+        filteredResult, startDate, endDate, '1', this.qty, this.qtyNin
       );
       console.log('%c[Horizontal] calcHabitacionesDisponibles response', 'color: orange', dispoResponse);
     } catch (err) {
