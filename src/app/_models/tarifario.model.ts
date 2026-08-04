@@ -21,7 +21,10 @@ export interface tarifarioTabla{
     TarifaxPersona:number[]
     Tarifa_Promedio:number,
     TarifaRack:number,
-    Descuento?:number
+    Descuento?:number,
+    PlanAlimentos?: string;
+    FlexibilidadLogistica?: string;
+    FormaPago?: PagoOption[];
   }
 
 
@@ -63,7 +66,10 @@ export interface Tarifas {
     Visibilidad:VisibilityRates,
     Cancelacion:Politicas[],
     hotel?:string;
-    Descuento?:number
+    Descuento?:number,
+    PlanAlimentos?: string;
+    FlexibilidadLogistica?: string;
+    FormaPago?: PagoOption[];
 }
 
 
@@ -104,4 +110,7 @@ export interface VisibilityRates {
     subTask?:VisibilityRates[]
 }
 
-2
+export interface PagoOption {
+  name: string;
+  value: boolean;
+}

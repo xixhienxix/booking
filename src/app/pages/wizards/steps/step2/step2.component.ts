@@ -15,6 +15,7 @@ import { Promos } from 'src/app/_models/promos.model';
 import { BookingRoomImageService, IHabitacionImage } from 'src/app/_service/room-image.service';
 import { resolvePolicyType } from './cancel-policy/cancelation-policy.helper';
 import { CancellationPolicyType } from './cancel-policy/cancelation.policy.component';
+import { TarifaFeature } from 'src/app/_models/tarifas.model';
 
 @Component({
   selector: 'app-step2',
@@ -90,11 +91,40 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   private roomHabsMap: { [key: string]: number } = {};
 
   validatedPromo: Promos | null = null;
+  desgloseLocked: string | null = null;
+
+  readonly paymentLabelMap: Record<string,string> = {
+      "Paga al Llegar": "Paga al llegar",
+      "Pago Total al reservar": "Pago al reservar",
+      "Reserva sin tarjeta": "Reserva sin tarjeta",
+      "Confirma mediante transferencia": "Transferencia para confirmar",
+      "Anticipo del 50%": "Anticipo 50%"
+  };
+
+  readonly cancellationLabelMap: Record<string,string> = {
+      "Gratis":"Cancelación gratis",
+      "No Reembolsable":"No reembolsable",
+      "Reembolsable Parcial":"Reembolso parcial"
+  };
+
+  readonly iconMap = {
+      payment: "payments",
+      cancelation: "check_circle",
+      food: "restaurant",
+      logistics: "local_shipping"
+  };
+
+  private featureCache = new Map<string, TarifaFeature[]>();
 
   // ── Política de cancelación ──────────────────────────────────────────
   // Expone el helper al template para resolver el tipo de política
   // a partir del array tarifas.Politicas
   resolvePolicyType = resolvePolicyType;
+
+  tooltipOpenKey: string | null = null;  // key = `${codigo}__${tarifaNombre}`
+  tooltipPos: { top: number; left: number } = { top: 0, left: 0 };
+  private _skipNextDocumentClose = false;
+
 
   constructor(
     private _disponibilidadService: DisponibilidadService,
@@ -116,6 +146,16 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
 
   get todayStr(): string {
     return new Date().toISOString().split('T')[0];
+  }
+
+  getFeatures(tarifa: Tarifas): TarifaFeature[] {
+      if(!this.featureCache.has(tarifa.Tarifa)){
+          this.featureCache.set(
+              tarifa.Tarifa,
+              this.buildFeatures(tarifa)
+          );
+      }
+      return this.featureCache.get(tarifa.Tarifa)!;
   }
 
   // BUG 2 FIX: get selected habs for a specific room+tarifa combo
@@ -185,6 +225,46 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
       this.startEditSearch();
     }
   }
+
+  buildFeatures(tarifa: Tarifas): TarifaFeature[] {
+
+    const features: TarifaFeature[] = [];
+
+    tarifa.FormaPago
+        ?.filter(x => x.value)
+        .forEach(item => {
+            features.push({
+                label: this.paymentLabelMap[item.name] ?? item.name,
+                icon: this.iconMap.payment,
+                type: "payment"
+            });
+        });
+
+    tarifa.Cancelacion
+        ?.filter(x => x.value)
+        .forEach(item => {
+            features.push({
+                label: this.cancellationLabelMap[item.name] ?? item.name,
+                icon: this.iconMap.cancelation,
+                type: "cancelation"
+            });
+        });
+    if (tarifa.PlanAlimentos) {
+        features.push({
+            label: tarifa.PlanAlimentos,
+            icon: this.iconMap.food,
+            type: "food"
+        });
+    }
+    if (tarifa.FlexibilidadLogistica) {
+        features.push({
+            label: tarifa.FlexibilidadLogistica,
+            icon: this.iconMap.logistics,
+            type: "logistics"
+        });
+    }
+    return features;
+}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['intialDate'] || changes['endDate']) {
@@ -308,101 +388,234 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     return Math.ceil(value);
   }
 
-  // BUG 2 + BUG 4 FIX: agregaHab now uses per-room habs qty and tags dates
-  agregaHab(tarifas: any, codigo: string, quedan: number) {
-    const habsToAdd = Number(quedan);
-    const nightlyRate = this.roundUp(this.ratesToCalc(tarifas, false, codigo));
-    const basePrice = nightlyRate * this.totalNights * habsToAdd;  // BUG 2: multiply by habsToAdd
-    let finalPrice = basePrice;
-    let discountAmount = 0;
+/**
+ * Returns true if the validated promo applies to this specific room codigo.
+ * Used in the template to avoid complex expressions in *ngIf.
+ */
+promoAplicaParaHab(codigo: string): boolean {
+  if (!this.validatedPromo) return false;
+  if (!this.validatedPromo.habs || this.validatedPromo.habs.length === 0) return true;
+  const codigoNorm = codigo.replace('_', ' ').trim().toUpperCase();
+  return this.validatedPromo.habs.some(
+    h => h.replace('_', ' ').trim().toUpperCase() === codigoNorm
+  );
+}
 
-    if (this.validatedPromo) {
-      const desglose = Array.from({ length: this.totalNights }, (_, i) => ({
-        tarifa: tarifas.Tarifa,
-        fecha: `night_${i}`,
-        tarifaTotal: nightlyRate,
-      }));
-      const result = this._promoValidatorService.applyPromo(
-        this.validatedPromo, desglose, nightlyRate * this.totalNights, this.totalNights,
-      );
-      // BUG 2: multiply promo price by habs quantity too
-      finalPrice = result.pendiente * habsToAdd;
-      discountAmount = result.discountAmount * habsToAdd;
-    }
+agregaHab(tarifas: any, codigo: string, quedan: number): void {
+  const habsToAdd   = Number(quedan);
+  const breakdown   = (this.ratesToCalc(tarifas, true, codigo) as any[]) ?? [];
 
-    // BUG 4 FIX: store the search dates with each reservation entry
-    const obj: miReserva[] = [{
-      codigoCuarto: codigo,
-      numeroCuarto: '',
-      cantidadHabitaciones: habsToAdd,
-      nombreTarifa: tarifas.Tarifa,
-      precioTarifa: finalPrice,
-      precioOriginal: basePrice,
-      descuentoAplicado: discountAmount,
-      promoNombre: this.validatedPromo?.nombre ?? '',
-      detallesTarifa: this.plan,
-      cantidadAdultos: this.qty,
-      cantidadNinos: this.qtyNin,
-      // BUG 4: tag with search dates so changing dates later doesn't invalidate them
-      fechaInicial: new Date(this.intialDate),
-      fechaFinal: new Date(this.endDate),
-    }];
+  // Build real per-night desglose from the breakdown returned by ratesToCalc
+  const desglose = breakdown.map((entry: any) => ({
+    tarifa:     entry.tarifa     ?? tarifas.Tarifa,
+    fecha:      entry.fecha      ?? '',
+    tarifaTotal: Math.ceil(entry.tarifaTotal ?? 0),
+  }));
 
-    this._disponibilidadService.addMiReserva(obj);
-    const hasReserva = (this._disponibilidadService.getMiReserva()?.length ?? 0) > 0;
-    this.updateParentModel({}, hasReserva);
+  const basePrice = desglose.reduce((s, e) => s + e.tarifaTotal, 0) * habsToAdd;
+  let finalPrice    = basePrice;
+  let discountAmount = 0;
 
-    // Show toast notification
-    clearTimeout(this.toastTimer);
-    const toastKey = `${codigo}__${tarifas.Tarifa}`;
+  // Check if promo applies to this specific room
+  const promoAplicaParaEstaHab = this.promoAplicaParaHab(codigo);
 
-    clearTimeout(this.toastTimer);
+  if (this.validatedPromo && promoAplicaParaEstaHab) {
+    const totalBase = desglose.reduce((s, e) => s + e.tarifaTotal, 0);
 
-    this.showAddedToastKey = toastKey;
+    const result = this._promoValidatorService.applyPromo(
+      this.validatedPromo,
+      desglose,
+      totalBase,
+      this.totalNights,
+      new Date(this.intialDate),  // ← pass checkIn for day-name resolution
+    );
 
-    this.toastTimer = setTimeout(() => {
-      this.showAddedToastKey = null;
-    }, 3000);
-
-    // Reset the habs selector for this room back to 1 after adding
-    this.setRoomHabs(codigo, tarifas.Tarifa, 1);
+    finalPrice    = result.pendiente * habsToAdd;
+    discountAmount = result.discountAmount * habsToAdd;
   }
+
+  const obj: miReserva[] = [{
+    codigoCuarto:        codigo,
+    numeroCuarto:        '',
+    cantidadHabitaciones: habsToAdd,
+    nombreTarifa:        tarifas.Tarifa,
+    precioTarifa:        finalPrice,
+    precioOriginal:      basePrice,
+    descuentoAplicado:   discountAmount,
+    promoNombre:         (this.validatedPromo && promoAplicaParaEstaHab)
+                           ? this.validatedPromo.nombre ?? ''
+                           : '',
+    detallesTarifa:      this.plan,
+    cantidadAdultos:     this.qty,
+    cantidadNinos:       this.qtyNin,
+    fechaInicial:        new Date(this.intialDate),
+    fechaFinal:          new Date(this.endDate),
+  }];
+
+  this._disponibilidadService.addMiReserva(obj);
+
+  const hasReserva = (this._disponibilidadService.getMiReserva()?.length ?? 0) > 0;
+  this.updateParentModel({}, hasReserva);
+
+  clearTimeout(this.toastTimer);
+  const toastKey = `${codigo}__${tarifas.Tarifa}`;
+  this.showAddedToastKey = toastKey;
+  this.toastTimer = setTimeout(() => { this.showAddedToastKey = null; }, 3000);
+
+  this.setRoomHabs(codigo, tarifas.Tarifa, 1);
+}
 
   getMaxValue(codigo: string): number {
     const arr = this.generateInventarioArray(codigo);
     return arr.length ? Math.max(...arr) : 0;
   }
 
-  /**
+/**
    * Returns only the habitaciones that have at least one tarifa in tarifasArray.
    * Habitaciones without any matching tarifa are hidden from the UI.
    * Uses deduplication by Codigo so each room type appears only once.
+   * NUEVO: Ordena prioritariamente arriba las habitaciones que aplican para el cupón activo.
    */
   getHabitacionesConTarifa(): IHabitaciones[] {
     const seenCodigos = new Set<string>();
-    return this.habitaciones.filter(hab => {
+    
+    // 1. Filtramos y deduplicamos las habitaciones válidas tal como estaba originalmente
+    const habitacionesFiltradas = this.habitaciones.filter(hab => {
       if (seenCodigos.has(hab.Codigo)) return false;
       const tieneTarifa = this.tarifasArray.some(t => t.Habitacion.includes(hab.Codigo));
       if (tieneTarifa) seenCodigos.add(hab.Codigo);
       return tieneTarifa;
     });
+
+    // 2. Si no hay cupón validado o la promoción no restringe habitaciones, regresamos la lista normal
+    if (!this.validatedPromo || !this.validatedPromo.habs || this.validatedPromo.habs.length === 0) {
+      return habitacionesFiltradas;
+    }
+
+    // 3. Si hay cupón con restricciones, ordenamos: las válidas para el cupón van arriba (index menor)
+    return [...habitacionesFiltradas].sort((a, b) => {
+      const codigoANormalizado = a.Codigo.replace('_', ' ').trim().toUpperCase();
+      const codigoBNormalizado = b.Codigo.replace('_', ' ').trim().toUpperCase();
+
+      const aAplicaPromo = this.validatedPromo!.habs.some(h => 
+        h.replace('_', ' ').trim().toUpperCase() === codigoANormalizado
+      ) ? 1 : 0;
+
+      const bAplicaPromo = this.validatedPromo!.habs.some(h => 
+        h.replace('_', ' ').trim().toUpperCase() === codigoBNormalizado
+      ) ? 1 : 0;
+
+      // Restamos b - a para que los que tengan un '1' (aplica) se posicionen primero en el arreglo
+      return bAplicaPromo - aAplicaPromo;
+    });
   }
 
-  calcPromoTotal(tarifas: any, codigo: string): number {
-    if (!this.validatedPromo) {
+calcPromoTotal(tarifas: any, codigo: string): number {
+  if (!this.validatedPromo) {
+    return this.roundUp(this.ratesToCalc(tarifas, false, codigo)) * this.totalNights;
+  }
+
+  const codigoNorm = codigo.replace('_', ' ').trim().toUpperCase();
+  if (this.validatedPromo.habs?.length > 0) {
+    const habMatch = this.validatedPromo.habs.some(
+      h => h.replace('_', ' ').trim().toUpperCase() === codigoNorm
+    );
+    if (!habMatch) {
       return this.roundUp(this.ratesToCalc(tarifas, false, codigo)) * this.totalNights;
     }
-    const nightlyRate = this.roundUp(this.ratesToCalc(tarifas, false, codigo));
-    const desglose = Array.from({ length: this.totalNights }, (_, i) => ({
-      tarifa: tarifas.Tarifa,
-      fecha: `night_${i}`,
-      tarifaTotal: nightlyRate,
-    }));
-    const result = this._promoValidatorService.applyPromo(
-      this.validatedPromo, desglose, nightlyRate * this.totalNights, this.totalNights,
-    );
-    return result.pendiente; // caller multiplies by getRoomHabs in template
   }
+
+  const result = this.calcPromoDesglose(tarifas, codigo);
+  return result.pendiente;
+}
+
+toggleDesgloseLock(codigo: string, tarifa: string, event: MouseEvent): void {
+  event.stopPropagation();
+  const key = `${codigo}__${tarifa}`;
+  this.desgloseLocked = this.desgloseLocked === key ? null : key;
+}
+
+isDesgloseLocked(codigo: string, tarifa: string): boolean {
+  return this.desgloseLocked === `${codigo}__${tarifa}`;
+}
+
+// ── NEW: returns full PromoApplicationResult using real per-night rates ───
+calcPromoDesglose(tarifas: any, codigo: string): import('../../../../_service/promo.validation.service').PromoApplicationResult {
+  // Build real per-night desglose using actual base rates per date
+  const breakdown: { tarifa: string; fecha: string; tarifaTotal: number }[] =
+    this.ratesToCalc(tarifas, true, codigo) ?? [];
+
+  // ratesToCalc with onlyBreakDown=true returns { tarifa, fecha, tarifaTotal }[]
+  // Make sure each entry has all three fields
+  const desglose = breakdown.map((entry: any) => ({
+    tarifa: entry.tarifa ?? tarifas.Tarifa,
+    fecha:  entry.fecha  ?? '',
+    tarifaTotal: Math.ceil(entry.tarifaTotal ?? 0),
+  }));
+
+  const totalBase = desglose.reduce((s, e) => s + e.tarifaTotal, 0);
+
+  return this._promoValidatorService.applyPromo(
+    this.validatedPromo!,
+    desglose,
+    totalBase,
+    this.totalNights,
+    new Date(this.intialDate),   // ← pass checkIn so day names resolve correctly
+  );
+}
+
+// ── NEW: toggle tooltip visibility ───────────────────────────────────────
+toggleDesglosTooltip(codigo: string, tarifaNombre: string, event: Event): void {
+  event.stopPropagation();
+
+  const key = `${codigo}__${tarifaNombre}`;
+
+  if (this.tooltipOpenKey === key) {
+    this.tooltipOpenKey = null;
+    return;
+  }
+
+  const btn  = event.currentTarget as HTMLElement;
+  const rect = btn.getBoundingClientRect();
+  this.tooltipPos = {
+    top:  rect.bottom + 8,
+    left: Math.min(rect.left, window.innerWidth - 348),
+  };
+
+  this.tooltipOpenKey        = key;
+  this._skipNextDocumentClose = true;   // ← tell the host listener to skip this round
+}
+
+isTooltipOpen(codigo: string, tarifaNombre: string): boolean {
+  return this.tooltipOpenKey === `${codigo}__${tarifaNombre}`;
+}
+
+@HostListener('document:click')
+onDocumentClick(): void {
+  if (this._skipNextDocumentClose) {
+    this._skipNextDocumentClose = false;
+    return;                             // ← skip: same click that opened the panel
+  }
+  if (this.tooltipOpenKey) {
+    this.tooltipOpenKey = null;
+  }
+}
+
+@HostListener('document:keydown', ['$event'])
+onKeyDown(event: KeyboardEvent): void {
+  if (event.key === 'Escape') {
+    if (this.tooltipOpenKey) { this.tooltipOpenKey = null; return; }
+    if (this.lightbox.open)  { this.closeLightbox(); }
+  }
+  if (!this.lightbox.open) return;
+  if (event.key === 'ArrowRight') this.lightboxNext();
+  if (event.key === 'ArrowLeft')  this.lightboxPrev();
+}
+
+onPanelClick(event: Event): void {
+  event.stopPropagation();
+  this._skipNextDocumentClose = true;  // keep panel open when clicking inside it
+}
 
   startEditSearch(): void {
     this.editLlegadaDate  = new Date(this.intialDate);
@@ -431,60 +644,57 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     this.editSalidaDate = event.value ? new Date(event.value) : null;
   }
 
-  applySearchChanges(): void {
-    const newStart = this.editLlegadaDate;
-    const newEnd   = this.editSalidaDate;
+applySearchChanges(): void {
+  const newStart = this.editLlegadaDate;
+  const newEnd   = this.editSalidaDate;
 
-    if (!newStart || !newEnd || newEnd <= newStart) return;
+  if (!newStart || !newEnd || newEnd <= newStart) return;
 
-    this.intialDate  = newStart;
-    this.endDate     = newEnd;
-    this.totalNights = this.calcNights(newStart, newEnd);
-    this.qty    = this.editAdultos;
-    this.qtyNin = this.editNinos;
+  this.intialDate  = newStart;
+  this.endDate     = newEnd;
+  this.totalNights = this.calcNights(newStart, newEnd); // ← ya está aquí, bien
+  this.qty    = this.editAdultos;
+  this.qtyNin = this.editNinos;
 
-    this._disponibilidadService.changeFechaIni(newStart);
-    this._disponibilidadService.changeFechaFinal(newEnd);
+  this._disponibilidadService.changeFechaIni(newStart);
+  this._disponibilidadService.changeFechaFinal(newEnd);
 
-    // BUG 1 FIX: clear validity — user must add a room for the NEW search
-    // (existing rooms from other date ranges are kept, but new search = not valid yet)
-    const existingReservas = this._disponibilidadService.getMiReserva();
-    this.updateParentModel({}, existingReservas.length > 0);
+  const existingReservas = this._disponibilidadService.getMiReserva();
+  this.updateParentModel({}, existingReservas.length > 0);
 
-    // Validate promo
-    const code = this.editPromoCode.trim().toUpperCase();
-    if (code) {
-      const result = this._promoValidatorService.validatePromo(
-        code,
-        this._promoBookingService.currentPromos,
-        newStart,
-        newEnd,
-        this.totalNights,
-        [], [], true,
-      );
-      if (result.valid && result.promo) {
-        this.editPromoStatus = 'valid';
-        this.validatedPromo  = result.promo;
-        this._disponibilidadService.changeValidatedPromo(result.promo);
-      } else {
-        this.editPromoStatus  = 'invalid';
-        this.editPromoMessage = result.reason ?? 'Código no válido.';
-        this.validatedPromo   = null;
-        this._disponibilidadService.changeValidatedPromo(null);
-        return;
-      }
+  // Validate promo
+  const code = this.editPromoCode.trim().toUpperCase();
+  if (code) {
+    const result = this._promoValidatorService.validatePromo(
+      code,
+      this._promoBookingService.currentPromos,
+      newStart,
+      newEnd,
+      this.totalNights, // ← esto ya pasa las noches, la validación de stay tipo 3 ocurre aquí
+      [], [], true,
+    );
+    if (result.valid && result.promo) {
+      this.editPromoStatus  = 'valid';
+      this.editPromoMessage = ''; // ← limpiar mensaje anterior si ahora es válido
+      this.validatedPromo   = result.promo;
+      this._disponibilidadService.changeValidatedPromo(result.promo);
     } else {
-      this.validatedPromo = null;
+      this.editPromoStatus  = 'invalid';
+      this.editPromoMessage = result.reason ?? 'Código no válido.'; // ← aquí aparece el mensaje de stay
+      this.validatedPromo   = null;
       this._disponibilidadService.changeValidatedPromo(null);
+      return;
     }
-
-    // Reset per-room habs map for the new search
-    this.roomHabsMap = {};
-
-    const payload = { intialDate: newStart, endDate: newEnd, qty: this.qty, qtyNin: this.qtyNin };
-    this.searchChanged.emit(payload);
-    this.isEditingSearch = false;
+  } else {
+    this.validatedPromo = null;
+    this._disponibilidadService.changeValidatedPromo(null);
   }
+
+  this.roomHabsMap = {};
+  const payload = { intialDate: newStart, endDate: newEnd, qty: this.qty, qtyNin: this.qtyNin };
+  this.searchChanged.emit(payload);
+  this.isEditingSearch = false;
+}
 
   // ── Image CDN & carousel ──────────────────────────────────
 
@@ -565,14 +775,6 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     this.lightbox.index = (this.lightbox.index - 1 + len) % len;
   }
 
-  @HostListener('document:keydown', ['$event'])
-  onKeyDown(event: KeyboardEvent): void {
-    if (!this.lightbox.open) return;
-    if (event.key === 'Escape')      this.closeLightbox();
-    if (event.key === 'ArrowRight')  this.lightboxNext();
-    if (event.key === 'ArrowLeft')   this.lightboxPrev();
-  }
-
   ngOnDestroy() {
     clearTimeout(this.toastTimer);
     document.body.style.overflow = '';
@@ -637,4 +839,24 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     });
   }
  
+  /**
+   * Evalúa si la razón de no encontrar disponibilidad es porque la búsqueda 
+   * del usuario supera el límite de huéspedes de todas las habitaciones del hotel.
+   */
+  get esPorExcesoDeCapacidad(): boolean {
+    // Si hay resultados en la búsqueda, no hay nada que evaluar aquí
+    if (this.getHabitacionesConTarifa().length > 0) return false;
+
+    const totalBusqueda = (this.qty ?? 1) + (this.qtyNin ?? 0);
+
+    // Revisamos la lista de todas las habitaciones configuradas en el hotel
+    if (this.roomCodesComplete && this.roomCodesComplete.length > 0) {
+      // Si el total de personas de la búsqueda es ESTRICTAMENTE MAYOR que la
+      // capacidad máxima de la habitación más grande que tiene el hotel:
+      const maxCapacidadHotel = Math.max(...this.roomCodesComplete.map(h => h.Personas ?? 0));
+      return totalBusqueda > maxCapacidadHotel;
+    }
+
+    return false;
+  }
 }

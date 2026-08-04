@@ -14,6 +14,7 @@ export interface IHabitaciones {
   Numero: string[];
   Tipo: string;
   Descripcion: string;
+  Caracteristicas:string;
   Adultos: number;
   Ninos: number;
   Inventario: number;

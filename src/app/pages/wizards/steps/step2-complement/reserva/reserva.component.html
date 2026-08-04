@@ -137,6 +137,7 @@
     </ng-container>
 
     <!-- Tax breakdown -->
+<!-- Tax breakdown -->
     <div class="price-summary">
       <div class="price-summary-row">
         <span>Subtotal</span>
@@ -155,6 +156,11 @@
         <span>Total</span>
         <span>{{ total | currency }}</span>
       </div>
+    </div>
+
+    <div class="tax-notice-widget">
+      <mat-icon>info</mat-icon>
+      <span>Todos los precios son en MXN e incluyen IVA (16%) + ISH (3%)</span>
     </div>
 
   </div>

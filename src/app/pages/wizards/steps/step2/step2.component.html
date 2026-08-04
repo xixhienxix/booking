@@ -3,8 +3,6 @@
 
   <!-- ── View mode ── -->
   <ng-container *ngIf="!isEditingSearch">
-
-    <!-- Row 1: all summary data in one line -->
     <div class="summary-top-row">
       <div class="summary-item">
         <span class="summary-label">Llegada</span>
@@ -30,31 +28,25 @@
         <span class="summary-label">Niños</span>
         <span class="summary-value">{{ qtyNin }}</span>
       </div>
-
       <div *ngIf="validatedPromo" class="promo-badge-summary">
         <mat-icon>local_offer</mat-icon>
         <span>{{ validatedPromo.nombre }}</span>
       </div>
-
       <div class="summary-divider" *ngIf="hasSearched"></div>
       <div class="summary-item" *ngIf="hasSearched">
         <span class="summary-label">Disponibles</span>
         <span class="summary-value">{{ getHabitacionesConTarifa().length }}</span>
       </div>
     </div>
-
-    <!-- Row 2: Nueva Búsqueda full-width -->
     <button class="btn-nueva-busqueda" type="button" (click)="startEditSearch()">
       <mat-icon>search</mat-icon>
       Nueva Búsqueda
     </button>
-
   </ng-container>
 
   <!-- ── Edit mode ── -->
   <ng-container *ngIf="isEditingSearch">
     <div class="edit-search-grid">
-
       <div class="edit-field edit-date-field">
         <label class="edit-label">Fechas</label>
         <mat-form-field appearance="outline" class="edit-date-picker">
@@ -70,7 +62,6 @@
           <mat-date-range-picker #editPicker></mat-date-range-picker>
         </mat-form-field>
       </div>
-
       <div class="edit-field guests-field">
         <label class="edit-label">Adultos</label>
         <div class="guest-counter-edit">
@@ -79,7 +70,6 @@
           <button type="button" class="counter-btn" (click)="editAdultos = editAdultos + 1">+</button>
         </div>
       </div>
-
       <div class="edit-field guests-field">
         <label class="edit-label">Niños</label>
         <div class="guest-counter-edit">
@@ -88,7 +78,6 @@
           <button type="button" class="counter-btn" (click)="editNinos = editNinos + 1">+</button>
         </div>
       </div>
-
       <div class="edit-field promo-field">
         <label class="edit-label">Promo</label>
         <div class="promo-edit-wrapper">
@@ -98,15 +87,13 @@
           <mat-icon *ngIf="editPromoStatus === 'valid'" class="promo-status-icon valid">check_circle</mat-icon>
           <mat-icon *ngIf="editPromoStatus === 'invalid'" class="promo-status-icon invalid">cancel</mat-icon>
         </div>
-        <span *ngIf="editPromoStatus === 'invalid'" class="promo-error-msg">{{ editPromoMessage }}</span>
+        <div><label>{{ editPromoMessage }}</label></div>
       </div>
-
       <div class="edit-actions">
         <button class="btn-apply" type="button" (click)="applySearchChanges()">
           <mat-icon>search</mat-icon> Buscar
         </button>
       </div>
-
     </div>
   </ng-container>
 </div>
@@ -123,297 +110,404 @@
 <!-- ── Results ── -->
 <ng-container *ngIf="hasSearched">
 
-  <div class="tax-notice">
-    <mat-icon>info</mat-icon>
-    Todos los precios son en MXN e incluyen IVA (16%) + ISH (3%)
+  <!-- Invalid coupon banner -->
+  <div class="capacity-notice-calm coupon-error-banner" *ngIf="editPromoStatus === 'invalid'">
+    <div class="notice-icon-wrapper">
+      <mat-icon class="group-icon">local_offer</mat-icon>
+    </div>
+    <div class="calm-content">
+      <h3>¡Ups! Parece que este código no quiere funcionar. 🧐</h3>
+      <p class="notice-p">
+        El código promocional que ingresaste no es válido, ya expiró, o no aplica para las fechas y habitaciones que seleccionaste.
+      </p>
+      <div class="suggestion-box">
+        <mat-icon class="bulb-icon">lightbulb</mat-icon>
+        <p>
+          <strong>Sugerencia:</strong> Verifica que esté escrito correctamente (sin espacios extra).
+          Si no tienes otro código, no te preocupes, ¡Da clic en "Nueva Búsqueda" para consultar disponibilidad!
+        </p>
+      </div>
+    </div>
   </div>
 
-  <ng-container *ngFor="let dispo of getHabitacionesConTarifa(); let x = index">
-    <div class="habitacion-card">
+  <!-- CASO 1: Hay habitaciones disponibles -->
+  <ng-container *ngIf="getHabitacionesConTarifa().length > 0">
+    <ng-container *ngFor="let dispo of getHabitacionesConTarifa(); let x = index">
+      <div class="habitacion-card">
 
-      <div class="room-info">
-        <!-- ── Image Carousel ── -->
-        <div class="room-carousel" [class.no-images]="!dispo.images?.length">
+        <!-- Room info row -->
+        <div class="room-info">
 
-          <!-- Slides -->
-          <ng-container *ngIf="dispo.images?.length; else noImage">
-            <div class="carousel-track">
-              <div class="carousel-slide"
-                   *ngFor="let img of dispo.images; let i = index"
-                   [class.active]="getActiveIndex(dispo.Codigo) === i">
-                <img
-                  [src]="getImageUrl(img, 'medium')"
-                  [alt]="dispo.Codigo + ' - foto ' + (i + 1)"
-                  (click)="openLightbox(dispo, i)"
-                  (error)="roomImageService.onImgError($event, img)"
-                  loading="lazy" />
-                <div class="carousel-expand-hint">
-                  <mat-icon>zoom_in</mat-icon>
+          <!-- Carousel -->
+          <div class="room-carousel" [class.no-images]="!dispo.images?.length">
+            <ng-container *ngIf="dispo.images?.length; else noImage">
+              <div class="carousel-track">
+                <div class="carousel-slide"
+                     *ngFor="let img of dispo.images; let i = index"
+                     [class.active]="getActiveIndex(dispo.Codigo) === i">
+                  <img [src]="getImageUrl(img, 'medium')"
+                       [alt]="dispo.Codigo + ' - foto ' + (i + 1)"
+                       (click)="openLightbox(dispo, i)"
+                       (error)="roomImageService.onImgError($event, img)"
+                       loading="lazy" />
+                  <div class="carousel-expand-hint">
+                    <mat-icon>zoom_in</mat-icon>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Arrows (only if more than 1 image) -->
-            <ng-container *ngIf="(dispo.images?.length ?? 0) > 1">
-              <button class="carousel-arrow prev" type="button"
-                      (click)="prevImage(dispo.Codigo, dispo.images!.length, $event)"
-                      aria-label="Anterior">
-                <mat-icon>chevron_left</mat-icon>
-              </button>
-              <button class="carousel-arrow next" type="button"
-                      (click)="nextImage(dispo.Codigo, dispo.images!.length, $event)"
-                      aria-label="Siguiente">
-                <mat-icon>chevron_right</mat-icon>
-              </button>
-
-              <!-- Dot indicators -->
-              <div class="carousel-dots">
-                <span class="carousel-dot"
-                      *ngFor="let img of dispo.images; let i = index"
-                      [class.active]="getActiveIndex(dispo.Codigo) === i"
-                      (click)="setActiveIndex(dispo.Codigo, i)">
-                </span>
-              </div>
+              <ng-container *ngIf="(dispo.images?.length ?? 0) > 1">
+                <button class="carousel-arrow prev" type="button"
+                        (click)="prevImage(dispo.Codigo, dispo.images!.length, $event)"
+                        aria-label="Anterior">
+                  <mat-icon>chevron_left</mat-icon>
+                </button>
+                <button class="carousel-arrow next" type="button"
+                        (click)="nextImage(dispo.Codigo, dispo.images!.length, $event)"
+                        aria-label="Siguiente">
+                  <mat-icon>chevron_right</mat-icon>
+                </button>
+                <div class="carousel-dots">
+                  <span class="carousel-dot"
+                        *ngFor="let img of dispo.images; let i = index"
+                        [class.active]="getActiveIndex(dispo.Codigo) === i"
+                        (click)="setActiveIndex(dispo.Codigo, i)">
+                  </span>
+                </div>
+              </ng-container>
             </ng-container>
-
-          </ng-container>
-
-          <!-- Fallback -->
-          <ng-template #noImage>
-            <div class="carousel-no-image">
-              <mat-icon>hotel</mat-icon>
-              <span>Sin imágenes</span>
-            </div>
-          </ng-template>
-        </div>
-        <!-- ── /Image Carousel ── -->
-        <div class="room-details">
-          <h2 class="room-code">{{ dispo.Codigo.replace('_', ' ') }}</h2>
-          <p class="room-desc">{{ dispo.Descripcion }}</p>
-          <div class="max-ocupacion">
-            <span><strong>Máx. Personas:</strong> {{ dispo.Personas }}</span>
+            <ng-template #noImage>
+              <div class="carousel-no-image">
+                <mat-icon>hotel</mat-icon>
+                <span>Sin imágenes</span>
+              </div>
+            </ng-template>
           </div>
-          <div class="amenidades">
-            <ng-container *ngFor="let amenidad of dispo.Amenidades">
-              <div class="amenidad-item">
-                <img src="../../../../../assets/media/icons/custom/{{ amenidad }}.png" [alt]="amenidad" />
-                <span>{{ amenidad }}</span>
-              </div>
-            </ng-container>
+
+          <!-- Room details -->
+          <div class="room-details">
+            <h2 class="room-code">{{ dispo.Codigo.replace('_', ' ') }}</h2>
+            <p class="room-desc">{{ dispo.Descripcion }}</p>
+            <div class="max-ocupacion">
+              <span><strong>Máx. Personas:</strong> {{ dispo.Personas }}</span>
+            </div>
+            <div class="amenidades">
+              <ng-container *ngFor="let amenidad of dispo.Amenidades">
+                <div class="amenidad-item">
+                  <img src="../../../../../assets/media/icons/custom/{{ amenidad }}.png" [alt]="amenidad" />
+                  <span>{{ amenidad }}</span>
+                </div>
+              </ng-container>
+            </div>
           </div>
         </div>
+
+        <!-- Tarifas -->
+        <div class="tarifas-container">
+          <h4 class="tarifas-title">Tarifas Disponibles</h4>
+          <ng-container *ngFor="let tarifas of tarifasArray">
+            <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
+              <div class="tarifa-row">
+
+                <!-- Left: info + controls -->
+                <div class="tarifa-left">
+                  <div class="tarifa-nombre">{{ tarifas.Tarifa }}</div>
+
+                  <div class="availability-badge available" *ngIf="getMaxValue(dispo.Codigo) > 3">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Habitaciones Disponibles</span>
+                  </div>
+                  <div class="availability-badge urgency"
+                       *ngIf="getMaxValue(dispo.Codigo) > 0 && getMaxValue(dispo.Codigo) <= 3">
+                    <mat-icon>alarm</mat-icon>
+                    <span>¡Solo quedan {{ getMaxValue(dispo.Codigo) }}
+                      Habitación{{ getMaxValue(dispo.Codigo) === 1 ? '' : 'es' }}!</span>
+                  </div>
+
+<div class="booking-controls">
+
+    <!-- First Row -->
+    <div class="guest-row">
+
+        <div class="guest-chip">
+            <span class="guest-chip__icon">
+                <mat-icon>person</mat-icon>
+            </span>
+
+            <span class="guest-chip__body">
+                <span class="guest-chip__label">Adultos</span>
+                <span class="guest-chip__value">{{ qty }}</span>
+            </span>
+        </div>
+
+        <div class="guest-chip">
+            <span class="guest-chip__icon">
+                <mat-icon>child_care</mat-icon>
+            </span>
+
+            <span class="guest-chip__body">
+                <span class="guest-chip__label">Niños</span>
+                <span class="guest-chip__value">{{ qtyNin }}</span>
+            </span>
+        </div>
+
+    </div>
+
+    <!-- Second Row -->
+    <div class="room-row">
+
+        <label class="room-label">
+            Habitaciones:
+        </label>
+
+        <select
+            [ngModel]="getRoomHabs(dispo.Codigo, tarifas.Tarifa)"
+            (ngModelChange)="setRoomHabs(dispo.Codigo, tarifas.Tarifa, $event)">
+
+            <option
+                *ngFor="let num of generateInventarioArray(dispo.Codigo)"
+                [value]="num">
+
+                {{ num }}
+
+            </option>
+
+        </select>
+
+    </div>
+
+</div>
+
+              <div class="tarifa-features">
+
+                  <h5 class="features-title">Características</h5>
+
+              <div class="features-list">
+                  <div
+                      class="feature-chip"
+                      *ngFor="let feature of getFeatures(tarifas)">
+                      <mat-icon class="feature-icon">
+                          {{ feature.icon }}
+                      </mat-icon>
+                      <span class="feature-label">
+                          {{ feature.label }}
+                      </span>
+                  </div>
+              </div>
+
+              </div>
+
+                  <div class="btn-group">
+                    <button type="button"
+                            [disabled]="getMaxValue(dispo.Codigo) === 0"
+                            (click)="agregaHab(tarifas, dispo.Codigo, getRoomHabs(dispo.Codigo, tarifas.Tarifa))">
+                      + Agregar Habitación
+                    </button>
+                  </div>
+
+                  <div *ngIf="showAddedToastKey === (dispo.Codigo + '__' + tarifas.Tarifa)" class="added-toast">
+                    <mat-icon>check_circle</mat-icon>
+                    ¡Habitación correctamente agregada a Mi Reserva!
+                  </div>
+
+                  <app-cancellation-policy
+                    [policyType]="resolvePolicyType(tarifas.Politicas ?? [])"
+                    [freeHours]="48"
+                    [partialDays]="7"
+                    partialPenalty="20% / 1 Noche">
+                  </app-cancellation-policy>
+                </div>
+
+                <!-- Right: price column -->
+                <div class="precio-wrapper">
+
+                  <!-- ══ SCENARIO A: Manual coupon applies to this room ══ -->
+                  <ng-container *ngIf="validatedPromo && !isAutoPromo(validatedPromo) && promoAplicaParaHab(dispo.Codigo)">
+                    <div class="precio-banner cupon">
+                      {{ validatedPromo.tipo === 3
+                          ? '🎁 NOCHES GRATIS APLICADAS'
+                          : '-' + validatedPromo.qtyPrecio + (validatedPromo.discountType ? '%' : ' MXN') + ' CUPÓN APLICADO' }}
+                    </div>
+
+                    <span class="precio-original tachado">
+                      {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights
+                         * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
+                    </span>
+
+                    <!-- Price + hover desglose -->
+                    <div class="precio-final-row">
+                      <span class="precio-final">
+                        {{ calcPromoTotal(tarifas, dispo.Codigo)
+                           * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
+                      </span>
+
+                      <!-- Hover host: ? button + floating panel -->
+<div class="desglose-host" [class.locked]="isDesgloseLocked(dispo.Codigo, tarifas.Tarifa)">
+
+  <button type="button"
+          class="desglose-trigger"
+          [class.active]="isDesgloseLocked(dispo.Codigo, tarifas.Tarifa)"
+          (click)="toggleDesgloseLock(dispo.Codigo, tarifas.Tarifa, $event)"
+          [attr.aria-expanded]="isDesgloseLocked(dispo.Codigo, tarifas.Tarifa)"
+          aria-label="Ver desglose por noche">
+    {{ isDesgloseLocked(dispo.Codigo, tarifas.Tarifa) ? '✕' : '?' }}
+  </button>
+
+  <!-- Hint — only on hover when panel is closed -->
+  <div class="desglose-hint">
+    Da clic para ver el desglose
+  </div>
+
+  <!-- Panel — only when this specific card is locked -->
+  <div class="desglose-panel--hover">
+    <div class="desglose-panel__header">
+      Desglose · {{ totalNights }} noches
+    </div>
+    <div class="desglose-col-headers">
+      <span>Fecha</span>
+      <span>Tipo</span>
+      <span class="col-right">Tarifa</span>
+    </div>
+    <div class="desglose-panel__body">
+      <div class="desglose-row"
+           *ngFor="let dia of calcPromoDesglose(tarifas, dispo.Codigo).desgloseDetalle"
+           [class.promo-night]="dia.promoAplicada"
+           [class.paid-night]="!dia.promoAplicada && dia.label === 'Noche Pagada'">
+        <span class="desglose-fecha">{{ dia.fechaCorta }}</span>
+        <span class="desglose-label">{{ dia.label }}</span>
+        <span class="desglose-precio">
+          <s *ngIf="dia.promoAplicada && dia.tarifaOriginal !== dia.tarifaFinal"
+             class="desglose-original">
+            {{ dia.tarifaOriginal | currency:'':'symbol':'1.0-0' }}
+          </s>
+          {{ dia.tarifaFinal | currency:'':'symbol':'1.0-0' }}
+        </span>
       </div>
+    </div>
+    <div class="desglose-panel__footer">
+      <span>Total con promo</span>
+      <strong>
+        {{ calcPromoTotal(tarifas, dispo.Codigo)
+           * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
+      </strong>
+    </div>
+  </div>
 
-      <div class="tarifas-container">
-        <h4 class="tarifas-title">Tarifas Disponibles</h4>
+</div>
+                    </div>
 
-        <ng-container *ngFor="let tarifas of tarifasArray">
-          <ng-container *ngIf="tarifas.Habitacion.includes(dispo.Codigo)">
+                    <small class="precio-nights-label">
+                      Total {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}<br>Impuestos incluidos
+                    </small>
+                    <div class="precio-separator"></div>
+                    <div class="precio-savings">
+                      <span class="savings-star">★</span>
+                      <span class="savings-text">
+                        ¡Felicidades!<br>Ahorraste
+                        <strong>
+                          {{ (roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights
+                             - calcPromoTotal(tarifas, dispo.Codigo))
+                             * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
+                        </strong> pesos
+                      </span>
+                    </div>
+                  </ng-container>
 
-            <div class="tarifa-row">
-
-              <!-- ── Left: tarifa info + selectors ── -->
-              <div class="tarifa-left">
-
-                <div class="tarifa-nombre">{{ tarifas.Tarifa }}</div>
-
-                <!-- Availability badge: > 3 = green calm, <= 3 = red urgency -->
-                <div class="availability-badge available" *ngIf="getMaxValue(dispo.Codigo) > 3">
-                  <mat-icon>check_circle</mat-icon>
-                  <span>Habitaciones Disponibles</span>
-                </div>
-                <div class="availability-badge urgency" *ngIf="getMaxValue(dispo.Codigo) > 0 && getMaxValue(dispo.Codigo) <= 3">
-                  <mat-icon>alarm</mat-icon>
-                  <span>¡Solo quedan {{ getMaxValue(dispo.Codigo) }} Habitación{{ getMaxValue(dispo.Codigo) === 1 ? '' : 'es' }}!</span>
-                </div>
-
-                <div class="selects-row">
-
-                  <!-- Adultos chip — read-only from search -->
-                  <div class="guest-chip">
-                    <span class="guest-chip__icon">
-                      <mat-icon>person</mat-icon>
+                  <!-- ══ SCENARIO B: Auto-promo ══ -->
+                  <ng-container *ngIf="validatedPromo && isAutoPromo(validatedPromo)">
+                    <div class="precio-banner auto-promo">{{ getPromoBannerText(validatedPromo) }}</div>
+                    <span class="precio-final">
+                      {{ calcPromoTotal(tarifas, dispo.Codigo)
+                         * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
                     </span>
-                    <span class="guest-chip__body">
-                      <span class="guest-chip__label">Adultos</span>
-                      <span class="guest-chip__value">{{ qty }}</span>
+                    <small class="precio-nights-label">
+                      Total {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}<br>Impuestos incluidos
+                    </small>
+                    <div class="precio-separator"></div>
+                    <div class="precio-auto-legend">{{ getPromoLegend(validatedPromo) }}</div>
+                  </ng-container>
+
+                  <!-- ══ SCENARIO C: No promo or promo doesn't apply to this room ══ -->
+                  <ng-container *ngIf="!validatedPromo || (!isAutoPromo(validatedPromo) && !promoAplicaParaHab(dispo.Codigo))">
+                    <span class="precio-final">
+                      {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights
+                         * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
                     </span>
-                  </div>
+                    <small class="precio-nights-label">
+                      Total {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}<br>Impuestos incluidos
+                    </small>
+                    <div class="precio-separator"></div>
+                    <div class="precio-trust">
+                      <div class="trust-icon">✔</div>
+                      <span>Mejor tarifa directa garantizada, sin cargos ocultos</span>
+                    </div>
+                  </ng-container>
 
-                  <!-- Niños chip — read-only from search -->
-                  <div class="guest-chip">
-                    <span class="guest-chip__icon">
-                      <mat-icon>child_care</mat-icon>
-                    </span>
-                    <span class="guest-chip__body">
-                      <span class="guest-chip__label">Niños</span>
-                      <span class="guest-chip__value">{{ qtyNin }}</span>
-                    </span>
-                  </div>
-
-                  <!-- Habs selector — same row on desktop, wraps on mobile -->
-                  <div class="select-item habs-select">
-                    <label>Habitaciones:</label>
-                    <select [ngModel]="getRoomHabs(dispo.Codigo, tarifas.Tarifa)"
-                            (ngModelChange)="setRoomHabs(dispo.Codigo, tarifas.Tarifa, $event)">
-                      <option *ngFor="let num of generateInventarioArray(dispo.Codigo)" [value]="num">{{ num }}</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="btn-group">
-                  <button type="button"
-                    [disabled]="getMaxValue(dispo.Codigo) === 0"
-                    (click)="agregaHab(tarifas, dispo.Codigo, getRoomHabs(dispo.Codigo, tarifas.Tarifa))">
-                    + Agregar Habitación
-                  </button>
-                </div>
-
-                <!-- Toast -->
-                <div *ngIf="showAddedToastKey === (dispo.Codigo + '__' + tarifas.Tarifa)" class="added-toast">
-                  <mat-icon>check_circle</mat-icon>
-                  ¡Habitación correctamente agregada a Mi Reserva!
-                </div>
-
-                <!-- ── Política de cancelación ── -->
-                <app-cancellation-policy
-                  [policyType]="resolvePolicyType(tarifas.Politicas ?? [])"
-                  [freeHours]="48"
-                  [partialDays]="7"
-                  partialPenalty="20% / 1 Noche">
-                </app-cancellation-policy>
-
-              </div>
-
-              <!-- ── Right: precio-wrapper with all 5 UX scenarios ── -->
-              <div class="precio-wrapper">
-
-                <!-- ══════════════════════════════════════════════
-                     SCENARIO A: Manual coupon applied (validatedPromo with discountType)
-                     Shows: orange banner + crossed price + final price + savings celebration
-                     ══════════════════════════════════════════════ -->
-                <ng-container *ngIf="validatedPromo && validatedPromo.discountType !== undefined && !isAutoPromo(validatedPromo)">
-                  <div class="precio-banner cupon">
-                    -{{ validatedPromo.qtyPrecio }}{{ validatedPromo.discountType ? '%' : ' MXN' }} CUPÓN APLICADO
-                  </div>
-                  <span class="precio-original tachado">
-                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
-                  </span>
-                  <span class="precio-final">
-                    {{ calcPromoTotal(tarifas, dispo.Codigo) * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
-                  </span>
-                  <small class="precio-nights-label">
-                    Total {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}<br>Impuestos incluidos
-                  </small>
-                  <div class="precio-separator"></div>
-                  <div class="precio-savings">
-                    <span class="savings-star">★</span>
-                    <span class="savings-text">
-                      ¡Felicidades!<br>
-                      Ahorraste <strong>{{ (roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights - calcPromoTotal(tarifas, dispo.Codigo)) * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}</strong> pesos
-                    </span>
-                  </div>
-                </ng-container>
-
-                <!-- ══════════════════════════════════════════════
-                     SCENARIO B: Auto-promo (dates match a special rate)
-                     Shows: orange banner with promo title + final price only + legend
-                     ══════════════════════════════════════════════ -->
-                <ng-container *ngIf="validatedPromo && isAutoPromo(validatedPromo)">
-                  <div class="precio-banner auto-promo">
-                    {{ getPromoBannerText(validatedPromo) }}
-                  </div>
-                  <span class="precio-final">
-                    {{ calcPromoTotal(tarifas, dispo.Codigo) * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
-                  </span>
-                  <small class="precio-nights-label">
-                    Total {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}<br>Impuestos incluidos
-                  </small>
-                  <div class="precio-separator"></div>
-                  <div class="precio-auto-legend">
-                    {{ getPromoLegend(validatedPromo) }}
-                  </div>
-                </ng-container>
-
-                <!-- ══════════════════════════════════════════════
-                     SCENARIO C: No promo — base price + trust badge
-                     Shows: price + "Mejor tarifa directa garantizada"
-                     ══════════════════════════════════════════════ -->
-                <ng-container *ngIf="!validatedPromo">
-                  <span class="precio-final">
-                    {{ roundUp(ratesToCalc(tarifas, false, dispo.Codigo)) * totalNights * getRoomHabs(dispo.Codigo, tarifas.Tarifa) | currency:'':'symbol':'1.0-0' }}
-                  </span>
-                  <small class="precio-nights-label">
-                    Total {{ totalNights }} {{ totalNights === 1 ? 'noche' : 'noches' }}<br>Impuestos incluidos
-                  </small>
-                  <div class="precio-separator"></div>
-                  <div class="precio-trust">
-                    <div class="trust-icon">✔</div>
-                    <span>Mejor tarifa directa garantizada, sin cargos ocultos</span>
-                  </div>
-                </ng-container>
-
-              </div>
-              <!-- end precio-wrapper -->
-
-            </div>
+                </div><!-- /precio-wrapper -->
+              </div><!-- /tarifa-row -->
+            </ng-container>
           </ng-container>
-        </ng-container>
-      </div>
+        </div><!-- /tarifas-container -->
+      </div><!-- /habitacion-card -->
+    </ng-container>
+  </ng-container>
 
+  <!-- CASO 2: Sin disponibilidad -->
+  <ng-container *ngIf="getHabitacionesConTarifa().length === 0">
+    <div class="capacity-notice-calm" *ngIf="esPorExcesoDeCapacidad">
+      <div class="notice-icon-wrapper"><mat-icon class="group-icon">group</mat-icon></div>
+      <div class="calm-content">
+        <h3>¡Tu familia es más grande que nuestras habitaciones! 😅</h3>
+        <p class="notice-p">En nuestro hotel no contamos con habitaciones con capacidad para acomodar a tantas personas juntas.</p>
+        <div class="suggestion-box">
+          <mat-icon class="bulb-icon">lightbulb</mat-icon>
+          <p><strong>Sugerencia:</strong> Da clic en "Nueva Búsqueda" y reduce el número de huéspedes para reservar dos o más habitaciones por separado.</p>
+        </div>
+      </div>
+    </div>
+    <div class="capacity-notice-calm" *ngIf="!esPorExcesoDeCapacidad">
+      <div class="notice-icon-wrapper"><mat-icon class="group-icon">calendar_month</mat-icon></div>
+      <div class="calm-content">
+        <h3>¡Uy! Tenemos casa llena en estas fechas. 😅</h3>
+        <p class="notice-p">Nos encantaría recibirte, pero por el momento nuestro hotel ya está al 100% de su capacidad.</p>
+        <div class="suggestion-box">
+          <mat-icon class="bulb-icon">lightbulb</mat-icon>
+          <p><strong>Sugerencia:</strong> Si tienes flexibilidad en tu viaje, da clic en "Nueva Búsqueda" e intenta con unas fechas diferentes.</p>
+        </div>
+      </div>
     </div>
   </ng-container>
 
 </ng-container>
 
-<!-- ══════════════════════════════════════════════════════
-     LIGHTBOX OVERLAY
-     ══════════════════════════════════════════════════════ -->
+<!-- ── Lightbox ── -->
 <div class="lightbox-overlay" *ngIf="lightbox.open" (click)="closeLightbox()">
   <div class="lightbox-panel" (click)="$event.stopPropagation()">
-
-    <!-- Close -->
     <button class="lightbox-close" type="button" (click)="closeLightbox()" aria-label="Cerrar">
       <mat-icon>close</mat-icon>
     </button>
-
-    <!-- Main image -->
     <div class="lightbox-img-wrap">
-      <img
-        [src]="getImageUrl(lightbox.images[lightbox.index], 'large')"
-        [alt]="lightbox.codigo + ' - foto ' + (lightbox.index + 1)"
-        (error)="roomImageService.onImgError($event, lightbox.images[lightbox.index])"
-        class="lightbox-img" />
+      <img [src]="getImageUrl(lightbox.images[lightbox.index], 'large')"
+           [alt]="lightbox.codigo + ' - foto ' + (lightbox.index + 1)"
+           (error)="roomImageService.onImgError($event, lightbox.images[lightbox.index])"
+           class="lightbox-img" />
     </div>
-
-    <!-- Nav arrows -->
     <ng-container *ngIf="lightbox.images.length > 1">
-      <button class="lightbox-arrow prev" type="button"
-              (click)="lightboxPrev()" aria-label="Anterior">
+      <button class="lightbox-arrow prev" type="button" (click)="lightboxPrev()" aria-label="Anterior">
         <mat-icon>chevron_left</mat-icon>
       </button>
-      <button class="lightbox-arrow next" type="button"
-              (click)="lightboxNext()" aria-label="Siguiente">
+      <button class="lightbox-arrow next" type="button" (click)="lightboxNext()" aria-label="Siguiente">
         <mat-icon>chevron_right</mat-icon>
       </button>
     </ng-container>
-
-    <!-- Thumbnail strip -->
     <div class="lightbox-thumbs" *ngIf="lightbox.images.length > 1">
-      <img
-        *ngFor="let img of lightbox.images; let i = index"
-        [src]="getImageUrl(img, 'thumb')"
-        [class.active]="lightbox.index === i"
-        (click)="lightbox.index = i"
-        (error)="roomImageService.onImgError($event, img)"
-        [alt]="'Miniatura ' + (i + 1)"
-        class="lightbox-thumb" />
+      <img *ngFor="let img of lightbox.images; let i = index"
+           [src]="getImageUrl(img, 'thumb')"
+           [class.active]="lightbox.index === i"
+           (click)="lightbox.index = i"
+           (error)="roomImageService.onImgError($event, img)"
+           [alt]="'Miniatura ' + (i + 1)"
+           class="lightbox-thumb" />
     </div>
-
-    <!-- Counter -->
-    <div class="lightbox-counter">
-      {{ lightbox.index + 1 }} / {{ lightbox.images.length }}
-    </div>
-
+    <div class="lightbox-counter">{{ lightbox.index + 1 }} / {{ lightbox.images.length }}</div>
   </div>
 </div>

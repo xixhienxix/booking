@@ -110,6 +110,15 @@ export class BookingReservaService {
         ])
       );
 
+    const promoCode = huespedArray[0]?.promoCode;
+    if (promoCode) {
+      await firstValueFrom(
+        this.decrementInventario(promoCode).pipe(
+          catchError(e => { console.error('Promo decrement error:', e); return of(null); })
+        )
+      );
+    }
+
       // Send confirmation email
       const emailPayload: EmailPayload = {
         to: huespedArray[0].email,
@@ -130,5 +139,9 @@ export class BookingReservaService {
       console.error('Booking process error:', error);
       return { success: false, error: error.message };
     }
+  }
+
+  decrementInventario(codigo: string): Observable<any> {
+    return this.http.patch(this._hotelConfig.current?.apiUrl + `/promos/${codigo}/inventario`, {});
   }
 }

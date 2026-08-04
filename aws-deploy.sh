@@ -49,4 +49,4 @@ aws cloudfront create-invalidation \
   --distribution-id E2ZG7WVPSOS5HW \
   --paths "/*"
 
-echo "✅ Deploy complete! App should be live at https://d3lkfchxk2jil4.cloudfront.net"o
+echo "✅ Deploy complete! App should be live at https://d3lkfchxk2jil4.cloudfront.net"

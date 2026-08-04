@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { BehaviorSubject, Subject, firstValueFrom, forkJoin } from 'rxjs';
+import { BehaviorSubject, Subject, catchError, firstValueFrom, forkJoin, of } from 'rxjs';
 import { ICalendario, defaultCalendario } from 'src/app/_models/calendario.model';
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { TarifasService } from 'src/app/_service/tarifas.service';
@@ -204,15 +204,21 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     const currentStep = this.currentStep$.value;
 
     if (currentStep === 3) {
-      // Only guestForm is required — cardForm was removed from the UX
       this.step3.guestForm.markAllAsTouched();
       if (!this.step3.guestForm.valid) return;
- 
+
       const saved = await this.step3.submitBooking();
       if (!saved) {
         console.error('Reservation could not be saved');
         return;
       }
+
+      // ← Re-fetch promos immediately after successful save
+      await firstValueFrom(
+        this._promosBookingService.fetchPromos().pipe(
+          catchError(e => { console.error('Promo refresh error:', e); return of([]); })
+        )
+      );
     }
 
     const nextStep = currentStep + 1;
@@ -226,10 +232,11 @@ export class HorizontalComponent implements OnInit, OnDestroy {
     this.currentStep$.next(prev);
   }
 
-  resetStepper() {
+  async resetStepper() {
     this._disponibilidadService.changeMiReserva([]);
     this.currentStep$.next(2);
     this.isCurrentFormValid$.next(false);
+    await this.resetAfterBooking();
   }
 
   honQtyHabsUpdate(numeroHabs: number) {
@@ -246,5 +253,29 @@ export class HorizontalComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
+  }
+
+  async resetAfterBooking(): Promise<void> {
+    await firstValueFrom(this._promosBookingService.fetchPromos());
+
+    this._disponibilidadService.changeMiReserva([]);
+    this.hasSearched = false;
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); tomorrow.setHours(0,0,0,0);
+    this.intialDate = today;
+    this.endDate = tomorrow;
+
+    // ← clear the validated promo from the account state
+    this.account$.next({
+      ...this.account$.value,
+      validatedPromo: null,
+      codigoPromo: '',        
+      fechaInicial: today,
+      fechaFinal: tomorrow,
+    });
+
+    this.currentStep$.next(2);
+    this.isCurrentFormValid$.next(false);
   }
 }

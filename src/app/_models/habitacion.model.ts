@@ -6,6 +6,7 @@ export interface Habitacion
   Numero:string[],
   Tipo:string,
   Descripcion:string,
+  Caracteristicas:string,
   Personas:number,
   Adultos:number;
   Ninos:number;
@@ -27,6 +28,7 @@ export const DEFAULT_HAB = {
   Numero:[],
   Tipo:'',
   Descripcion:'',
+  Caracteristicas:'',
   Personas:1,
   Adultos:1,
   Ninos:0,
