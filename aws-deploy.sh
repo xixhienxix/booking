@@ -34,24 +34,13 @@ aws s3 cp $DIST_PATH/index.html s3://$BUCKET_NAME/index.html \
   --cache-control "no-cache,no-store,must-revalidate" \
   --content-type "text/html"
 
+# Replace the hotel configs section with:
 echo "🏨 Uploading hotel configs (no-cache)..."
-aws s3 cp src/hotel-config.json s3://$BUCKET_NAME/hotel-config.json \
+aws s3 sync dist/main/hotel-configs/ s3://$BUCKET_NAME/hotel-configs/ \
   --cache-control "no-cache,no-store,must-revalidate" \
   --content-type "application/json"
 
-aws s3 cp src/hotel-configs/movnext.json s3://$BUCKET_NAME/hotel-configs/movnext.json \
-  --cache-control "no-cache,no-store,must-revalidate" \
-  --content-type "application/json"
-
-aws s3 cp src/hotel-configs/hotel-palomas.json s3://$BUCKET_NAME/hotel-configs/hotel-palomas.json \
-  --cache-control "no-cache,no-store,must-revalidate" \
-  --content-type "application/json"
-
-aws s3 cp src/hotel-configs/hotel-palomas-express.json s3://$BUCKET_NAME/hotel-configs/hotel-palomas-express.json \
-  --cache-control "no-cache,no-store,must-revalidate" \
-  --content-type "application/json"
-
-aws s3 cp src/hotel-configs/hotel-palomas-nayarit.json s3://$BUCKET_NAME/hotel-configs/hotel-palomas-nayarit.json \
+aws s3 cp dist/main/hotel-config.json s3://$BUCKET_NAME/hotel-config.json \
   --cache-control "no-cache,no-store,must-revalidate" \
   --content-type "application/json"
 

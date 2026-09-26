@@ -1,0 +1,7 @@
+{
+  "hotelID":     "movnext",
+  "hotelNombre": "MovNext",
+  "hotelLogo":   "https://storage.googleapis.com/hotel-pokemon/logo.png",
+  "hotelColor":  "#00506a",
+  "apiUrl":      "https://milobify.com"
+}
