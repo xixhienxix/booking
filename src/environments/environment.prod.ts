@@ -10,4 +10,5 @@ export const environment = {
     'HotelDos':  'dev-secret-hoteldos',
     'HotelTres': 'dev-secret-hoteltres',
   } as Record<string, string>,
+    internalSecret: 'y3RB@5gX#Q6mv4eVZ2Lcz8!upG*M7daFqK$P1sRjHT9NnDbGx^Yf%WAoeLiXU0Ct'
 };

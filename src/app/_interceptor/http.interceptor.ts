@@ -23,7 +23,7 @@ export class HotelInterceptor implements HttpInterceptor {
 
     // One shared secret for all hotels — proves request came from this frontend
     const internalSecret = environment.internalSecret;
-
+    
     let url = req.url;
     if (!url.startsWith('http')) {
       url = `${apiUrl}${url.startsWith('/') ? '' : '/'}${url}`;
