@@ -1,6 +1,6 @@
 {
-  "hotelID":     "HotelDos",
-  "hotelNombre": "Hotel Tres",
+  "hotelID":     "las-palomas-nuevo-nayarit",
+  "hotelNombre": "Las Palomas Nuevo Nayarit",
   "hotelLogo":   "https://your-cdn.com/hoteldos-logo.png",
   "hotelColor":  "#8b2500",
   "apiUrl":      "https://milobify.com"

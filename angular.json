@@ -26,11 +26,20 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/hotel-config.json"
-            ],
+          "assets": [
+            "src/favicon.ico",
+            "src/assets",
+            {
+              "glob": "**/*",
+              "input": "src/hotel-configs",
+              "output": "/hotel-configs"
+            },
+            {
+              "glob": "hotel-config.json",
+              "input": "src",
+              "output": "/"
+            }
+          ],
             "styles": [
               "@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"

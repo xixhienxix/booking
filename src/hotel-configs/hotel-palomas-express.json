@@ -1,6 +1,6 @@
 {
-  "hotelID":     "HotelTres",
-  "hotelNombre": "Hotel Tres",
+  "hotelID":     "las-palomas-tepic-express",
+  "hotelNombre": "Las Palomas Tepic Express",
   "hotelLogo":   "https://your-cdn.com/hoteltres-logo.png",
   "hotelColor":  "#1a5c2a",
   "apiUrl":      "https://milobify.com"

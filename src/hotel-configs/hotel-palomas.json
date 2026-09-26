@@ -1,6 +1,6 @@
 {
-  "hotelID":     "HotelDos",
-  "hotelNombre": "Hotel Dos",
+  "hotelID":     "las-palomas-tepic",
+  "hotelNombre": "Las Palomas Tepic",
   "hotelLogo":   "https://your-cdn.com/hoteldos-logo.png",
   "hotelColor":  "#8b2500",
   "apiUrl":      "https://milobify.com"
