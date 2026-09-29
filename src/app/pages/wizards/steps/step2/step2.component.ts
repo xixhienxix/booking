@@ -175,56 +175,410 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
     this.onQtyHabsUpdate.emit(Number(value));
   }
 
-  async ngOnInit() {
-    console.log('%c[Step2] ngOnInit — intialDate:', 'color: yellow', this.intialDate, '| endDate:', this.endDate, '| hasSearched:', this.hasSearched);
+async ngOnInit() {
+  console.log(
+    '%c[Step2] ngOnInit — intialDate:',
+    'color: yellow',
+    this.intialDate,
+    '| endDate:',
+    this.endDate,
+    '| hasSearched:',
+    this.hasSearched
+  );
 
-    this.tarifas = await firstValueFrom(this._tarifasServices.getAll());
-    this.roomCodesComplete = await firstValueFrom(this._disponibilidadService.getAllHabitaciones());
+  // ============================================================
+  // 1. LOAD ALL TARIFAS
+  // ============================================================
+  this.tarifas = await firstValueFrom(
+    this._tarifasServices.getAll()
+  );
 
-    this.tarifasStandard = this.tarifas.filter(item => item.Tarifa === 'Tarifa Base');
-    this.tarifasTemporales = this.tarifas.filter(item => item.Tarifa === 'Tarifa De Temporada');
-    this.tarifasEspeciales = this.tarifas.filter(
-      item => item.Tarifa !== 'Tarifa Base' && item.Tarifa !== 'Tarifa De Temporada'
+  console.log(
+    '%c[Step2 DEBUG] tarifas from getAll():',
+    'color: #9c27b0; font-weight: bold',
+    this.tarifas
+  );
+
+  console.log(
+    '[Step2 DEBUG] tarifas count:',
+    this.tarifas?.length ?? 0
+  );
+
+  // ============================================================
+  // 2. LOAD COMPLETE ROOM CATALOG
+  // ============================================================
+  this.roomCodesComplete = await firstValueFrom(
+    this._disponibilidadService.getAllHabitaciones()
+  );
+
+  console.log(
+    '%c[Step2 DEBUG] roomCodesComplete:',
+    'color: #2196f3; font-weight: bold',
+    this.roomCodesComplete
+  );
+
+  console.log(
+    '[Step2 DEBUG] roomCodesComplete count:',
+    this.roomCodesComplete?.length ?? 0
+  );
+
+  console.table(
+    (this.roomCodesComplete ?? []).map((room, index) => ({
+      index,
+      Codigo: room.Codigo,
+      Numero: room.Numero,
+      Personas: room.Personas,
+      Adultos: room.Adultos,
+      Ninos: room.Ninos,
+      images: room.images?.length ?? 0
+    }))
+  );
+
+  // ============================================================
+  // 3. SPLIT TARIFAS
+  // ============================================================
+  this.tarifasStandard = this.tarifas.filter(
+    item => item.Tarifa === 'Tarifa Base'
+  );
+
+  this.tarifasTemporales = this.tarifas.filter(
+    item => item.Tarifa === 'Tarifa De Temporada'
+  );
+
+  this.tarifasEspeciales = this.tarifas.filter(
+    item =>
+      item.Tarifa !== 'Tarifa Base' &&
+      item.Tarifa !== 'Tarifa De Temporada'
+  );
+
+  console.log('[Step2 DEBUG] tarifas categorized:', {
+    standard: this.tarifasStandard.length,
+    temporales: this.tarifasTemporales.length,
+    especiales: this.tarifasEspeciales.length
+  });
+
+  // ============================================================
+  // 4. PROMO SUBSCRIPTION
+  // ============================================================
+  this._disponibilidadService.currentValidatedPromo.subscribe(promo => {
+    this.validatedPromo = promo;
+
+    console.log(
+      '[Step2 DEBUG] currentValidatedPromo:',
+      promo
+    );
+  });
+
+  // ============================================================
+  // 5. RESERVATION SUBSCRIPTION
+  // ============================================================
+  this._disponibilidadService.currentReserva.subscribe(reservas => {
+    const hasReserva = reservas.length > 0;
+
+    console.log(
+      '[Step2 DEBUG] currentReserva:',
+      reservas,
+      '| hasReserva:',
+      hasReserva
     );
 
-    this._disponibilidadService.currentValidatedPromo.subscribe(promo => {
-      this.validatedPromo = promo;
+    this.updateParentModel({}, hasReserva);
+  });
+
+  // ============================================================
+  // 6. CALCULATE NIGHTS
+  // ============================================================
+  this.totalNights = this.calcNights(
+    this.intialDate,
+    this.endDate
+  );
+
+  console.log(
+    '[Step2 DEBUG] totalNights:',
+    this.totalNights
+  );
+
+  // ============================================================
+  // 7. AVAILABLE ROOMS SUBSCRIPTION
+  // ============================================================
+  this._disponibilidadService.currentData.subscribe(res => {
+
+    console.log(
+      '%c[Step2 DEBUG] currentData RAW:',
+      'color: #ff9800; font-weight: bold',
+      res
+    );
+
+    console.log(
+      '[Step2 DEBUG] currentData RAW count:',
+      res?.length ?? 0
+    );
+
+    // Sort images so isCover is always index 0
+    this.habitaciones = res.map(hab => {
+      if (hab.images && hab.images.length > 1) {
+        return {
+          ...hab,
+          images: [...hab.images].sort(
+            (a, b) =>
+              (b.isCover ? 1 : 0) -
+              (a.isCover ? 1 : 0)
+          )
+        };
+      }
+
+      return hab;
     });
 
-    // BUG 1 FIX: validity is ONLY true when at least one room has been added
-    this._disponibilidadService.currentReserva.subscribe(reservas => {
-      const hasReserva = reservas.length > 0;
-      this.updateParentModel({}, hasReserva);
-    });
+    console.log(
+      '%c[Step2 DEBUG] habitaciones AFTER mapping:',
+      'color: #00bcd4; font-weight: bold',
+      this.habitaciones
+    );
 
-    this.totalNights = this.calcNights(this.intialDate, this.endDate);
+    console.table(
+      this.habitaciones.map((h, index) => ({
+        index,
+        Codigo: h.Codigo,
+        Numero: h.Numero,
+        Personas: h.Personas,
+        Adultos: h.Adultos,
+        Ninos: h.Ninos,
 
-    this._disponibilidadService.currentData.subscribe(res => {
-      // 1. Mapeamos el arreglo original para ordenar las imágenes de cada habitación
-      this.habitaciones = res.map(hab => {
-        // Validamos que la habitación tenga un arreglo de imágenes válido con más de 1 elemento
-        if (hab.images && hab.images.length > 1) {
-          return {
-            ...hab,
-            // Ordenamos: las que tengan isCover === true se restan primero y se van al índice 0
-            images: [...hab.images].sort((a, b) => (b.isCover ? 1 : 0) - (a.isCover ? 1 : 0))
-          };
-        }
-        return hab; // Si no tiene imágenes o solo tiene una, se queda intacta
-      });
+        Descripcion: h.Descripcion
+          ? h.Descripcion.substring(0, 50)
+          : '❌ EMPTY',
 
-      // Reset per-room habs map when availability changes
-      this.roomHabsMap = {};
-    });
+        Amenidades: h.Amenidades?.length ?? 0,
 
-    this._tarifasServices.currentData.subscribe(res => {
-      this.tarifasArray = [...res];
-    });
+        images: h.images?.length ?? 0,
 
-    if (!this.hasSearched) {
-      this.startEditSearch();
+        cover:
+          h.images?.find(img => img.isCover)?.key ??
+          '❌ NO COVER'
+      }))
+    );
+
+    // ----------------------------------------------------------
+    // IMPORTANT:
+    // Compare habitaciones against roomCodesComplete
+    // ----------------------------------------------------------
+
+    console.log(
+      '%c[Step2 DEBUG] ROOM CODE MATCH CHECK',
+      'color: red; font-weight: bold'
+    );
+
+    console.table(
+      this.habitaciones.map((h, index) => {
+
+        const roomCatalogMatch =
+          this.roomCodesComplete.find(
+            room => room.Codigo === h.Codigo
+          );
+
+        return {
+          index,
+          Codigo: h.Codigo,
+
+          foundInRoomCodesComplete:
+            !!roomCatalogMatch,
+
+          catalogAdultos:
+            roomCatalogMatch?.Adultos ?? '❌ NOT FOUND',
+
+          catalogNinos:
+            roomCatalogMatch?.Ninos ?? '❌ NOT FOUND',
+
+          catalogPersonas:
+            roomCatalogMatch?.Personas ?? '❌ NOT FOUND'
+        };
+      })
+    );
+
+    // Reset per-room habs map when availability changes
+    this.roomHabsMap = {};
+
+    // Run combined diagnostic if tarifas already arrived
+    if (this.tarifasArray?.length > 0) {
+      this.debugRooms();
+    } else {
+      console.log(
+        '[Step2 DEBUG] habitaciones ready, waiting for tarifasArray...'
+      );
     }
+  });
+
+  // ============================================================
+  // 8. AVAILABLE TARIFAS SUBSCRIPTION
+  // ============================================================
+  this._tarifasServices.currentData.subscribe(res => {
+
+    console.log(
+      '%c[Step2 DEBUG] tarifas currentData RAW:',
+      'color: #4caf50; font-weight: bold',
+      res
+    );
+
+    this.tarifasArray = [...res];
+
+    console.log(
+      '[Step2 DEBUG] tarifasArray count:',
+      this.tarifasArray.length
+    );
+
+    console.table(
+      this.tarifasArray.map((t, index) => ({
+        index,
+        Tarifa: t.Tarifa,
+
+        Habitacion: Array.isArray(t.Habitacion)
+          ? t.Habitacion.join(', ')
+          : t.Habitacion,
+
+        HabitacionType:
+          Array.isArray(t.Habitacion)
+            ? 'array'
+            : typeof t.Habitacion,
+
+        FormaPagoType:
+          Array.isArray(t.FormaPago)
+            ? 'array'
+            : typeof t.FormaPago,
+
+        CancelacionType:
+          Array.isArray(t.Cancelacion)
+            ? 'array'
+            : typeof t.Cancelacion
+      }))
+    );
+
+    // Run combined diagnostic if habitaciones already arrived
+    if (this.habitaciones?.length > 0) {
+      this.debugRooms();
+    } else {
+      console.log(
+        '[Step2 DEBUG] tarifasArray ready, waiting for habitaciones...'
+      );
+    }
+  });
+
+  // ============================================================
+  // 9. EXISTING SEARCH BEHAVIOR
+  // ============================================================
+  if (!this.hasSearched) {
+    console.log(
+      '[Step2 DEBUG] hasSearched=false → calling startEditSearch()'
+    );
+
+    this.startEditSearch();
   }
+
+  console.log(
+    '%c[Step2] ngOnInit COMPLETE',
+    'color: green; font-weight: bold'
+  );
+}
+
+private debugRooms(): void {
+
+  if (
+    !this.habitaciones?.length ||
+    !this.tarifasArray?.length
+  ) {
+    console.log(
+      '[Step2 DEBUG] debugRooms waiting...',
+      {
+        habitaciones: this.habitaciones?.length ?? 0,
+        tarifas: this.tarifasArray?.length ?? 0
+      }
+    );
+
+    return;
+  }
+
+  console.log(
+    '%c========== ROOMS TO RENDER ==========',
+    'color: #e91e63; font-weight: bold; font-size: 14px'
+  );
+
+  const habitacionesRender =
+    this.getHabitacionesConTarifa();
+
+  console.log(
+    '[Step2 DEBUG] habitaciones total:',
+    this.habitaciones.length
+  );
+
+  console.log(
+    '[Step2 DEBUG] habitaciones returned by getHabitacionesConTarifa():',
+    habitacionesRender.length
+  );
+
+  console.table(
+    habitacionesRender.map((h, index) => {
+
+      const catalogRoom =
+        this.roomCodesComplete.find(
+          room => room.Codigo === h.Codigo
+        );
+
+      const matchingTarifas =
+        this.tarifasArray.filter(t =>
+          t.Habitacion?.includes(h.Codigo)
+        );
+
+      return {
+        index,
+
+        Codigo: h.Codigo,
+
+        Numero: h.Numero,
+
+        Personas: h.Personas,
+
+        Adultos: h.Adultos,
+
+        Ninos: h.Ninos,
+
+        Descripcion:
+          h.Descripcion
+            ? '✅'
+            : '❌ EMPTY',
+
+        Amenidades:
+          h.Amenidades?.length ?? 0,
+
+        images:
+          h.images?.length ?? 0,
+
+        tarifas:
+          matchingTarifas.length,
+
+        catalogMatch:
+          catalogRoom
+            ? '✅'
+            : '❌ NOT FOUND',
+
+        catalogAdultos:
+          catalogRoom?.Adultos ?? '❌',
+
+        catalogNinos:
+          catalogRoom?.Ninos ?? '❌'
+      };
+    })
+  );
+
+  console.log(
+    '[Step2 DEBUG] FULL ROOMS TO RENDER:',
+    habitacionesRender
+  );
+
+  console.log(
+    '%c=====================================',
+    'color: #e91e63; font-weight: bold'
+  );
+}
 
   buildFeatures(tarifa: Tarifas): TarifaFeature[] {
 
