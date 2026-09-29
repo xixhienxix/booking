@@ -149,13 +149,18 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
   }
 
   getFeatures(tarifa: Tarifas): TarifaFeature[] {
-      if(!this.featureCache.has(tarifa.Tarifa)){
-          this.featureCache.set(
-              tarifa.Tarifa,
-              this.buildFeatures(tarifa)
-          );
-      }
-      return this.featureCache.get(tarifa.Tarifa)!;
+    const key =
+      (tarifa as any)._id ??
+      `${tarifa.Tarifa}__${JSON.stringify(tarifa.Habitacion)}`;
+
+    if (!this.featureCache.has(key)) {
+      this.featureCache.set(
+        key,
+        this.buildFeatures(tarifa)
+      );
+    }
+
+    return this.featureCache.get(key)!;
   }
 
   // BUG 2 FIX: get selected habs for a specific room+tarifa combo
@@ -421,7 +426,9 @@ async ngOnInit() {
     );
 
     this.tarifasArray = [...res];
-
+  // Tarifas changed, so cached features may no longer be valid
+  this.featureCache.clear();
+  
     console.log(
       '[Step2 DEBUG] tarifasArray count:',
       this.tarifasArray.length
@@ -580,44 +587,75 @@ private debugRooms(): void {
   );
 }
 
-  buildFeatures(tarifa: Tarifas): TarifaFeature[] {
+buildFeatures(tarifa: Tarifas): TarifaFeature[] {
+  const features: TarifaFeature[] = [];
 
-    const features: TarifaFeature[] = [];
-
+  // ============================================================
+  // FORMA DE PAGO
+  // ============================================================
+  if (Array.isArray(tarifa.FormaPago)) {
     tarifa.FormaPago
-        ?.filter(x => x.value)
-        .forEach(item => {
-            features.push({
-                label: this.paymentLabelMap[item.name] ?? item.name,
-                icon: this.iconMap.payment,
-                type: "payment"
-            });
+      .filter(item => item?.value)
+      .forEach(item => {
+        features.push({
+          label: this.paymentLabelMap[item.name] ?? item.name,
+          icon: this.iconMap.payment,
+          type: 'payment'
         });
+      });
+  } else if (tarifa.FormaPago) {
+    console.warn(
+      `[Step2] FormaPago is NOT an array for tarifa "${tarifa.Tarifa}"`,
+      tarifa.FormaPago
+    );
+  }
 
+  // ============================================================
+  // CANCELACION
+  // ============================================================
+  if (Array.isArray(tarifa.Cancelacion)) {
     tarifa.Cancelacion
-        ?.filter(x => x.value)
-        .forEach(item => {
-            features.push({
-                label: this.cancellationLabelMap[item.name] ?? item.name,
-                icon: this.iconMap.cancelation,
-                type: "cancelation"
-            });
-        });
-    if (tarifa.PlanAlimentos) {
+      .filter(item => item?.value)
+      .forEach(item => {
         features.push({
-            label: tarifa.PlanAlimentos,
-            icon: this.iconMap.food,
-            type: "food"
+          label:
+            this.cancellationLabelMap[item.name] ??
+            item.name,
+
+          icon: this.iconMap.cancelation,
+          type: 'cancelation'
         });
-    }
-    if (tarifa.FlexibilidadLogistica) {
-        features.push({
-            label: tarifa.FlexibilidadLogistica,
-            icon: this.iconMap.logistics,
-            type: "logistics"
-        });
-    }
-    return features;
+      });
+  } else if (tarifa.Cancelacion) {
+    console.warn(
+      `[Step2] Cancelacion is NOT an array for tarifa "${tarifa.Tarifa}"`,
+      tarifa.Cancelacion
+    );
+  }
+
+  // ============================================================
+  // PLAN DE ALIMENTOS
+  // ============================================================
+  if (tarifa.PlanAlimentos) {
+    features.push({
+      label: tarifa.PlanAlimentos,
+      icon: this.iconMap.food,
+      type: 'food'
+    });
+  }
+
+  // ============================================================
+  // FLEXIBILIDAD LOGISTICA
+  // ============================================================
+  if (tarifa.FlexibilidadLogistica) {
+    features.push({
+      label: tarifa.FlexibilidadLogistica,
+      icon: this.iconMap.logistics,
+      type: 'logistics'
+    });
+  }
+
+  return features;
 }
 
   ngOnChanges(changes: SimpleChanges): void {
