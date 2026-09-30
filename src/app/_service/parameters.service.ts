@@ -13,7 +13,7 @@ export class ParametersService {
     readonly parameters$ = this._parameters$.asObservable();
 
     private _parametersFront$ = new BehaviorSubject<Parametros_Front>(PARAMETROS_FRONT_DEFAULT_VALUES);
-    readonly parametersFront$ = this._parameters$.asObservable();
+    readonly parametersFront$ = this._parametersFront$.asObservable();
 
     constructor(private http: HttpClient, private _hotelConfig: HotelConfigService) {
     }

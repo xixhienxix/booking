@@ -148,7 +148,7 @@
         <span>{{ iva | currency }}</span>
       </div>
       <div class="price-summary-row">
-        <span>ISH (3%)</span>
+        <span>ISH ({{ ishPercent }}%)</span>
         <span>{{ ish | currency }}</span>
       </div>
       <div class="price-summary-divider"></div>
@@ -160,7 +160,7 @@
 
     <div class="tax-notice-widget">
       <mat-icon>info</mat-icon>
-      <span>Todos los precios son en MXN e incluyen IVA (16%) + ISH (3%)</span>
+      <span>Todos los precios son en MXN e incluyen IVA (16%) + ISH ({{ishPercent}}%)</span>
     </div>
 
   </div>

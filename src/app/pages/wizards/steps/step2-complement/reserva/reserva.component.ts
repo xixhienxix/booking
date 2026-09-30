@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { miReserva } from 'src/app/_models/mireserva.model';
 import { Promos } from 'src/app/_models/promos.model';
+import { ParametersService } from 'src/app/_service/parameters.service';
+import { combineLatest, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-reserva',
@@ -17,18 +19,38 @@ export class ReservaComponent implements OnInit {
   ish: number = 0;
   total: number = 0;
   validatedPromo: Promos | null = null;
+  ishPercent = 0;
+  private readonly IVA_RATE = 0.16;
+  private destroy$ = new Subject<void>();
 
-  constructor(private _disponibilidadService: DisponibilidadService) {}
+  constructor(private _disponibilidadService: DisponibilidadService,
+    private _parametrosService: ParametersService
+  ) {}
 
   ngOnInit() {
-    this._disponibilidadService.currentValidatedPromo.subscribe(promo => {
-      this.validatedPromo = promo;
-    });
+    this._disponibilidadService.currentValidatedPromo
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(promo => (this.validatedPromo = promo));
 
-    this._disponibilidadService.currentReserva.subscribe(val => {
-      this.miReserva = val;
-      this.recalcTotals(val);
-    });
+    // Recalculate whenever the reservation OR the parameters change
+    combineLatest([
+      this._disponibilidadService.currentReserva,
+      this._parametrosService.parametersFront$
+    ])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(([reserva, params]) => {
+        this.ishPercent = params.ish ?? 0;
+        this.miReserva = reserva;
+        this.recalcTotals(reserva);
+      });
+
+    // Only needed if nothing else (e.g. APP_INITIALIZER) already loads them
+    this._parametrosService.getFrontParameters().subscribe();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // Nights per room
@@ -55,22 +77,25 @@ export class ReservaComponent implements OnInit {
     this.ish = 0;
     this.total = 0;
 
+    const ishRate = this.ishPercent / 100;
+    const roomTaxFactor = 1 + this.IVA_RATE + ishRate;
+
     for (const reserva of val) {
-      // Room price already includes IVA 16% + ISH 3% = factor 1.19
+      // Room price already includes IVA + ISH
       const totalRoomWithTaxes = reserva.precioTarifa || 0;
-      const netRoomPrice = totalRoomWithTaxes / 1.19;
+      const netRoomPrice = totalRoomWithTaxes / roomTaxFactor;
 
       this.subtotal += netRoomPrice;
-      this.iva += netRoomPrice * 0.16;
-      this.ish += netRoomPrice * 0.03;
+      this.iva += netRoomPrice * this.IVA_RATE;
+      this.ish += netRoomPrice * ishRate;
       this.total += totalRoomWithTaxes;
 
-      // Packages — IVA 16% only
+      // Packages: IVA only
       for (const pkg of reserva.packageList ?? []) {
         const pkgTotal = (pkg.Precio || 0) * (pkg.Cantidad || 1);
-        const netPkg = pkgTotal / 1.16;
+        const netPkg = pkgTotal / (1 + this.IVA_RATE);
         this.subtotal += netPkg;
-        this.iva += netPkg * 0.16;
+        this.iva += netPkg * this.IVA_RATE;
         this.total += pkgTotal;
       }
     }
