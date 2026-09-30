@@ -154,10 +154,11 @@ export class Step2Component implements OnInit, OnChanges, OnDestroy {
       `${tarifa.Tarifa}__${JSON.stringify(tarifa.Habitacion)}`;
 
     if (!this.featureCache.has(key)) {
-      this.featureCache.set(
-        key,
-        this.buildFeatures(tarifa)
-      );
+
+      const features = this.buildFeatures(tarifa)
+        .filter(feature => feature.type !== 'cancelation');
+
+      this.featureCache.set(key, features);
     }
 
     return this.featureCache.get(key)!;
@@ -428,7 +429,7 @@ async ngOnInit() {
     this.tarifasArray = [...res];
   // Tarifas changed, so cached features may no longer be valid
   this.featureCache.clear();
-  
+
     console.log(
       '[Step2 DEBUG] tarifasArray count:',
       this.tarifasArray.length
@@ -667,6 +668,20 @@ buildFeatures(tarifa: Tarifas): TarifaFeature[] {
     }
     if (changes['hasSearched']) {
       console.log('[Step2] ngOnChanges — hasSearched changed to:', this.hasSearched);
+    }
+  }
+
+  onAmenidadImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+
+    // Hide the broken image
+    img.style.display = 'none';
+
+    // Show our fallback icon
+    const fallback = img.nextElementSibling as HTMLElement;
+
+    if (fallback) {
+      fallback.style.display = 'inline-flex';
     }
   }
 

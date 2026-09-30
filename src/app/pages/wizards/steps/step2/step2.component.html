@@ -191,12 +191,20 @@
               <span><strong>Máx. Personas:</strong> {{ dispo.Personas }}</span>
             </div>
             <div class="amenidades">
-              <ng-container *ngFor="let amenidad of dispo.Amenidades">
-                <div class="amenidad-item">
-                  <img src="../../../../../assets/media/icons/custom/{{ amenidad }}.png" [alt]="amenidad" />
-                  <span>{{ amenidad }}</span>
-                </div>
-              </ng-container>
+            <ng-container *ngFor="let amenidad of dispo.Amenidades">
+              <div class="amenidad-item">
+                <img
+                  class="amenidad-icon"
+                  [src]="'assets/media/icons/custom/' + amenidad + '.png'"
+                  [alt]="amenidad"
+                  (error)="onAmenidadImageError($event)"
+                />
+
+                <span class="amenidad-fallback-icon" aria-hidden="true">✦</span>
+
+                <span>{{ amenidad }}</span>
+              </div>
+            </ng-container>
             </div>
           </div>
         </div>
@@ -279,20 +287,21 @@
 
               <div class="tarifa-features">
 
-                  <h5 class="features-title">Características</h5>
+              <ng-container *ngIf="getFeatures(tarifas).length > 0">
 
-              <div class="features-list">
+                <h3 class="features-title">Características</h3>
+
+                <div class="features">
                   <div
-                      class="feature-chip"
-                      *ngFor="let feature of getFeatures(tarifas)">
-                      <mat-icon class="feature-icon">
-                          {{ feature.icon }}
-                      </mat-icon>
-                      <span class="feature-label">
-                          {{ feature.label }}
-                      </span>
+                    class="feature-chip"
+                    *ngFor="let feature of getFeatures(tarifas)"
+                  >
+                    <mat-icon>{{ feature.icon }}</mat-icon>
+                    <span>{{ feature.label }}</span>
                   </div>
-              </div>
+                </div>
+
+              </ng-container>
 
               </div>
 
@@ -475,7 +484,7 @@
         </div>
       </div>
     </div>
-  </ng-container>
+  </ng-container> 
 
 </ng-container>
 
