@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { firstValueFrom, map, switchMap } from 'rxjs';
+import { firstValueFrom, map, switchMap, forkJoin } from 'rxjs';
 import { ICalendario } from 'src/app/_models/calendario.model';
 import { PackagesService } from 'src/app/_service/packages.service';
 import { Packages } from 'src/app/_models/packages.model';
@@ -73,20 +73,40 @@ export class Step3Component implements OnInit {
     });
   }
 
+  get bancoCuenta(): string {
+    return this.getBancoFromClabe(this.currentParametrosFront?.clabe);
+  }
+
   getMiReserva(): miReserva[] {
     return this._disponibilidadService.getMiReserva();
   }
 
   async ngOnInit() {
     this.initForm();
-    this._parametrosService.getAll().subscribe();
-    this._parametrosService.getFrontParameters().subscribe();
-    this.currentParametros = this._parametrosService.currentParameters;
-    this.currentParametrosFront = this._parametrosService.currentFrontParameters;
+
+    const { parametros, parametrosFront } = await firstValueFrom(
+      forkJoin({
+        parametros: this._parametrosService.getAll(),
+        parametrosFront: this._parametrosService.getFrontParameters()
+      })
+    );
+
+    this.currentParametros = parametros;
+    this.currentParametrosFront = parametrosFront;
+
+    console.log('[Step3] parametros:', parametros);
+    console.log('[Step3] parametrosFront:', parametrosFront);
+    console.log(
+      '[Step3] room_auto_assign:',
+      parametros?.room_auto_assign
+    );
 
     // Build today label: "Miércoles 6 de Mayo del 2026"
     const now = new Date();
-    this.todayLabel = `${this.DAYS_ES[now.getDay()]} ${now.getDate()} de ${this.MONTHS_ES[now.getMonth()].charAt(0).toUpperCase() + this.MONTHS_ES[now.getMonth()].slice(1)} del ${now.getFullYear()}`;
+    this.todayLabel =
+        `${this.DAYS_ES[now.getDay()]} ${now.getDate()} de ` +
+        `${this.MONTHS_ES[now.getMonth()].charAt(0).toUpperCase() + this.MONTHS_ES[now.getMonth()].slice(1)} ` +
+        `del ${now.getFullYear()}`;
 
     this._disponibilidadService.currentValidatedPromo.subscribe(p => this.validatedPromo = p);
     this._disponibilidadService.currentFechaIni.subscribe(d => this.checkIn = d);
@@ -143,6 +163,49 @@ export class Step3Component implements OnInit {
         .map(item => ({ ...item, selectedCantidad: 1 }));
     });
   }
+
+  getBancoFromClabe(clabe: string | null | undefined): string {
+    if (!clabe) return '';
+
+    const cleanClabe = clabe.replace(/\D/g, '');
+
+    if (cleanClabe.length < 3) return '';
+
+    const bancoCode = cleanClabe.substring(0, 3);
+
+    const bancos: Record<string, string> = {
+      '002': 'Citibanamex',
+      '006': 'Banco Nacional de México',
+      '009': 'Banco Internacional',
+      '012': 'BBVA México',
+      '014': 'Santander',
+      '019': 'Banca Mifel',
+      '021': 'HSBC México',
+      '030': 'BanBajío',
+      '036': 'Inbursa',
+      '044': 'Scotiabank',
+      '058': 'Banregio',
+      '062': 'Afirme',
+      '072': 'Banorte',
+      '106': 'Bank of America México',
+      '127': 'Banco Azteca',
+      '128': 'Banco Autofin',
+      '129': 'Banco Famsa',
+      '130': 'Compartamos Banco',
+      '132': 'Multiva',
+      '137': 'Bancoppel',
+      '143': 'CIBanco',
+      '147': 'Banco de Inversión Afirme',
+      '152': 'Invex',
+      '154': 'Banco Covalto',
+      '156': 'Sabadell',
+      '166': 'Banco del Bajío',
+      '646': 'STP'
+    };
+
+    return bancos[bancoCode] ?? `Institución bancaria (${bancoCode})`;
+  }
+
 
   agregarExtraAHabitacion(packages: PackagesSimplex, reserva: miReserva) {
     const currentReserva = this._disponibilidadService.getMiReserva().map(r => ({
@@ -282,21 +345,54 @@ export class Step3Component implements OnInit {
   }
 
   async submitBooking(): Promise<boolean> {
-    try {
-      this._spinnerService.loadingState = true;
-      const formData = this.guestForm.value;
-      const miReserva = this._disponibilidadService.getMiReserva();
-      if (!miReserva.length) return false;
+  this._spinnerService.loadingState = true;
 
-      const folio = await firstValueFrom(this._folioService.getBookingFolio());
-      let currentFolioValue = parseInt(folio.Folio, 10);
-      localStorage.setItem('guestEmail', formData.email);
+  try {
+    console.log('[Step3] ===== SUBMIT BOOKING START =====');
 
-      const allTarifas = await firstValueFrom(this._tarifasService.currentData);
-      const standardRatesArray = allTarifas.filter(t => t.Tarifa === 'Tarifa Base');
-      const tempRatesArray = allTarifas.filter(t => t.Tarifa === 'Tarifa De Temporada');
+    const formData = this.guestForm.value;
+    const miReserva = this._disponibilidadService.getMiReserva();
 
-      const huespedArray: BookingHuesped[] = [];
+    console.log('[Step3] formData:', formData);
+    console.log('[Step3] miReserva:', miReserva);
+
+    if (!miReserva.length) {
+      console.error('[Step3] No reservations found');
+      return false;
+    }
+
+    console.log('[Step3] requesting folio...');
+
+    const folio = await firstValueFrom(
+      this._folioService.getBookingFolio()
+    );
+
+    console.log('[Step3] folio received:', folio);
+
+    let currentFolioValue = parseInt(folio.Folio, 10);
+
+    localStorage.setItem('guestEmail', formData.email);
+
+    console.log('[Step3] requesting tarifas...');
+
+    const allTarifas = await firstValueFrom(
+      this._tarifasService.getAll()
+    );
+
+    console.log('[Step3] tarifas received:', allTarifas);
+
+    const standardRatesArray = allTarifas.filter(
+      t => t.Tarifa === 'Tarifa Base'
+    );
+
+    const tempRatesArray = allTarifas.filter(
+      t => t.Tarifa === 'Tarifa De Temporada'
+    );
+
+    console.log('[Step3] Base rates:', standardRatesArray);
+    console.log('[Step3] Seasonal rates:', tempRatesArray);
+
+    const huespedArray: BookingHuesped[] = [];
 
       for (const reserva of miReserva) {
         const folioStr = folio.Letra + currentFolioValue;
@@ -317,9 +413,24 @@ export class Step3Component implements OnInit {
         const salida = DateTime.fromJSDate(reservaCheckOut)
           .set({ hour: 12, minute: 0, second: 0 }).toISO()!;
 
+        console.log('[Step3] Looking for tarifa:', {
+          nombreTarifa: reserva.nombreTarifa,
+          codigoCuarto: reserva.codigoCuarto
+        });
+
+        console.log(
+          '[Step3] available tarifa names:',
+          allTarifas.map(t => ({
+            Tarifa: t.Tarifa,
+            Habitacion: t.Habitacion
+          }))
+        );
+          
         const fullTarifa = allTarifas.find(t =>
           t.Tarifa === reserva.nombreTarifa && t.Habitacion.includes(reserva.codigoCuarto)
         );
+
+        console.log('[Step3] fullTarifa found:', fullTarifa);
 
         if (!fullTarifa) {
           console.error(`Tarifa not found for ${reserva.codigoCuarto} - ${reserva.nombreTarifa}`);
@@ -349,6 +460,11 @@ export class Step3Component implements OnInit {
         const room = roomsArray.find(r => r.codigo === reserva.codigoCuarto);
         const numero = room?.numero ?? '';
 
+        const shouldAutoAssign =
+          this.currentParametros?.room_auto_assign ?? false;
+
+        console.log('[Step3] room_auto_assign:', shouldAutoAssign);
+
         const huesped: BookingHuesped = {
           folio: folioStr,
           adultos: reserva.cantidadAdultos,
@@ -376,7 +492,7 @@ export class Step3Component implements OnInit {
           ciudad: '',
           codigoPostal: '',
           lenguaje: '',
-          numeroCuarto: this.currentParametros.room_auto_assign ? numero : '',
+          numeroCuarto: shouldAutoAssign ? numero : '',          
           tipoHuesped: '',
           notas: formData.requerimiento ?? '',
           vip: '',
@@ -391,14 +507,26 @@ export class Step3Component implements OnInit {
         currentFolioValue++;
       }
 
+      console.log(
+        '[Step3] FINAL huespedArray:',
+        JSON.parse(JSON.stringify(huespedArray))
+      );
+
+      console.log('[Step3] calling processBooking...');
+
       const result = await this._bookingReservaService.processBooking(huespedArray, 'America/Mexico_City');
       this._spinnerService.loadingState = false;
+
+      console.log('[Step3] processBooking result:', result);
+
       return result.success;
 
-    } catch (err) {
-      this._spinnerService.loadingState = false;
-      console.error('submitBooking error:', err);
-      return false;
-    }
+  } catch (err) {
+    console.error('[Step3] submitBooking FAILED:', err);
+    return false;
+
+  } finally {
+    this._spinnerService.loadingState = false;
+  }
   }
 }

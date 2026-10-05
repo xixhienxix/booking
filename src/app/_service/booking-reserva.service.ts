@@ -2,10 +2,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, forkJoin, firstValueFrom, of, catchError } from 'rxjs';
-import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { DateTime } from 'luxon';
 import { HotelConfigService } from './hotel-config.service';
+import { shareReplay, map } from 'rxjs/operators';
 
 export interface BookingHuesped {
   folio: string;
@@ -45,9 +45,9 @@ export interface BookingHuesped {
   promoCode: string;
 }
 
+
 export interface EmailPayload {
   to: string;
-  from: string;
   subject: string;
   nombre: string;
   folio: string;
@@ -59,7 +59,11 @@ export interface EmailPayload {
 @Injectable({ providedIn: 'root' })
 export class BookingReservaService {
 
+private lastEmailPayload: EmailPayload | null = null;
+emailSent = false;
+
   constructor(private http: HttpClient, private _hotelConfig: HotelConfigService ) {}
+  private prefix$?: Observable<string>;
 
   saveHuespedes(huespedArray: BookingHuesped[]): Observable<any> {
     return this.http.post<any>(
@@ -87,7 +91,7 @@ export class BookingReservaService {
   async processBooking(
     huespedArray: BookingHuesped[],
     tz: string
-  ): Promise<{ success: boolean; error?: string }> {
+  ): Promise<{ success: boolean; emailSent?: boolean; error?: string }> {
     try {
       const pago = huespedArray.map(item => ({
         Folio: item.folio,
@@ -102,38 +106,54 @@ export class BookingReservaService {
         Cajero: 'BOOKING_WEB'
       }));
 
-      // Save huesped + estado de cuenta in parallel
-      const [huespedRes] = await firstValueFrom(
+      // 1) Save huesped + estado de cuenta in parallel
+      await firstValueFrom(
         forkJoin([
-          this.saveHuespedes(huespedArray).pipe(catchError(e => { console.error(e); return of(null); })),
-          this.saveEstadoCuenta(pago).pipe(catchError(e => { console.error(e); return of(null); })),
+          this.saveHuespedes(huespedArray).pipe(
+            catchError(e => { console.error('saveHuespedes error:', e); return of(null); })
+          ),
+          this.saveEstadoCuenta(pago).pipe(
+            catchError(e => { console.error('saveEstadoCuenta error:', e); return of(null); })
+          ),
         ])
       );
 
-    const promoCode = huespedArray[0]?.promoCode;
-    if (promoCode) {
-      await firstValueFrom(
-        this.decrementInventario(promoCode).pipe(
-          catchError(e => { console.error('Promo decrement error:', e); return of(null); })
-        )
-      );
-    }
+      // 2) Promo inventory
+      const promoCode = huespedArray[0]?.promoCode;
+      if (promoCode) {
+        await firstValueFrom(
+          this.decrementInventario(promoCode).pipe(
+            catchError(e => { console.error('Promo decrement error:', e); return of(null); })
+          )
+        );
+      }
 
-      // Send confirmation email
+      // 3) Reservation code = PREFIX-folio (falls back to the raw folio)
+      let reservationCode = huespedArray[0].folio;
+      try {
+        const prefix = await firstValueFrom(this.getHotelPrefix());
+        reservationCode = this.buildReservationCode(prefix, huespedArray[0].folio);
+      } catch (e) {
+        console.error('Could not fetch hotel prefix, using raw folio', e);
+      }
+      localStorage.setItem('reservationCode', reservationCode);
+
+      // 4) Confirmation email (backend picks the hotel sender, then the fallback)
       const emailPayload: EmailPayload = {
         to: huespedArray[0].email,
-        from: 'zefraoracle@gmail.com',
-        subject: 'Reservación Confirmada — Hotel Pokemon',
+        subject: 'Reservación Confirmada',
         nombre: huespedArray.map(h => h.nombre).join(', '),
         folio: huespedArray.map(h => h.folio).join(', '),
         llegada: huespedArray[0].llegada,
         salida: huespedArray[0].salida,
-        reservationCode: huespedArray[0].folio,
+        reservationCode,
       };
 
-      await firstValueFrom(this.sendConfirmationEmail(emailPayload));
+      this.lastEmailPayload = emailPayload;
+      const res = await firstValueFrom(this.sendConfirmationEmail(emailPayload));
+      this.emailSent = res !== null;
 
-      return { success: true };
+      return { success: true, emailSent: this.emailSent };
 
     } catch (error: any) {
       console.error('Booking process error:', error);
@@ -143,5 +163,35 @@ export class BookingReservaService {
 
   decrementInventario(codigo: string): Observable<any> {
     return this.http.patch(this._hotelConfig.current?.apiUrl + `/promos/${codigo}/inventario`, {});
+  }
+
+  getHotelPrefix(): Observable<string> {
+    if (!this.prefix$) {
+      this.prefix$ = this.http
+        .get<{ prefix: string }>(this._hotelConfig.current?.apiUrl + '/hotel/prefix')
+        .pipe(map(r => r.prefix), shareReplay(1));
+    }
+    return this.prefix$;
+  }
+
+  resendConfirmation(): Observable<{ ok: boolean; via?: string }> {
+    if (!this.lastEmailPayload) return of({ ok: false });
+
+    return this.http
+      .post<{ via?: string }>(
+        this._hotelConfig.current?.apiUrl + '/mail/send',
+        this.lastEmailPayload
+      )
+      .pipe(
+        map(r => ({ ok: true, via: r?.via })),
+        catchError(err => {
+          console.error('Resend error:', err);
+          return of({ ok: false });
+        })
+      );
+  }
+
+  buildReservationCode(prefix: string, code: string): string {
+    return `${prefix}-${code}`;
   }
 }

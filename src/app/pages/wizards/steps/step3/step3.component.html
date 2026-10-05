@@ -180,10 +180,30 @@
         </div>
       </div>
       <ul class="bank-details-list">
-        <li><span class="bank-detail-key">Titular:</span> <span class="bank-detail-val">{{ currentParametrosFront.nombre_cuenta  }}</span></li>
-        <li><span class="bank-detail-key">Banco:</span> <span class="bank-detail-val">{{ 'BBVA' }}</span></li>
-        <li><span class="bank-detail-key">Cuenta CLABE:</span> <span class="bank-detail-val clabe">{{ currentParametrosFront.clabe  }}</span></li>
+
+        <li>
+          <span class="bank-detail-key">Titular:</span>
+          <span class="bank-detail-val">
+            {{ currentParametrosFront.nombre_cuenta || '—' }}
+          </span>
+        </li>
+
+        <li>
+          <span class="bank-detail-key">Banco:</span>
+          <span class="bank-detail-val">
+            {{ bancoCuenta || '—' }}
+          </span>
+        </li>
+
+        <li>
+          <span class="bank-detail-key">Cuenta CLABE:</span>
+          <span class="bank-detail-val clabe">
+            {{ currentParametrosFront.clabe || '—' }}
+          </span>
+        </li>
+
       </ul>
+
     </div>
 
     <!-- Bloque 3: Siguientes pasos / WhatsApp -->

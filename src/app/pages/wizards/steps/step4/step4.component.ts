@@ -1,15 +1,16 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { DisponibilidadService } from 'src/app/_service/disponibilidad.service';
 import { miReserva } from 'src/app/_models/mireserva.model';
 import { Promos } from 'src/app/_models/promos.model';
 import { HotelConfigService } from 'src/app/_service/hotel-config.service';
+import { BookingReservaService, EmailPayload } from 'src/app/_service/booking-reserva.service';
 
 @Component({
   selector: 'app-step5',
   templateUrl: './step4.component.html',
   styleUrls: ['./step4.component.scss']
 })
-export class Step4Component implements OnInit {
+export class Step4Component implements OnInit, OnDestroy {
 
   miReserva: miReserva[] = [];
   validatedPromo: Promos | null = null;
@@ -22,6 +23,11 @@ export class Step4Component implements OnInit {
   ish: number = 0;
   total: number = 0;
   totalDescuento: number = 0;
+  
+  emailSent = true;
+  resendState: 'idle' | 'sending' | 'sent' | 'error' = 'idle';
+  resendCooldown = 0;
+  private cooldownTimer?: any;
 
   @Output() honHomeButton = new EventEmitter<void>();
 
@@ -33,10 +39,11 @@ export class Step4Component implements OnInit {
   constructor(
     private _disponibilidadService: DisponibilidadService,
     private _hotelConfig: HotelConfigService,
+    private _bookingReserva: BookingReservaService,
   ) {}
 
   ngOnInit(): void {
-    this.confirmationNumber = 'HPK-' + Date.now().toString().slice(-8).toUpperCase();
+    this.confirmationNumber = localStorage.getItem('reservationCode') ?? '';    
     this.hotelNombre = this._hotelConfig.current?.hotelNombre ?? 'el hotel';
     this.guestEmail = localStorage.getItem('guestEmail') ?? '';
 
@@ -65,6 +72,32 @@ export class Step4Component implements OnInit {
     this._disponibilidadService.currentValidatedPromo.subscribe(promo => {
       this.validatedPromo = promo;
     });
+
+    this.emailSent = this._bookingReserva.emailSent;
+
+  }
+
+  resendConfirmation(): void {
+      if (this.resendState === 'sending' || this.resendCooldown > 0) return;
+      this.resendState = 'sending';
+
+      this._bookingReserva.resendConfirmation().subscribe(res => {
+        this.resendState = res.ok ? 'sent' : 'error';
+        if (res.ok) {
+          this.emailSent = true;
+          console.log('[Step4] confirmation resent via:', res.via); // 'hotel' or 'platform'
+          this.startCooldown(30);
+        }
+      });
+    }
+
+  private startCooldown(seconds: number): void {
+    this.resendCooldown = seconds;
+    clearInterval(this.cooldownTimer);
+    this.cooldownTimer = setInterval(() => {
+      this.resendCooldown--;
+      if (this.resendCooldown <= 0) clearInterval(this.cooldownTimer);
+    }, 1000);
   }
 
   // Format date without relying on Angular locale pipe registration
@@ -117,5 +150,10 @@ export class Step4Component implements OnInit {
 
   printConfirmation(): void {
     window.print();
+  }
+
+
+  ngOnDestroy(): void {
+    clearInterval(this.cooldownTimer);
   }
 }

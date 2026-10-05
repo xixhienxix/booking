@@ -141,17 +141,34 @@
   </mat-card>
 
   <!-- Email notice -->
-  <mat-card class="notice-card">
-    <mat-icon class="notice-icon">mark_email_read</mat-icon>
-    <div class="notice-content">
-      <h4>Confirmación enviada</h4>
-      <p>
-        Hemos enviado los detalles completos de tu reservación a
-        <strong>{{ guestEmail }}</strong>.<br>
-        Si no lo ves en tu bandeja de entrada, revisa la carpeta de spam.
-      </p>
+<mat-card class="notice-card">
+  <mat-icon class="notice-icon">{{ emailSent ? 'mark_email_read' : 'mail_outline' }}</mat-icon>
+  <div class="notice-content">
+    <h4>{{ emailSent ? 'Confirmación enviada' : 'No pudimos enviar el correo' }}</h4>
+    <p *ngIf="emailSent">
+      Hemos enviado los detalles completos de tu reservación a
+      <strong>{{ guestEmail }}</strong>.<br>
+      Si no lo ves en tu bandeja de entrada, revisa la carpeta de spam.
+    </p>
+    <p *ngIf="!emailSent">
+      Tu reservación está confirmada, pero el correo a
+      <strong>{{ guestEmail }}</strong> no pudo enviarse. Guarda tu número de confirmación
+      o intenta reenviarlo.
+    </p>
+
+    <div class="resend-row">
+      <button mat-stroked-button type="button" (click)="resendConfirmation()"
+              [disabled]="resendState === 'sending' || resendCooldown > 0">
+        <mat-icon>forward_to_inbox</mat-icon>
+        {{ resendState === 'sending' ? 'Enviando...'
+           : resendCooldown > 0 ? 'Reenviar en ' + resendCooldown + 's'
+           : 'Reenviar confirmación' }}
+      </button>
+      <span *ngIf="resendState === 'sent'" class="resend-ok">Correo reenviado</span>
+      <span *ngIf="resendState === 'error'" class="resend-err">No se pudo enviar. Intenta de nuevo.</span>
     </div>
-  </mat-card>
+  </div>
+</mat-card>
 
   <!-- Next steps -->
   <mat-card class="detail-card">

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { DEFAULT_PARAMETERS, PARAMETERS, Parametros_Front, PARAMETROS_FRONT_DEFAULT_VALUES } from "../_models/parameters.model";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "src/environments/environment";
-import { BehaviorSubject, Observable, tap } from "rxjs";
+import { BehaviorSubject, map, Observable, tap } from "rxjs";
 import { HotelConfigService } from "./hotel-config.service";
 
 @Injectable({
@@ -27,9 +27,14 @@ export class ParametersService {
     }
 
     getAll(): Observable<PARAMETERS> {
-        return this.http.get<PARAMETERS>(`${this._hotelConfig.current?.apiUrl}/booking/parameters`).pipe(
-            tap((parameters: PARAMETERS) => this._parameters$.next(parameters)
-        ));
+        return this.http
+            .get<PARAMETERS | null>(
+                `${this._hotelConfig.current?.apiUrl}/booking/parameters`
+            )
+            .pipe(
+                map((parameters) => parameters ?? DEFAULT_PARAMETERS),
+                tap((parameters) => this._parameters$.next(parameters))
+            );
     }
 
     getFrontParameters(): Observable<Parametros_Front> {
